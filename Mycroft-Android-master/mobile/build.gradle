@@ -25,7 +25,6 @@ apply plugin: 'kotlin-android-extensions'
 android {
 
     compileSdkVersion rootProject.compileSdkVersion
-    buildToolsVersion rootProject.buildToolsVersion
     defaultConfig {
         applicationId "mycroft.ai"
         minSdkVersion rootProject.minSdkVersion
