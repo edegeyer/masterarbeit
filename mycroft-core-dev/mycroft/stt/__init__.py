@@ -390,15 +390,15 @@ class GoVivaceSTT(TokenSTT):
 class STTFactory:
     CLASSES = {
         "mycroft": MycroftSTT,
-        "google": GoogleSTT,
-        "google_cloud": GoogleCloudSTT,
-        "google_cloud_streaming": GoogleCloudStreamingSTT,
-        "wit": WITSTT,
-        "ibm": IBMSTT,
+        #"google": GoogleSTT,
+        #"google_cloud": GoogleCloudSTT,
+        #"google_cloud_streaming": GoogleCloudStreamingSTT,
+        #"wit": WITSTT,
+        #"ibm": IBMSTT,
         "kaldi": KaldiSTT,
-        "bing": BingSTT,
-        "govivace": GoVivaceSTT,
-        "houndify": HoundifySTT,
+        #"bing": BingSTT,
+        #"govivace": GoVivaceSTT,
+        #"houndify": HoundifySTT,
         "deepspeech_server": DeepSpeechServerSTT,
         "deepspeech_stream_server": DeepSpeechStreamServerSTT,
         "mycroft_deepspeech": MycroftDeepSpeechSTT
@@ -406,7 +406,8 @@ class STTFactory:
 
     @staticmethod
     def create():
+        # TODO: hier so anpassen, dass es nicht zum auslesen der Daten aus der Standardconfig kommt, sondern aus eigener Datei
         config = Configuration.get().get("stt", {})
-        module = config.get("module", "mycroft")
+        module = config.get("module", "mycroft_deepspeech")
         clazz = STTFactory.CLASSES.get(module)
         return clazz()

@@ -208,6 +208,7 @@ class Configuration:
         if not configs:
             configs = [LocalConf(DEFAULT_CONFIG), RemoteConf(),
                        LocalConf(SYSTEM_CONFIG), LocalConf(USER_CONFIG),
+
                        Configuration.__patch]
         else:
             # Handle strings in stack
