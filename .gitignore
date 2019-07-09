@@ -30,3 +30,5 @@ proguard/
 
 # Android Studio captures folder
 captures/
+
+mycroft-core-dev/venv/
