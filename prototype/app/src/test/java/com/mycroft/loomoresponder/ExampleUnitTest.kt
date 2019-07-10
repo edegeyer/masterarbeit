@@ -1,4 +1,4 @@
-package com.example.prototyp
+package com.mycroft.loomoresponder
 
 import org.junit.Test
 
