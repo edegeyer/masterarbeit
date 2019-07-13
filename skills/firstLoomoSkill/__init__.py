@@ -14,15 +14,14 @@ from mycroft.util.log import LOG
 # Each skill is contained within its own class, which inherits base methods
 # from the MycroftSkill class.  You extend this class as shown below.
 
-# TODO: Change "Template" to a unique name for your skill
-class TemplateSkill(MycroftSkill):
+class LoomoControlSkill(MycroftSkill):
 
     # The constructor of the skill, which calls MycroftSkill's constructor
     def __init__(self):
         super(TemplateSkill, self).__init__(name="TemplateSkill")
         
         # Initialize working variables used within the skill.
-        self.count = 0
+        self.count = 0 # wird nicht mehr benötigt, da dieser Skill entfernt wurde
 
     # The "handle_xxxx_intent" function is triggered by Mycroft when the
     # skill's intent is matched.  The intent is defined by the IntentBuilder()
@@ -35,6 +34,11 @@ class TemplateSkill(MycroftSkill):
     #   'Hello world'
     #   'Howdy you great big world'
     #   'Greetings planet earth'
+
+
+
+
+
     @intent_handler(IntentBuilder("").require("Hello").require("World"))
     def handle_hello_world_intent(self, message):
         # In this case, respond by simply speaking a canned response.
@@ -42,13 +46,6 @@ class TemplateSkill(MycroftSkill):
         #    dialogs/en-us/hello.world.dialog
         self.speak_dialog("hello.world")
 
-    @intent_handler(IntentBuilder("").require("Count").require("Dir"))
-    def handle_count_intent(self, message):
-        if message.data["Dir"] == "up":
-            self.count += 1
-        else:  # assume "down"
-            self.count -= 1
-        self.speak_dialog("count.is.now", data={"count": self.count})
 
     # The "stop" method defines what Mycroft does when told to stop during
     # the skill's execution. In this case, since the skill's functionality
