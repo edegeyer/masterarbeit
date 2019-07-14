@@ -2,29 +2,13 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="0db3856b-1c22-4f34-abe3-31cef3d6addf" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/../00__skill_template/.idea/workspace.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/dialog/en-us/location.test.dialog" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/vocab/en-us/going.voc" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../conf/ownmycroft.conf" beforeDir="false" afterPath="$PROJECT_DIR$/../../conf/ownmycroft.conf" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../00__skill_template/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../00__skill_template/LICENSE" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../00__skill_template/README.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../00__skill_template/__init__.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../00__skill_template/dialog/en-us/count.is.now.dialog" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../00__skill_template/dialog/en-us/hello.world.dialog" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../00__skill_template/manifest.yml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../00__skill_template/vocab/en-us/Count.voc" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../00__skill_template/vocab/en-us/Dir.voc" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../00__skill_template/vocab/en-us/Hello.voc" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../00__skill_template/vocab/en-us/World.voc" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../firstLoomoSkill/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../firstLoomoSkill/LICENSE" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../firstLoomoSkill/README.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../firstLoomoSkill/__init__.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../firstLoomoSkill/dialog/en-us/hello.world.dialog" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../firstLoomoSkill/manifest.yml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../firstLoomoSkill/vocab/en-us/Hello.voc" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../firstLoomoSkill/vocab/en-us/World.voc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dialog/en-us/location.test.dialog" beforeDir="false" afterPath="$PROJECT_DIR$/dialog/en-us/location.test.dialog" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/regex/en-us/Location.rx" beforeDir="false" afterPath="$PROJECT_DIR$/regex/en-us/Direction.rx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vocab/en-us/direction.voc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/vocab/en-us/going.voc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/vocab/en-us/turn.voc" beforeDir="false" afterPath="$PROJECT_DIR$/vocab/en-us/turn.voc" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -34,11 +18,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/__init__.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="795">
-              <caret line="53" column="65" selection-start-line="53" selection-start-column="65" selection-end-line="53" selection-end-column="65" />
+            <state relative-caret-position="840">
+              <caret line="56" column="59" selection-start-line="56" selection-start-column="59" selection-end-line="56" selection-end-column="59" />
               <folding>
                 <element signature="e#442#480#0" expanded="true" />
               </folding>
@@ -47,10 +31,10 @@
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/regex/en-us/Location.rx">
+        <entry file="file://$PROJECT_DIR$/regex/en-us/Direction.rx">
           <provider selected="true" editor-type-id="text-editor">
             <state>
-              <caret column="24" selection-start-column="24" selection-end-column="24" />
+              <caret column="21" selection-start-column="21" selection-end-column="21" />
             </state>
           </provider>
         </entry>
@@ -59,16 +43,16 @@
         <entry file="file://$PROJECT_DIR$/dialog/en-us/location.test.dialog">
           <provider selected="true" editor-type-id="text-editor">
             <state>
-              <caret column="26" selection-start-column="26" selection-end-column="26" />
+              <caret column="17" selection-start-column="17" selection-end-column="17" />
             </state>
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/vocab/en-us/going.voc">
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/vocab/en-us/turn.voc">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="30">
-              <caret line="2" column="5" lean-forward="true" selection-start-line="2" selection-start-column="5" selection-end-line="2" selection-end-column="5" />
+            <state>
+              <caret column="1" selection-start-column="1" selection-end-column="1" />
             </state>
           </provider>
         </entry>
@@ -94,9 +78,11 @@
         <option value="$PROJECT_DIR$/dialog/en-us/hello.world.dialog" />
         <option value="$PROJECT_DIR$/regex/en-us/direction.rx" />
         <option value="$PROJECT_DIR$/regex/en-us/location.rx" />
-        <option value="$PROJECT_DIR$/dialog/en-us/location.test.dialog" />
         <option value="$PROJECT_DIR$/vocab/en-us/going.voc" />
+        <option value="$PROJECT_DIR$/regex/en-us/Location.rx" />
         <option value="$PROJECT_DIR$/__init__.py" />
+        <option value="$PROJECT_DIR$/dialog/en-us/location.test.dialog" />
+        <option value="$PROJECT_DIR$/vocab/en-us/turn.voc" />
       </list>
     </option>
   </component>
@@ -189,12 +175,12 @@
       <option name="presentableId" value="Default" />
       <updated>1563099045127</updated>
       <workItem from="1563099046528" duration="4835000" />
-      <workItem from="1563111401640" duration="2428000" />
+      <workItem from="1563111401640" duration="3373000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="7263000" />
+    <option name="totallyTimeSpent" value="8208000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="1280" y="30" width="1284" height="1414" extended-state="0" />
@@ -278,34 +264,34 @@
     <entry file="file://$PROJECT_DIR$/dialog/en-us/count.is.now.dialog">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
-    <entry file="file://$PROJECT_DIR$/vocab/en-us/going.voc">
+    <entry file="file://$PROJECT_DIR$/regex/en-us/Direction.rx">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="30">
-          <caret line="2" column="5" lean-forward="true" selection-start-line="2" selection-start-column="5" selection-end-line="2" selection-end-column="5" />
+        <state>
+          <caret column="21" selection-start-column="21" selection-end-column="21" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/__init__.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="840">
+          <caret line="56" column="59" selection-start-line="56" selection-start-column="59" selection-end-line="56" selection-end-column="59" />
+          <folding>
+            <element signature="e#442#480#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/dialog/en-us/location.test.dialog">
       <provider selected="true" editor-type-id="text-editor">
         <state>
-          <caret column="26" selection-start-column="26" selection-end-column="26" />
+          <caret column="17" selection-start-column="17" selection-end-column="17" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/regex/en-us/Location.rx">
+    <entry file="file://$PROJECT_DIR$/vocab/en-us/turn.voc">
       <provider selected="true" editor-type-id="text-editor">
         <state>
-          <caret column="24" selection-start-column="24" selection-end-column="24" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/__init__.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="795">
-          <caret line="53" column="65" selection-start-line="53" selection-start-column="65" selection-end-line="53" selection-end-column="65" />
-          <folding>
-            <element signature="e#442#480#0" expanded="true" />
-          </folding>
+          <caret column="1" selection-start-column="1" selection-end-column="1" />
         </state>
       </provider>
     </entry>
