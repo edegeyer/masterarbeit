@@ -50,6 +50,18 @@ class TemplateSkill(MycroftSkill):
             self.count -= 1
         self.speak_dialog("count.is.now", data={"count": self.count})
 
+
+    @intent_handler(IntentBuilder("").require("going").require("Location"))
+    def handle_locatuion_intent(self,message):
+        LOG.info("MESSAGE IS: ", str(message.data.get("location")))
+        location = message.data.get("Location")
+        LOG.info("LOCATION IS ", str(location))
+        location2 = "Berlin"
+        #location = "test"
+        #print("TEST LOCATION IS: ", location)
+        self.speak_dialog("location.test", data={"location": location})
+
+
     # The "stop" method defines what Mycroft does when told to stop during
     # the skill's execution. In this case, since the skill's functionality
     # is extremely simple, there is no need to override it.  If you DO
