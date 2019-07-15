@@ -35,26 +35,39 @@ class TemplateSkill(MycroftSkill):
     #   'Hello world'
     #   'Howdy you great big world'
     #   'Greetings planet earth'
-    @intent_handler(IntentBuilder("").require("Hello").require("World"))
-    def handle_hello_world_intent(self, message):
-        # In this case, respond by simply speaking a canned response.
-        # Mycroft will randomly speak one of the lines from the file
-        #    dialogs/en-us/hello.world.dialog
-        self.speak_dialog("hello.world")
-
-    @intent_handler(IntentBuilder("").require("Count").require("Dir"))
-    def handle_count_intent(self, message):
-        if message.data["Dir"] == "up":
-            self.count += 1
-        else:  # assume "down"
-            self.count -= 1
-        self.speak_dialog("count.is.now", data={"count": self.count})
 
 
     @intent_handler(IntentBuilder("").require("turn").require("Direction"))
     def handle_turn_intent(self,message):
-        direction = message.data.get("Direction")
-        self.speak_dialog("location.test", data={"direction": direction})
+        #direction = message.data.get("Direction")
+        direction = message.data["Direction"]
+
+        # hard coded seems better, as certain instructions need to be passed over to Loomo
+        if direction == "right":
+            pass
+        elif direction == "left":
+            pass
+        elif direction == "around":
+            pass
+        else:
+           # anything else the user says, that's in the Direction file, means that the roboter has to turn to the user
+            pass
+        self.speak('Is turning {} what you want me to do?'.format(direction))
+        self.set_context('direction', direction)
+        self.set_context('action', 'turn')
+
+        #self.speak_dialog("location.test", data={"direction": direction})
+
+    @intent_handler(IntentBuilder("").require('action').require('direction').require('confirmation'))
+    def handle_confirmation_intent(self, message):
+        # depending on the users answer, do the action or ask again what to do
+        answer = message.data["confirmation"]
+        action = message.data["action"]
+        direction = message.data["direction"]
+        if answer == "yes":
+            self.speak("Will {} {}".format(action, direction))
+        else:
+            self.speak_dialog("misunderstood")
 
 
     # The "stop" method defines what Mycroft does when told to stop during
