@@ -52,7 +52,7 @@ class TemplateSkill(MycroftSkill):
         else:
            # anything else the user says, that's in the Direction file, means that the roboter has to turn to the user
             pass
-        self.speak('Is turning {} what you want me to do?'.format(direction))
+        self.speak('Is turning {} what you want me to do?'.format(direction), expect_response=True)
         self.set_context('direction', direction)
         self.set_context('action', 'turn')
 
@@ -67,7 +67,7 @@ class TemplateSkill(MycroftSkill):
         if answer == "yes":
             self.speak("Will {} {}".format(action, direction))
         else:
-            self.speak_dialog("misunderstood")
+            self.speak_dialog("misunderstood", expect_response=True)
 
 
     # The "stop" method defines what Mycroft does when told to stop during

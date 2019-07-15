@@ -2,14 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="0db3856b-1c22-4f34-abe3-31cef3d6addf" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/dialog/en-us/misunderstood.dialog" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/vocab/en-us/confirmation.voc" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/vocab/en-us/decline.voc" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dialog/en-us/location.test.dialog" beforeDir="false" afterPath="$PROJECT_DIR$/dialog/en-us/location.check.dialog" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/regex/en-us/Direction.rx" beforeDir="false" afterPath="$PROJECT_DIR$/regex/en-us/DirectionCopy.rx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/vocab/en-us/directionStatic.voc" beforeDir="false" afterPath="$PROJECT_DIR$/vocab/en-us/Direction.voc" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -22,8 +15,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/__init__.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="594">
-              <caret line="77" column="29" selection-start-line="77" selection-start-column="29" selection-end-line="77" selection-end-column="29" />
+            <state relative-caret-position="1122">
+              <caret line="84" column="26" lean-forward="true" selection-start-line="84" selection-start-column="26" selection-end-line="84" selection-end-column="26" />
               <folding>
                 <element signature="e#442#480#0" expanded="true" />
               </folding>
@@ -195,22 +188,22 @@
       <updated>1563099045127</updated>
       <workItem from="1563099046528" duration="4835000" />
       <workItem from="1563111401640" duration="3373000" />
-      <workItem from="1563179751985" duration="3283000" />
+      <workItem from="1563179751985" duration="4132000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="11491000" />
+    <option name="totallyTimeSpent" value="12340000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="1276" y="30" width="1284" height="1410" extended-state="4" />
     <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.25528455" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.25528455" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
-      <window_info anchor="bottom" id="Find" order="1" visible="true" weight="0.3299532" />
+      <window_info anchor="bottom" id="Find" order="1" weight="0.3299532" />
       <window_info anchor="bottom" id="Run" order="2" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
@@ -318,8 +311,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/__init__.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="594">
-          <caret line="77" column="29" selection-start-line="77" selection-start-column="29" selection-end-line="77" selection-end-column="29" />
+        <state relative-caret-position="1122">
+          <caret line="84" column="26" lean-forward="true" selection-start-line="84" selection-start-column="26" selection-end-line="84" selection-end-column="26" />
           <folding>
             <element signature="e#442#480#0" expanded="true" />
           </folding>
