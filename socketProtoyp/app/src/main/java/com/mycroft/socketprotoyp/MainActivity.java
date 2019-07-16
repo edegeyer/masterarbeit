@@ -54,8 +54,8 @@ public class MainActivity extends AppCompatActivity {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        //TextView textView = findViewById(R.id.messages);
-                        //textView.setText(textView.getText()+ "\n" + message);
+                        TextView textView = (TextView)findViewById(R.id.messages);
+                        textView.setText(textView.getText() + "\n" + message);
                         System.out.println("received Message: "+ message);
                     }
                 });
