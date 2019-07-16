@@ -2,49 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="0db3856b-1c22-4f34-abe3-31cef3d6addf" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/../../socketProtoyp/.gitignore" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../socketProtoyp/.idea/encodings.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../socketProtoyp/.idea/gradle.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../socketProtoyp/.idea/misc.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../socketProtoyp/.idea/runConfigurations.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../socketProtoyp/.idea/vcs.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../socketProtoyp/app/.gitignore" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../socketProtoyp/app/build.gradle" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../socketProtoyp/app/proguard-rules.pro" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../socketProtoyp/app/src/androidTest/java/com/mycroft/socketprotoyp/ExampleInstrumentedTest.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../socketProtoyp/app/src/main/AndroidManifest.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../socketProtoyp/app/src/main/java/com/mycroft/socketprotoyp/MainActivity.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../socketProtoyp/app/src/main/res/drawable-v24/ic_launcher_foreground.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../socketProtoyp/app/src/main/res/drawable/ic_launcher_background.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../socketProtoyp/app/src/main/res/layout/activity_main.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../socketProtoyp/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../socketProtoyp/app/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../socketProtoyp/app/src/main/res/mipmap-hdpi/ic_launcher.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../socketProtoyp/app/src/main/res/mipmap-hdpi/ic_launcher_round.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../socketProtoyp/app/src/main/res/mipmap-mdpi/ic_launcher.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../socketProtoyp/app/src/main/res/mipmap-mdpi/ic_launcher_round.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../socketProtoyp/app/src/main/res/mipmap-xhdpi/ic_launcher.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../socketProtoyp/app/src/main/res/mipmap-xhdpi/ic_launcher_round.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../socketProtoyp/app/src/main/res/mipmap-xxhdpi/ic_launcher.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../socketProtoyp/app/src/main/res/mipmap-xxhdpi/ic_launcher_round.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../socketProtoyp/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../socketProtoyp/app/src/main/res/mipmap-xxxhdpi/ic_launcher_round.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../socketProtoyp/app/src/main/res/values/colors.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../socketProtoyp/app/src/main/res/values/strings.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../socketProtoyp/app/src/main/res/values/styles.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../socketProtoyp/app/src/test/java/com/mycroft/socketprotoyp/ExampleUnitTest.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../socketProtoyp/build.gradle" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../socketProtoyp/gradle.properties" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../socketProtoyp/gradle/wrapper/gradle-wrapper.jar" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../socketProtoyp/gradle/wrapper/gradle-wrapper.properties" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../socketProtoyp/gradlew" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../socketProtoyp/gradlew.bat" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../socketProtoyp/settings.gradle" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../prototype/.idea/caches/build_file_checksums.ser" beforeDir="false" afterPath="$PROJECT_DIR$/../../prototype/.idea/caches/build_file_checksums.ser" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../prototype/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../../prototype/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../prototype/app/app.iml" beforeDir="false" afterPath="$PROJECT_DIR$/../../prototype/app/app.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../prototype/prototype.iml" beforeDir="false" afterPath="$PROJECT_DIR$/../../prototype/prototype.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../socketProtoyp/app/src/main/java/com/mycroft/socketprotoyp/MainActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../socketProtoyp/app/src/main/java/com/mycroft/socketprotoyp/MainActivity.java" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -57,8 +17,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/__init__.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="180">
-              <caret line="22" column="8" selection-start-line="22" selection-start-column="8" selection-end-line="22" selection-end-column="8" />
+            <state relative-caret-position="705">
+              <caret line="47" column="36" selection-start-line="47" selection-start-column="36" selection-end-line="47" selection-end-column="36" />
               <folding>
                 <element signature="e#442#480#0" expanded="true" />
               </folding>
@@ -144,7 +104,7 @@
     <option name="x" value="1276" />
     <option name="y" value="30" />
     <option name="width" value="1284" />
-    <option name="height" value="1414" />
+    <option name="height" value="1410" />
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectView">
@@ -202,7 +162,7 @@
   <component name="PropertiesComponent">
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../../mycroft-core-dev" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
   </component>
@@ -232,17 +192,18 @@
       <workItem from="1563111401640" duration="3373000" />
       <workItem from="1563179751985" duration="4132000" />
       <workItem from="1563262656619" duration="599000" />
+      <workItem from="1563276609791" duration="1221000" />
+      <workItem from="1563281600927" duration="1834000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="12939000" />
+    <option name="totallyTimeSpent" value="15994000" />
   </component>
   <component name="ToolWindowManager">
-    <frame x="1276" y="30" width="1284" height="1414" extended-state="4" />
-    <editor active="true" />
+    <frame x="1276" y="30" width="1284" height="1410" extended-state="4" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.2682927" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.27804878" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
@@ -303,8 +264,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/__init__.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="180">
-          <caret line="22" column="8" selection-start-line="22" selection-start-column="8" selection-end-line="22" selection-end-column="8" />
+        <state relative-caret-position="705">
+          <caret line="47" column="36" selection-start-line="47" selection-start-column="36" selection-end-line="47" selection-end-column="36" />
           <folding>
             <element signature="e#442#480#0" expanded="true" />
           </folding>

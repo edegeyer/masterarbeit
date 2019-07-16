@@ -10,6 +10,7 @@
 from adapt.intent import IntentBuilder
 from mycroft.skills.core import MycroftSkill, intent_handler
 from mycroft.util.log import LOG
+from mycroft.messagebus.message import Message
 
 # Each skill is contained within its own class, which inherits base methods
 # from the MycroftSkill class.  You extend this class as shown below.
@@ -41,6 +42,10 @@ class TemplateSkill(MycroftSkill):
     def handle_turn_intent(self,message):
         #direction = message.data.get("Direction")
         direction = message.data["Direction"]
+        self.bus.emit(Message(
+            "loomoInstruction",
+            {'action':'turn',
+             'direction':direction}))
 
         # hard coded seems better, as certain instructions need to be passed over to Loomo
         if direction == "right":
