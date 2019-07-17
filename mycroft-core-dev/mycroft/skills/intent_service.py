@@ -178,6 +178,8 @@ class IntentService:
         self.bus.on('skill.converse.error', self.handle_converse_error)
         self.bus.on('mycroft.speech.recognition.unknown', self.reset_converse)
         self.bus.on('mycroft.skills.loaded', self.update_skill_name_dict)
+        # own Loomo Method
+        self.bus.on('loomoMessage', self.handle_loomo_message)
 
         def add_active_skill_handler(message):
             self.add_active_skill(message.data['skill_id'])
@@ -187,6 +189,9 @@ class IntentService:
         self.waiting_for_converse = False
         self.converse_result = False
         self.converse_skill_id = ""
+
+    def handle_loomo_message(self, message):
+        pass
 
     def update_skill_name_dict(self, message):
         """

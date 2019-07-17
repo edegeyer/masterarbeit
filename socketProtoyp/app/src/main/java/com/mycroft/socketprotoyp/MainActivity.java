@@ -2,10 +2,13 @@ package com.mycroft.socketprotoyp;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Context;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.JsonReader;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -22,6 +25,8 @@ public class MainActivity extends AppCompatActivity {
 
 
     WebSocketClient mWebSocketClient;
+    boolean conntected = false;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,8 +35,50 @@ public class MainActivity extends AppCompatActivity {
 
         connectWebSocket();
         mWebSocketClient.connect();
+        final Button mButton = findViewById(R.id.sendMessageButton);
+        mButton.setOnClickListener(new View.OnClickListener(){
+            public void onClick(View v){
+                sendMessageToMycroft();
+            }
+        });
     }
 
+    private void sendMessageToMycroft(){
+        //TODO: 1. Send over a Message to Mycroft
+        //TODO: 2. Create Mycroft to show a reaction
+        //TODO: 3. enable parameters to be given to this function
+        JSONObject messageJsonData = new JSONObject();
+        JSONObject messageJson = new JSONObject();
+        try{
+            //messageJson.put("type", "loomoMessage");
+            messageJsonData.put("utterances", "loomo discover");
+            messageJsonData.put("type", "recognizer_loop:utterance");
+
+            messageJsonData.put("context", "null");
+            messageJson.put("data", messageJsonData);
+            //messageJson.put("data","discoveredPerson");
+        } catch (JSONException e){
+            e.printStackTrace();
+        }
+        try{
+            if (mWebSocketClient == null){
+                //TODO: check for WIFI
+                connectWebSocket();
+            }
+            try {
+                String message = "{\"data\": {\"utterances\": [\"loomodiscover123456789\"]}, \"type\": \"recognizer_loop:utterance\", \"context\": null}";
+
+                System.out.println("Going to send a message: " + messageJson.toString());
+                System.out.println("Going to send 2 message: " + message);
+
+                mWebSocketClient.send(message);
+            } catch (Exception e){
+                e.printStackTrace();
+            }
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+    }
 
     private void connectWebSocket(){
         URI uri;
@@ -58,13 +105,11 @@ public class MainActivity extends AppCompatActivity {
                     Log.d("JSON is: ", jsonObject.toString());
 
                     if (jsonObject.get("type").equals("connected")){
-                        // TODO: Toast not showing
-                        Toast.makeText(getBaseContext(), "connected", Toast.LENGTH_SHORT).show();
-
+                        //TODO: Show toast, that connection is made
                         System.out.println("it's connected");
 
                     }
-                    if (jsonObject.get("type").equals("loomoInstruction")) {
+                    else if (jsonObject.get("type").equals("loomoInstruction")) {
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
@@ -90,6 +135,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClose(int i, String s, boolean b){
                 Log.i("WebSocket", "Closed" + s);
+                conntected = false;
             }
 
             @Override

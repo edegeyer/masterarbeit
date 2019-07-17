@@ -38,6 +38,21 @@ class TemplateSkill(MycroftSkill):
     #   'Greetings planet earth'
 
 
+    @intent_handler(IntentBuilder("").require("person"))
+    # TODO: see, if it's possible to call a skill in a better way
+    def handle_person_detected_intent(self, message):
+        self.set_context('personDetected', "true")
+        self.speak_dialog("detected.person", expect_response=True)
+
+    @intent_handler(IntentBuilder("").require("personDetected").require("confirmation"))
+    def handle_direction_confirmation(self, message):
+        answer = message.data["confirmation"]
+        if answer == "yes":
+            self.speak("Currently I'm only able to turn")
+            self.speak("All commands have to be including the term turn and a direction", expect_response=True)
+        elif answer == "no":
+            self.speak("Ok, let me know when I can assist you")
+
     @intent_handler(IntentBuilder("").require("turn").require("Direction"))
     def handle_turn_intent(self,message):
         #direction = message.data.get("Direction")
@@ -64,7 +79,7 @@ class TemplateSkill(MycroftSkill):
         #self.speak_dialog("location.test", data={"direction": direction})
 
     @intent_handler(IntentBuilder("").require('action').require('direction').require('confirmation'))
-    def handle_confirmation_intent(self, message):
+    def handle_direction_confirmation_intent(self, message):
         # depending on the users answer, do the action or ask again what to do
         answer = message.data["confirmation"]
         action = message.data["action"]
