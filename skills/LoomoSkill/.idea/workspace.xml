@@ -1,17 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="0db3856b-1c22-4f34-abe3-31cef3d6addf" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/dialog/en-us/detected.person.dialog" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/vocab/en-us/person.voc" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../mycroft-core-dev/mycroft/messagebus/client/ws.py" beforeDir="false" afterPath="$PROJECT_DIR$/../../mycroft-core-dev/mycroft/messagebus/client/ws.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../mycroft-core-dev/mycroft/skills/intent_service.py" beforeDir="false" afterPath="$PROJECT_DIR$/../../mycroft-core-dev/mycroft/skills/intent_service.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../socketProtoyp/app/src/main/AndroidManifest.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../../socketProtoyp/app/src/main/AndroidManifest.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../socketProtoyp/app/src/main/java/com/mycroft/socketprotoyp/MainActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../socketProtoyp/app/src/main/java/com/mycroft/socketprotoyp/MainActivity.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../socketProtoyp/app/src/main/res/layout/activity_main.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../../socketProtoyp/app/src/main/res/layout/activity_main.xml" afterDir="false" />
-    </list>
+    <list default="true" id="0db3856b-1c22-4f34-abe3-31cef3d6addf" name="Default Changelist" comment="" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -104,10 +94,9 @@
     </option>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="-4" />
     <option name="y" value="30" />
     <option name="width" value="1284" />
-    <option name="height" value="1410" />
+    <option name="height" value="1406" />
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectView">
@@ -199,17 +188,17 @@
       <workItem from="1563281600927" duration="1834000" />
       <workItem from="1563355618191" duration="2694000" />
       <workItem from="1563370407133" duration="659000" />
+      <workItem from="1563793239873" duration="138000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="19347000" />
+    <option name="totallyTimeSpent" value="19485000" />
   </component>
   <component name="ToolWindowManager">
-    <frame x="-4" y="30" width="1284" height="1410" extended-state="0" />
-    <editor active="true" />
+    <frame x="0" y="30" width="1284" height="1406" extended-state="0" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.28780487" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.29268292" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
@@ -268,20 +257,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/dialog/en-us/misunderstood.dialog">
-      <provider selected="true" editor-type-id="text-editor">
-        <state>
-          <caret column="62" selection-start-column="62" selection-end-column="62" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/vocab/en-us/confirmation.voc">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="15">
-          <caret line="1" column="2" selection-start-line="1" selection-start-column="2" selection-end-line="1" selection-end-column="2" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/vocab/en-us/decline.voc">
       <provider selected="true" editor-type-id="text-editor">
         <state>
@@ -299,10 +274,13 @@
     <entry file="file://$PROJECT_DIR$/vocab/en-us/Direction.voc">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
-    <entry file="file://$PROJECT_DIR$/dialog/en-us/detected.person.dialog">
+    <entry file="file://$PROJECT_DIR$/__init__.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="15">
-          <caret line="1" selection-start-line="1" selection-end-line="1" selection-end-column="24" />
+        <state relative-caret-position="353">
+          <caret line="43" column="48" selection-start-line="43" selection-start-column="48" selection-end-line="43" selection-end-column="48" />
+          <folding>
+            <element signature="e#442#480#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -313,13 +291,24 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/__init__.py">
+    <entry file="file://$PROJECT_DIR$/dialog/en-us/detected.person.dialog">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="353">
-          <caret line="43" column="48" selection-start-line="43" selection-start-column="48" selection-end-line="43" selection-end-column="48" />
-          <folding>
-            <element signature="e#442#480#0" expanded="true" />
-          </folding>
+        <state relative-caret-position="15">
+          <caret line="1" selection-start-line="1" selection-end-line="1" selection-end-column="24" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/dialog/en-us/misunderstood.dialog">
+      <provider selected="true" editor-type-id="text-editor">
+        <state>
+          <caret column="62" selection-start-column="62" selection-end-column="62" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/vocab/en-us/confirmation.voc">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="15">
+          <caret line="1" column="2" selection-start-line="1" selection-start-column="2" selection-end-line="1" selection-end-column="2" />
         </state>
       </provider>
     </entry>

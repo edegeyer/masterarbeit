@@ -34,3 +34,5 @@ captures/
 mycroft-core-dev/venv/
 
 skills/firstLoomoSkill/\.idea/
+
+\.idea/
