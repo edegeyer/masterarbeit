@@ -20,12 +20,30 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         setUpLoomo();
         final Button turnLeftButton = findViewById(R.id.turnLeftButton);
+        final Button turnRightButton = findViewById(R.id.turnRightButton);
+        final Button turnAroundButton = findViewById(R.id.turnAroundButton);
+        final Button checkAudioButton = findViewById(R.id.checkAudioButton);
+        final Button simulatePersonDetectedButton = findViewById(R.id.detectedpersonButton);
+
         turnLeftButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                turn("left");
+                detectTurnDirection("left");
             }
         });
+        turnAroundButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                detectTurnDirection("around");
+            }
+        });
+        turnRightButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                detectTurnDirection("right");
+            }
+        });
+
 
     }
 
@@ -44,24 +62,38 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    public void turn(String direction){
+    public void detectTurnDirection(String direction){
         Timer mTimer = new Timer();
         mBase.setControlMode(Base.CONTROL_MODE_RAW);
-        if (direction.equals("left")){
-            new Thread(){
-                @Override
-                public void run(){
-                    mBase.setAngularVelocity((float)2.2);
+        switch (direction) {
+            case "left":
+                turn((float)2.2);
+                break;
+            case "right":
+                turn((float)-2.2);
+                break;
+            case "around":
+                turn((float)4.4);
+                break;
+            default:
+                break;
+        }
+    }
+
+    public void turn(final float velocity){
+        new Thread(){
+            @Override
+            public void run(){
+                mBase.setAngularVelocity(velocity);
                 try {
                     // sets for how long the robot is turning with that speed
                     Thread.sleep(1000);
-                } catch (InterruptedException e){
+                } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
                 // make the robot stop
                 mBase.setAngularVelocity(0);
-                }
-            }.start();
-        }
+            }
+        }.start();
     }
 }
