@@ -10,6 +10,7 @@ import android.widget.Button;
 
 
 import com.segway.robot.algo.dts.DTSPerson;
+import com.segway.robot.algo.dts.Person;
 import com.segway.robot.algo.dts.PersonDetectListener;
 import com.segway.robot.sdk.base.bind.ServiceBinder;
 import com.segway.robot.sdk.locomotion.head.Head;
@@ -31,8 +32,7 @@ public class MainActivity extends AppCompatActivity {
     private boolean isVisionBind;
     private boolean isHeadBind;
     private boolean isBaseBind;
-
-
+//    ServiceBinder.BindStateListener mVisionBindStateListener;
 
 
     @Override
@@ -46,8 +46,6 @@ public class MainActivity extends AppCompatActivity {
         final Button checkAudioButton = findViewById(R.id.checkAudioButton);
         final Button simulatePersonDetectedButton = findViewById(R.id.detectedpersonButton);
 
-        // Head ist standardmäßig auf smooth eingestellt, sprich der Kopf wird entsprechen mitbewegt, aber leicht verzögert
-        // TODO: bewegen des Kopfes mit der gleichen Geschwindigkeit wie den restlichen Körper
         turnLeftButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -80,7 +78,6 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 //TODO: Zugriff auf die Kamera und Erkennung von Personen durchführen
                 //TODO: wenn Person erkannt: links&rechts drehen zum signalisieren
-                trackPerson();
                 initateDetect();
                 //TODO: wenn Mycroft eingebunden: Ansprechen der Person
             }
@@ -89,7 +86,7 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    public boolean isServiceAvailable(){
+    public boolean isServiceAvailable() {
         return isVisionBind && isHeadBind && isBaseBind;
     }
 
@@ -97,7 +94,7 @@ public class MainActivity extends AppCompatActivity {
     private PersonDetectListener mPersonDetectListener = new PersonDetectListener() {
         @Override
         public void onPersonDetected(DTSPerson[] person) {
-            if (isServiceAvailable()){
+            if (isServiceAvailable()) {
                 mHead.setMode(Head.MODE_ORIENTATION_LOCK);
                 mHeadPIDController.updateTarget(person[0].getTheta(), person[0].getDrawingRect(), 480);
             }
@@ -114,17 +111,28 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
-    public void initateDetect(){
-        mDts.startDetectingPerson(mPersonDetectListener);
+    public void initateDetect() {
+        //mDts.startDetectingPerson(mPersonDetectListener);
+        //DTSPerson person[] = mDts.detectPersons(3 * 1000 * 1000);
+        //System.out.println("PErsons: " + person.length);
+    //    mVisionBindStateListener.onBind();
+        if (isVisionBind) {
+            Person[] persons = mDts.detectPersons(3 * 1000 * 1000);
+            System.out.println("PErsoons: " + persons.length);
+            if (persons.length > 0){
+                turn(2);
+                turn(-4);
+                turn(2);
+            }
+        } else {
+            System.out.println("not bound");
+        }
     }
 
 
-
-
-
-    public void setUpLoomo(){
+    public void setUpLoomo() {
         // setup the base
-        mBase=Base.getInstance();
+        mBase = Base.getInstance();
         mBase.bindService(this.getBaseContext(), new ServiceBinder.BindStateListener() {
             @Override
             public void onBind() {
@@ -152,53 +160,51 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         mVision = Vision.getInstance();
-        mVision.bindService(this.getApplicationContext(), new ServiceBinder.BindStateListener() {
-            @Override
-            public void onBind() {
-                isVisionBind = true;
-                mDts = mVision.getDTS();
-                mDts.setVideoSource(DTS.VideoSource.CAMERA);
-                mDts.start();
-
-            }
-
-            @Override
-            public void onUnbind(String reason) {
-                isVisionBind = false;
-
-            }
-        });
+        mVision.bindService(this.getApplicationContext(), mVisionBindStateListener);
     }
 
-    public void trackPerson(){
 
-        //TODO: Reaktion auf entdeckte Person: ohne Sprache: wackeln der Base
-        //TODO: Aktion, wenn es nicht die gewünschte Person ist (optional)
 
-    }
 
-    public void detectTurnDirection(String direction){
+    private ServiceBinder.BindStateListener mVisionBindStateListener = new ServiceBinder.BindStateListener() {
+        @Override
+        public void onBind() {
+            isVisionBind = true;
+            mDts = mVision.getDTS();
+            mDts.setVideoSource(DTS.VideoSource.CAMERA);
+            mDts.start();
+
+        }
+
+        @Override
+        public void onUnbind(String reason) {
+            isVisionBind = false;
+
+        }
+    };
+
+    public void detectTurnDirection(String direction) {
         Timer mTimer = new Timer();
         mBase.setControlMode(Base.CONTROL_MODE_RAW);
         switch (direction) {
             case "left":
-                turn((float)2.2);
+                turn((float) 2.2);
                 break;
             case "right":
-                turn((float)-2.2);
+                turn((float) -2.2);
                 break;
             case "around":
-                turn((float)4.4);
+                turn((float) 4.4);
                 break;
             default:
                 break;
         }
     }
 
-    public void turn(final float velocity){
-        new Thread(){
+    public void turn(final float velocity) {
+        new Thread() {
             @Override
-            public void run(){
+            public void run() {
                 System.out.println(mHead.getHeadJointYaw());
                 mHead.setMode(Head.MODE_ORIENTATION_LOCK);
                 mBase.setAngularVelocity(velocity);
