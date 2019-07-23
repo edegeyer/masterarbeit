@@ -1,37 +1,39 @@
 package com.mycroft.loomoprototype;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.hardware.camera2.CameraCaptureSession;
-import android.hardware.camera2.CameraDevice;
 import android.os.Bundle;
 import android.view.Surface;
 import android.view.View;
 import android.widget.Button;
 
+
 import com.segway.robot.algo.dts.DTSPerson;
-import com.segway.robot.algo.dts.Person;
-import com.segway.robot.algo.dts.PersonTrackingListener;
+import com.segway.robot.algo.dts.PersonDetectListener;
 import com.segway.robot.sdk.base.bind.ServiceBinder;
 import com.segway.robot.sdk.locomotion.head.Head;
 import com.segway.robot.sdk.locomotion.sbv.Base;
 import com.segway.robot.sdk.vision.DTS;
 import com.segway.robot.sdk.vision.Vision;
+import com.segway.robot.support.control.HeadPIDController;
 
 import java.util.Timer;
-import java.util.logging.Logger;
 
 public class MainActivity extends AppCompatActivity {
 
     Base mBase;
     Head mHead;
-    Vision mVision;
-    CameraDevice mCameraDevice;
-    CameraCaptureSession mPreviewSession;
+    private Vision mVision;
 
-    boolean isSurfaceTextureAvailable;
-    private DTS dts;
-    Surface mDTSSurface = null;
+    private DTS mDts;
+    private HeadPIDController mHeadPIDController = new HeadPIDController();
+    private boolean isVisionBind;
+    private boolean isHeadBind;
+    private boolean isBaseBind;
+
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,6 +81,7 @@ public class MainActivity extends AppCompatActivity {
                 //TODO: Zugriff auf die Kamera und Erkennung von Personen durchführen
                 //TODO: wenn Person erkannt: links&rechts drehen zum signalisieren
                 trackPerson();
+                initateDetect();
                 //TODO: wenn Mycroft eingebunden: Ansprechen der Person
             }
         });
@@ -86,18 +89,51 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    public boolean isServiceAvailable(){
+        return isVisionBind && isHeadBind && isBaseBind;
+    }
+
+
+    private PersonDetectListener mPersonDetectListener = new PersonDetectListener() {
+        @Override
+        public void onPersonDetected(DTSPerson[] person) {
+            if (isServiceAvailable()){
+                mHead.setMode(Head.MODE_ORIENTATION_LOCK);
+                mHeadPIDController.updateTarget(person[0].getTheta(), person[0].getDrawingRect(), 480);
+            }
+        }
+
+        @Override
+        public void onPersonDetectionResult(DTSPerson[] person) {
+
+        }
+
+        @Override
+        public void onPersonDetectionError(int errorCode, String message) {
+
+        }
+    };
+
+    public void initateDetect(){
+        mDts.startDetectingPerson(mPersonDetectListener);
+    }
+
+
+
+
+
     public void setUpLoomo(){
         // setup the base
         mBase=Base.getInstance();
         mBase.bindService(this.getBaseContext(), new ServiceBinder.BindStateListener() {
             @Override
             public void onBind() {
-
+                isBaseBind = true;
             }
 
             @Override
             public void onUnbind(String reason) {
-
+                isHeadBind = false;
             }
         });
         // setup the head
@@ -105,62 +141,39 @@ public class MainActivity extends AppCompatActivity {
         mHead.bindService(this.getApplicationContext(), new ServiceBinder.BindStateListener() {
             @Override
             public void onBind() {
-
+                isHeadBind = true;
+                mHeadPIDController.init(new HeadControlHandlerImpl(mHead));
+                mHeadPIDController.setHeadFollowFactor(1.0f);
             }
 
             @Override
             public void onUnbind(String reason) {
-
+                isHeadBind = false;
             }
         });
-        mVision.getInstance();
+        mVision = Vision.getInstance();
         mVision.bindService(this.getApplicationContext(), new ServiceBinder.BindStateListener() {
             @Override
             public void onBind() {
-                //dts = mVision.getDTS();
-                //dts.setVideoSource(DTS.VideoSource.SURFACE);
-                //dts.start();
-                //mDTSSurface = dts.getSurface();
-                //dts.setPoseRecognitionEnabled(true);
+                isVisionBind = true;
+                mDts = mVision.getDTS();
+                mDts.setVideoSource(DTS.VideoSource.CAMERA);
+                mDts.start();
 
             }
 
             @Override
             public void onUnbind(String reason) {
+                isVisionBind = false;
 
             }
         });
     }
 
     public void trackPerson(){
-        DTSPerson persons[] = dts.detectPersons(3 * 1000 * 1000);
-        dts = mVision.getDTS();
-        dts.setVideoSource(DTS.VideoSource.CAMERA);
-        // track the first person (if there is a person detected)
-        if (persons.length > 0){
-            System.out.println("Found person" + persons.length);
-        }
-        else {
-            System.out.println("No person detected");
-        }
-        dts.startPersonTracking(persons[0], 10 * 1000, new PersonTrackingListener() {
-            @Override
-            public void onPersonTracking(DTSPerson person) {
 
-            }
-
-            @Override
-            public void onPersonTrackingResult(DTSPerson person) {
-
-            }
-
-            @Override
-            public void onPersonTrackingError(int errorCode, String message) {
-
-            }
-        });
-        dts.stopPersonTracking();
-        dts.stop();
+        //TODO: Reaktion auf entdeckte Person: ohne Sprache: wackeln der Base
+        //TODO: Aktion, wenn es nicht die gewünschte Person ist (optional)
 
     }
 
