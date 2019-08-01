@@ -34,6 +34,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         connectWebSocket();
+
         mWebSocketClient.connect();
         final Button mButton = findViewById(R.id.sendMessageButton);
         mButton.setOnClickListener(new View.OnClickListener(){
