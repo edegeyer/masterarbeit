@@ -36,3 +36,19 @@ captures/
 \.idea/libraries/
 
 loomoPrototype/\.idea/caches/
+
+Mycroft-Android-master/\.idea/
+
+mycroft-core-dev/\.idea/
+
+mycroft-core-dev/\.venv/lib/python3\.7/site-packages/\.libs_cffi_backend/
+
+socketProtoyp/\.idea/
+
+skills/LoomoSkill/__pycache__/
+
+mycroft-core-dev/\.venv/lib/python3\.7/site-packages/pygments/lexers/__pycache__/
+
+mycroft-core-dev/\.venv/lib/python3\.7/site-packages/pygments/lexers/
+
+loomoPrototype/.idea/
