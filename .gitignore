@@ -52,3 +52,18 @@ mycroft-core-dev/\.venv/lib/python3\.7/site-packages/pygments/lexers/__pycache__
 mycroft-core-dev/\.venv/lib/python3\.7/site-packages/pygments/lexers/
 
 loomoPrototype/.idea/
+mycroft-core-dev/\.venv/lib/python3\.7/site-packages/__pycache__/
+
+mycroft-core-dev/\.venv/
+
+mycroft-core-dev/mycroft/__pycache__/
+
+mycroft-core-dev/mycroft/api/__pycache__/
+
+mycroft-core-dev/mycroft/audio/__pycache__/
+
+mycroft-core-dev/mycroft/util/__pycache__/
+
+mycroft-core-dev/mycroft/tts/__pycache__/
+
+mycroft-core-dev/mycroft/util/lang/__pycache__/
