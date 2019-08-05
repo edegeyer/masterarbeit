@@ -1,13 +1,8 @@
 package com.mycroft.loomoprototype;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-
-import android.media.MediaExtractor;
 import android.media.MediaRecorder;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.Surface;
 import android.view.View;
 import android.widget.Button;
 
@@ -20,12 +15,8 @@ import com.segway.robot.sdk.locomotion.head.Head;
 import com.segway.robot.sdk.locomotion.sbv.Base;
 import com.segway.robot.sdk.vision.DTS;
 import com.segway.robot.sdk.vision.Vision;
-import com.segway.robot.sdk.voice.Recognizer;
-import com.segway.robot.sdk.voice.VoiceException;
-import com.segway.robot.sdk.voice.audiodata.RawDataListener;
 import com.segway.robot.support.control.HeadPIDController;
 
-import java.security.spec.ECField;
 import java.util.Timer;
 
 public class MainActivity extends AppCompatActivity {
