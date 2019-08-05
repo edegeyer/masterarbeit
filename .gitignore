@@ -30,3 +30,21 @@ proguard/
 
 # Android Studio captures folder
 captures/
+
+\.idea/
+
+mycroft-core-dev/\.venv/
+
+mycroft-core-dev/mycroft/__pycache__/
+
+mycroft-core-dev/mycroft/audio/__pycache__/
+
+mycroft-core-dev/mycroft/tts/__pycache__/
+
+mycroft-core-dev/mycroft/util/__pycache__/
+
+mycroft-core-dev/mycroft/api/__pycache__/
+
+mycroft-core-dev/mycroft/util/lang/__pycache__/
+
+skills/LoomoSkill/__pycache__/
