@@ -31,4 +31,5 @@ dependencies {
     implementation 'com.segway.robot:basesdk:0.6.746'
     implementation 'com.segway.robot:visionsdk:0.6.547'
     implementation 'com.segway.robot:support-lib:1.1.2'
+    implementation 'com.segway.robot:speech-sdk:0.5.327'
 }

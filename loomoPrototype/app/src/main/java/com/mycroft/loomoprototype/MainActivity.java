@@ -3,7 +3,10 @@ package com.mycroft.loomoprototype;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.media.MediaExtractor;
+import android.media.MediaRecorder;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Surface;
 import android.view.View;
 import android.widget.Button;
@@ -17,8 +20,12 @@ import com.segway.robot.sdk.locomotion.head.Head;
 import com.segway.robot.sdk.locomotion.sbv.Base;
 import com.segway.robot.sdk.vision.DTS;
 import com.segway.robot.sdk.vision.Vision;
+import com.segway.robot.sdk.voice.Recognizer;
+import com.segway.robot.sdk.voice.VoiceException;
+import com.segway.robot.sdk.voice.audiodata.RawDataListener;
 import com.segway.robot.support.control.HeadPIDController;
 
+import java.security.spec.ECField;
 import java.util.Timer;
 
 public class MainActivity extends AppCompatActivity {
@@ -32,8 +39,11 @@ public class MainActivity extends AppCompatActivity {
     private boolean isVisionBind;
     private boolean isHeadBind;
     private boolean isBaseBind;
-//    ServiceBinder.BindStateListener mVisionBindStateListener;
 
+
+
+    final MediaRecorder recorder = new MediaRecorder();
+    private static String fileName = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,7 +55,8 @@ public class MainActivity extends AppCompatActivity {
         final Button turnAroundButton = findViewById(R.id.turnAroundButton);
         final Button checkAudioButton = findViewById(R.id.checkAudioButton);
         final Button simulatePersonDetectedButton = findViewById(R.id.detectedpersonButton);
-
+        fileName = getExternalCacheDir().getAbsolutePath();
+        fileName += "/audiorecordtest.3gp";
         turnLeftButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -70,6 +81,27 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 //TODO: zugriff auf die Mikrofone und ausgeben der Richtung, aus der die Geräusche kommen
                 // TODO: optional: loomo dreht sich entsprechend in die Richtung der Geräusche
+                recorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+                recorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
+                recorder.setOutputFile(fileName);
+                recorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
+                try {
+                    recorder.prepare();
+
+                } catch (Exception e){
+                    System.out.println("Error occured: " + e);
+                }
+                recorder.start();
+                try {
+                    Thread.sleep(1000);
+                } catch (Exception e){
+                    System.out.println("Can't go to sleep");
+                }
+                recorder.stop();
+
+                //TODO: play the recorded file
+                //TODO: send the data as a byte stream
+
             }
         });
 
@@ -160,7 +192,9 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         mVision = Vision.getInstance();
-        mVision.bindService(this.getApplicationContext(), mVisionBindStateListener);
+
+
+
     }
 
 
