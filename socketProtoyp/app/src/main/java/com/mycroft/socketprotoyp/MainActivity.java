@@ -3,8 +3,15 @@ package com.mycroft.socketprotoyp;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Context;
+import android.media.AudioFormat;
+import android.media.AudioRecord;
+import android.media.MediaRecorder;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Parcel;
+import android.os.ParcelFileDescriptor;
+import android.provider.ContactsContract;
+import android.renderscript.ScriptGroup;
 import android.util.JsonReader;
 import android.util.Log;
 import android.view.View;
@@ -16,9 +23,15 @@ import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
 import org.json.*;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
 import java.net.URI;
 import java.net.URISyntaxException;
-
+import java.net.UnknownHostException;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -28,20 +41,96 @@ public class MainActivity extends AppCompatActivity {
     boolean conntected = false;
 
 
+    public byte[] buffer;
+    public static DatagramSocket socket;
+    private int port=8181;
+
+    AudioRecord recorder;
+
+    private int sampleRate = 16000 ; // 44100 for music
+    private int channelConfig = AudioFormat.CHANNEL_CONFIGURATION_MONO;
+    private int audioFormat = AudioFormat.ENCODING_PCM_16BIT;
+    int minBufSize = AudioRecord.getMinBufferSize(sampleRate, channelConfig, audioFormat);
+    private boolean status = true;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        connectWebSocket();
+        //connectWebSocket();
 
-        mWebSocketClient.connect();
+       // mWebSocketClient.connect();
         final Button mButton = findViewById(R.id.sendMessageButton);
+        final Button captureAudioButton = findViewById(R.id.recordAudioButton);
+        final Button stopRecordingButton = findViewById(R.id.stopAudioRecord);
+        captureAudioButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                captureAudio();
+            }
+        });
         mButton.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v){
                 sendMessageToMycroft();
             }
         });
+
+        stopRecordingButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                status = false;
+                recorder.release();
+                Log.d("VS", "Recorder released");
+            }
+        });
+    }
+
+    private void captureAudio(){
+
+       status = true;
+       startStreaming();
+
+    }
+
+    public void startStreaming(){
+        Thread streamThread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    DatagramSocket socket = new DatagramSocket();
+                    Log.d("VS", "Socket created");
+
+                    byte[] buffer = new byte[minBufSize];
+
+                    Log.d("VS", "Buffer created of size " + minBufSize);
+                    DatagramPacket packet;
+
+                    final InetAddress destination = InetAddress.getByName("192.168.178.31");
+                    Log.d("VS", "Address received");
+
+                    recorder = new AudioRecord(MediaRecorder.AudioSource.MIC, sampleRate, channelConfig, audioFormat, minBufSize*10);
+                    Log.d("VS", "Recorder initialized");
+
+                    while (status){
+
+                        //reading dat from MIC into Buffer
+                        minBufSize = recorder.read(buffer, 0, buffer.length);
+
+                        //putting buffer in the packet
+                        packet = new DatagramPacket(buffer, buffer.length, destination, port);
+
+                        socket.send(packet);
+                        System.out.println("MinBufferSizer: "+ minBufSize);
+                    }
+                } catch (UnknownHostException e){
+                    Log.e("VS", "UnknownHostException");
+                } catch (IOException e){
+                    e.printStackTrace();
+                    Log.e("VS", "IOException");
+                }
+            }
+        });
+        streamThread.start();
     }
 
     private void sendMessageToMycroft(){

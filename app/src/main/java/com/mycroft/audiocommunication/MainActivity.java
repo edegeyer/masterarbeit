@@ -6,8 +6,11 @@ import android.media.MediaPlayer;
 import android.media.MediaRecorder;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+
+import java.io.IOException;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -23,6 +26,8 @@ public class MainActivity extends AppCompatActivity {
         final Button startAudioButton = findViewById(R.id.audioButton);
         fileName = getExternalCacheDir().getAbsolutePath();
         fileName += "/audiorecordtest.3gp";
+
+
         startAudioButton.setOnClickListener(new View.OnClickListener() {
                                                 @Override
                                                 public void onClick(View view) {
@@ -43,8 +48,31 @@ public class MainActivity extends AppCompatActivity {
                 System.out.println("Can't go to sleep");
             }
             recorder.stop();
+            recorder.release();
             //TODO: play the recorded file
             //TODO: send the data as a byte stream -> in die Socketproto App einfügen
+
+        final Button playAudioButton = findViewById(R.id.audioButton);
+        playAudioButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                try {
+                    player.setDataSource(fileName);
+                    player.prepare();
+                    player.start();
+                } catch (IOException e){
+                    Log.e("player", "prepare failed");
+                }
+                try {
+                    Thread.sleep(1000);
+                }
+                catch (Exception e){
+                    System.out.println("Can't go to sleep");
+                }
+                player.stop();
+                player.release();
+            }
+        });
             }
         }
         );
