@@ -1,31 +1,22 @@
 package com.mycroft.socketprotoyp;
 
-import androidx.appcompat.app.AppCompatActivity;
-
-import android.content.Context;
 import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaRecorder;
-import android.os.Build;
 import android.os.Bundle;
-import android.os.Parcel;
-import android.os.ParcelFileDescriptor;
-import android.provider.ContactsContract;
-import android.renderscript.ScriptGroup;
-import android.util.JsonReader;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
-import org.json.*;
+import org.json.JSONException;
+import org.json.JSONObject;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
@@ -57,9 +48,9 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        //connectWebSocket();
+       // connectWebSocket();
 
-       // mWebSocketClient.connect();
+     //   mWebSocketClient.connect();
         final Button mButton = findViewById(R.id.sendMessageButton);
         final Button captureAudioButton = findViewById(R.id.recordAudioButton);
         final Button stopRecordingButton = findViewById(R.id.stopAudioRecord);
@@ -96,6 +87,36 @@ public class MainActivity extends AppCompatActivity {
         Thread streamThread = new Thread(new Runnable() {
             @Override
             public void run() {
+
+                try{
+                    if (mWebSocketClient == null){
+                        //TODO: check for WIFI
+                        connectWebSocket();
+                        mWebSocketClient.connect();
+
+                    }
+                    String message = "{\"data\": {\"utterances\": [\"loomodiscover123456789\"]}, \"type\": \"recognizer_loop:utterance\", \"context\": null}";
+                    mWebSocketClient.send(message);
+            /*        try {
+                        byte[] buffer = new byte[minBufSize];
+
+                        Log.d("VS", "Buffer created of size " + minBufSize);
+                        DatagramPacket packet;
+                        recorder = new AudioRecord(MediaRecorder.AudioSource.MIC, sampleRate, channelConfig, audioFormat, minBufSize*10);
+                        Log.d("VS", "Recorder initialized");
+                        while (status){
+                            minBufSize = recorder.read(buffer, 0, buffer.length);
+                            mWebSocketClient.send(buffer);
+                        }
+
+                    } catch (Exception e){
+                        e.printStackTrace();
+                    } */
+                } catch (Exception e){
+                    e.printStackTrace();
+                }
+
+                /*
                 try {
                     DatagramSocket socket = new DatagramSocket();
                     Log.d("VS", "Socket created");
@@ -107,27 +128,15 @@ public class MainActivity extends AppCompatActivity {
 
                     final InetAddress destination = InetAddress.getByName("192.168.178.31");
                     Log.d("VS", "Address received");
-
                     recorder = new AudioRecord(MediaRecorder.AudioSource.MIC, sampleRate, channelConfig, audioFormat, minBufSize*10);
                     Log.d("VS", "Recorder initialized");
 
-                    while (status){
-
-                        //reading dat from MIC into Buffer
-                        minBufSize = recorder.read(buffer, 0, buffer.length);
-
-                        //putting buffer in the packet
-                        packet = new DatagramPacket(buffer, buffer.length, destination, port);
-
-                        socket.send(packet);
-                        System.out.println("MinBufferSizer: "+ minBufSize);
-                    }
                 } catch (UnknownHostException e){
                     Log.e("VS", "UnknownHostException");
                 } catch (IOException e){
                     e.printStackTrace();
                     Log.e("VS", "IOException");
-                }
+                }*/
             }
         });
         streamThread.start();
@@ -154,6 +163,7 @@ public class MainActivity extends AppCompatActivity {
             if (mWebSocketClient == null){
                 //TODO: check for WIFI
                 connectWebSocket();
+                mWebSocketClient.connect();
             }
             try {
                 String message = "{\"data\": {\"utterances\": [\"loomodiscover123456789\"]}, \"type\": \"recognizer_loop:utterance\", \"context\": null}";
@@ -175,6 +185,7 @@ public class MainActivity extends AppCompatActivity {
         try {
             // standard myCroft Messagebus URI: ws://IP:8181/core
             uri = new URI("ws://192.168.178.31:8181/core");
+            //uri = new URI("ws://192.168.178.31:10000");
             System.out.println("URI is: "+ uri);
         }
         catch (URISyntaxException e){

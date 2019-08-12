@@ -9,8 +9,14 @@ import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
 
+import java.io.BufferedReader;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.Socket;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -76,5 +82,34 @@ public class MainActivity extends AppCompatActivity {
             }
         }
         );
+        final Button sendMessage = findViewById(R.id.sendMessage);
+        sendMessage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // TODO: first: connect to the socket
+                // TODO: second: send a sample text message
+                Thread t = new Thread() {
+                    @Override
+                    public void run() {
+                        try {
+                            Socket s = new Socket("192.168.178.31", 65432);
+                            DataOutputStream dos = new DataOutputStream(s.getOutputStream());
+                            dos.write("Hello Android World".getBytes());
+
+                            //read input stream
+                            DataInputStream dis2 = new DataInputStream(s.getInputStream());
+                            InputStreamReader disR2 = new InputStreamReader(dis2);
+                            BufferedReader br = new BufferedReader(disR2);
+                            System.out.println("Received: " + br.toString());
+                            dis2.close();
+                            s.close();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                };
+                t.start();
+            }
+        });
     }
 }
