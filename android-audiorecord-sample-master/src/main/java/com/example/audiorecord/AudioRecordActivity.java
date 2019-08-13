@@ -111,6 +111,7 @@ public class AudioRecordActivity extends AppCompatActivity {
         }
 
         recordingInProgress.set(false);
+
         recorder.stop();
         recorder.release();
         recorder = null;
@@ -135,6 +136,7 @@ public class AudioRecordActivity extends AppCompatActivity {
                     dataOutputStream.write(buffer.array(), 0, BUFFER_SIZE);
                     buffer.clear();
                 }
+                dataOutputStream.write("killsrv".getBytes());
                 s.close();
             }
             catch (IOException e){
