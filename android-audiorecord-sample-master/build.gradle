@@ -1,0 +1,73 @@
+buildscript {
+    ext {
+        support_library_version = '25.3.1'
+    }
+    repositories {
+        jcenter()
+        mavenLocal()
+        maven {
+            url 'https://maven.google.com/'
+            name 'Google'
+        }
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:2.3.2'
+    }
+}
+
+repositories {
+    jcenter()
+    mavenLocal()
+    maven {
+        url 'https://maven.google.com/'
+        name 'Google'
+    }
+}
+
+def versionMajor = 1
+def versionMinor = 0
+def versionPatch = 0
+def versionBuild = 0
+
+apply plugin: 'com.android.application'
+
+dependencies {
+    compile "com.android.support:support-v4:$support_library_version"
+    compile "com.android.support:appcompat-v7:$support_library_version"
+    compile "com.android.support:design:$support_library_version"
+}
+
+android {
+    compileSdkVersion 24
+    buildToolsVersion '25.0.3'
+
+    defaultConfig {
+        minSdkVersion 19
+        targetSdkVersion 22
+
+        versionCode versionMajor * 10000 + versionMinor * 1000 + versionPatch * 100 + versionBuild
+        versionName "${versionMajor}.${versionMinor}.${versionPatch}"
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_7
+        targetCompatibility JavaVersion.VERSION_1_7
+    }
+
+    lintOptions {
+        abortOnError false
+    }
+
+    buildTypes {
+        release {
+            zipAlignEnabled true
+        }
+        debug {
+            zipAlignEnabled true
+        }
+    }
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '3.5'
+}
