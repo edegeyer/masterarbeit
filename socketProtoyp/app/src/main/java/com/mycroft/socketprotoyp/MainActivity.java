@@ -48,9 +48,9 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-       // connectWebSocket();
+        connectWebSocket();
 
-     //   mWebSocketClient.connect();
+        mWebSocketClient.connect();
         final Button mButton = findViewById(R.id.sendMessageButton);
         final Button captureAudioButton = findViewById(R.id.recordAudioButton);
         final Button stopRecordingButton = findViewById(R.id.stopAudioRecord);

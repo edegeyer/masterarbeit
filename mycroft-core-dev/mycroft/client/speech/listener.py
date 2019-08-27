@@ -44,6 +44,7 @@ import socket
 import threading
 myHOST = '192.168.178.31'  # Standard loopback interface address (localhost)
 myPORT = 65432  # Port to listen on (non-privileged ports are > 1023)
+audioPort = 65433 # Port to send audio to client
 
 
 class AudioStreamHandler(object):
@@ -68,9 +69,6 @@ class AudioProducer(Thread):
     """
 
     def __init__(self, state, queue, mic, recognizer, emitter, stream_handler):
-        thread = threading.Thread(target=self.createListener)
-        thread.daemon = True
-        thread.start()
         super(AudioProducer, self).__init__()
         self.daemon = True
         self.state = state
@@ -79,6 +77,30 @@ class AudioProducer(Thread):
         self.recognizer = recognizer
         self.emitter = emitter
         self.stream_handler = stream_handler
+        self.isStreaming = False
+        thread = threading.Thread(target=self.createListener)
+        #audioThread = threading.Thread(target=self.audioWriter())
+        thread.daemon = True
+        #audioThread.daemon = True
+        thread.start()
+        #audioThread.start()
+
+
+
+    def audioWriter(self):
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        s.bind((myHOST, audioPort))
+        print("created audio output socket at: ", socket.gethostname(), " ", audioPort)
+        s.listen(1)
+        print("now listetning on auidosocket")
+        while True:
+            conn, addr = s.accept()
+            print("Connected to: ", addr)
+            while True:
+                data = conn.recv(1024)
+                print("sending data")
+                conn.send(b'in the audio stream')
+
 
     def createListener(self):
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -94,14 +116,16 @@ class AudioProducer(Thread):
             conn, addr = s.accept()
             #self.print_lock.acquire()
             print("Connected to: ", addr)
+            self.isStreaming = True
+            print("set is streaming")
             while True:
                 data = conn.recv(7168)
                 # TODO: Daten so zwischenspeichern, dass sie als Input für den Stream genutzt werden können
                 audiostream.write(data)
-
-
+                #conn.send("HAVE DATA")
                 if not data:
                     print("Bye")
+                    self.isStreaming = False
                     break
                 elif data == 'killsrv':
                     conn.close()

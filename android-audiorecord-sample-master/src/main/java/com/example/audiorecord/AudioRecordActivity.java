@@ -22,25 +22,36 @@ import android.media.MediaRecorder;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
+import java.io.BufferedReader;
+import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.InetAddress;
 import java.net.Socket;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.ByteBuffer;
 import java.util.concurrent.atomic.AtomicBoolean;
+
+import org.java_websocket.client.WebSocketClient;
+import org.java_websocket.handshake.ServerHandshake;
+import org.json.JSONObject;
 
 /**
  * Sample that demonstrates how to record a device's microphone using {@link AudioRecord}.
  */
 public class AudioRecordActivity extends AppCompatActivity {
 
-    private static final int SAMPLING_RATE_IN_HZ = 44100;
+    private static final int SAMPLING_RATE_IN_HZ = 16000;
 
-    private static final int CHANNEL_CONFIG = AudioFormat.CHANNEL_IN_MONO;
+    private static final int CHANNEL_CONFIG = AudioFormat.CHANNEL_IN_DEFAULT;
 
     private static final int AUDIO_FORMAT = AudioFormat.ENCODING_PCM_16BIT;
 
@@ -50,7 +61,7 @@ public class AudioRecordActivity extends AppCompatActivity {
      * size is determined by {@link AudioRecord#getMinBufferSize(int, int, int)} and depends on the
      * recording settings.
      */
-    private static final int BUFFER_SIZE_FACTOR = 2;
+    private static final int BUFFER_SIZE_FACTOR = 10;
 
     /**
      * Size of the buffer where the audio data is stored by Android
@@ -66,10 +77,13 @@ public class AudioRecordActivity extends AppCompatActivity {
     private AudioRecord recorder = null;
 
     private Thread recordingThread = null;
+    private Thread listeningThread = null;
 
     private Button startButton;
-
+    WebSocketClient mWebSocketClient;
     private Button stopButton;
+
+    private Button playButton;
 
     private String SERVER = "192.168.178.31";
     private int PORT  = 65432;
@@ -78,9 +92,19 @@ public class AudioRecordActivity extends AppCompatActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.audio);
-
+        connectWebSocket();
+        mWebSocketClient.connect();
         stopButton = (Button) findViewById(R.id.btnStop);
         stopButton.setEnabled(true);
+        playButton = (Button) findViewById(R.id.playButton);
+        playButton.setEnabled(true);
+
+        playButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startPlaying();
+            }
+        });
 
         stopButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -94,6 +118,53 @@ public class AudioRecordActivity extends AppCompatActivity {
 
     }
 
+    private void connectWebSocket(){
+        URI uri;
+        try {
+            // TODO: adjust if connected to different network
+            uri = new URI("ws://192.168.178.31:8181/core");
+        }
+        catch (URISyntaxException e){
+            e.printStackTrace();
+            return;
+        }
+        mWebSocketClient = new WebSocketClient(uri){
+            @Override
+            public void onOpen(ServerHandshake serverHandshake){
+                System.out.println("WebSocket opened");
+            }
+
+            @Override
+            public void onMessage(String message){
+                try {
+                    final JSONObject jsonObject = new JSONObject(message);
+                    Log.d("JSON is: ", jsonObject.toString());
+                    if(jsonObject.get("type").equals("connected")){
+                        System.out.println("it's connected");
+                    }
+                }
+                catch (Throwable t){
+                    System.out.println("Malformed JSON");
+                }
+
+            }
+            @Override
+            public void onClose(int i, String s, boolean b){
+                Log.i("WebSocket", "Closed" + s);
+               // conntected = false;
+            }
+
+            @Override
+            public void onError(Exception e){
+                Log.i("WebSocket", "Error "+ e.getMessage());
+            }
+        };
+    }
+
+    private void startPlaying(){
+
+    }
+
     private void startRecording() {
         recorder = new AudioRecord(MediaRecorder.AudioSource.DEFAULT, SAMPLING_RATE_IN_HZ,
                 CHANNEL_CONFIG, AUDIO_FORMAT, BUFFER_SIZE);
@@ -102,7 +173,11 @@ public class AudioRecordActivity extends AppCompatActivity {
 
         recordingInProgress.set(true);
         recordingThread = new Thread(new RecordingRunnable(), "Recording Thread");
+        //listeningThread = new Thread(new ListeningRunnable(), "Listening Thread");
+        System.out.println("created both Threads");
         recordingThread.start();
+        //listeningThread.start();
+        System.out.println("startetd both Threads");
     }
 
     private void stopRecording() {
@@ -118,10 +193,36 @@ public class AudioRecordActivity extends AppCompatActivity {
         recordingThread = null;
     }
 
+
+    // This thread is only for playing the sound, actions get triggered by the messageds received from the message bus
+    private class ListeningRunnable implements Runnable {
+        private BufferedReader input;
+        @Override
+        public void run(){
+            System.out.println("in listening thread");
+            try{
+                // using the same port as the recording won't work, as there's constantly data written on by the client
+                Socket s = new Socket(SERVER, PORT+1);
+                this.input = new BufferedReader(new InputStreamReader(s.getInputStream()));
+                String message = input.readLine();
+                // there won't be any data written by the server if no recorded data has been sent over
+                while (recordingInProgress.get()){
+                    if (!message.isEmpty()) {
+                        System.out.println("message is: " + message);
+                    }
+                    // TODO: play the sound, when data has been sent
+                }
+            }
+            catch (Exception e){
+                System.out.println("Exception in listeneing Thread "+ e);
+            }
+        }
+    }
     private class RecordingRunnable implements Runnable {
 
         @Override
         public void run() {
+            System.out.println("in recording thread");
             try {
                 Socket s = new Socket(SERVER, PORT);
                 DataOutputStream dataOutputStream = new DataOutputStream(s.getOutputStream());
@@ -135,36 +236,17 @@ public class AudioRecordActivity extends AppCompatActivity {
                     }
                     dataOutputStream.write(buffer.array(), 0, BUFFER_SIZE);
                     buffer.clear();
+                   // String message = inputStream.readLine();
+                  //  System.out.println(message);
+
                 }
-                dataOutputStream.write("killsrv".getBytes());
+               // dataOutputStream.write("killsrv".getBytes());
                 s.close();
             }
             catch (IOException e){
                 e.printStackTrace();
             }
-            /*
-            final File file = new File(Environment.getExternalStorageDirectory(), "recording2.pcm");
-            final ByteBuffer buffer = ByteBuffer.allocateDirect(BUFFER_SIZE);
 
-            try (final FileOutputStream outStream = new FileOutputStream(file)) {
-                while (recordingInProgress.get()) {
-                    int result = recorder.read(buffer, BUFFER_SIZE);
-                    if (result < 0) {
-                        throw new RuntimeException("Reading of audio buffer failed: " +
-                                getBufferReadFailureReason(result));
-                    }
-                    outStream.write(buffer.array(), 0, BUFFER_SIZE);
-                    String myData = null;
-                    for (int i = 0; i < BUFFER_SIZE; i++){
-                        myData += buffer.get(i) ;
-                    }
-                    System.out.println("myData" + myData);
-                    buffer.clear();
-                }
-            } catch (IOException e) {
-                throw new RuntimeException("Writing of recorded audio failed", e);
-            }
-            */
         }
 
         private String getBufferReadFailureReason(int errorCode) {
