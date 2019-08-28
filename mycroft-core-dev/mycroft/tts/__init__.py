@@ -316,6 +316,7 @@ class TTS(metaclass=ABCMeta):
                 mycroft.util.get_cache_directory("tts/" + self.tts_name),
                 key + '.' + self.audio_ext)
 
+            # TODO: hier wird entweder die wav datei gesucht&gefunden oder aber diese datei dargstellt
             if os.path.exists(wav_file):
                 LOG.debug("TTS cache hit")
                 phonemes = self.load_phonemes(key)
@@ -323,7 +324,7 @@ class TTS(metaclass=ABCMeta):
                 wav_file, phonemes = self.get_tts(sentence, wav_file)
                 if phonemes:
                     self.save_phonemes(key, phonemes)
-
+                LOG.info("wav_file ", wav_file)
             vis = self.viseme(phonemes)
             self.queue.put((self.audio_ext, wav_file, vis, ident))
 

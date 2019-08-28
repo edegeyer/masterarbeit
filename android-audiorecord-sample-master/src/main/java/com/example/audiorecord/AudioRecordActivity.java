@@ -21,6 +21,7 @@ import android.media.AudioRecord;
 import android.media.MediaRecorder;
 import android.os.Bundle;
 import android.os.Environment;
+import android.speech.tts.TextToSpeech;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -38,6 +39,7 @@ import java.net.Socket;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.ByteBuffer;
+import java.util.Locale;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.java_websocket.client.WebSocketClient;
@@ -80,6 +82,8 @@ public class AudioRecordActivity extends AppCompatActivity {
     private Thread listeningThread = null;
 
     private Button startButton;
+    TextToSpeech mTTS = null;
+    private final int ACT_CHECK_TTS_DATA = 1000;
     WebSocketClient mWebSocketClient;
     private Button stopButton;
 
@@ -92,6 +96,12 @@ public class AudioRecordActivity extends AppCompatActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.audio);
+        mTTS = new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
+            @Override
+            public void onInit(int i) {
+                mTTS.setLanguage(Locale.UK);
+            }
+        });
         connectWebSocket();
         mWebSocketClient.connect();
         stopButton = (Button) findViewById(R.id.btnStop);
@@ -138,9 +148,14 @@ public class AudioRecordActivity extends AppCompatActivity {
             public void onMessage(String message){
                 try {
                     final JSONObject jsonObject = new JSONObject(message);
-                    Log.d("JSON is: ", jsonObject.toString());
                     if(jsonObject.get("type").equals("connected")){
                         System.out.println("it's connected");
+                    }
+                    if(jsonObject.get("type").equals("speak")){
+                        JSONObject jsonObject1 = jsonObject.getJSONObject("data");
+                        String utterance = jsonObject1.get("utterance").toString();
+                        System.out.println("UTTERANCE: "+ utterance);
+                        mTTS.speak(utterance, TextToSpeech.QUEUE_FLUSH, null);
                     }
                 }
                 catch (Throwable t){
@@ -159,6 +174,10 @@ public class AudioRecordActivity extends AppCompatActivity {
                 Log.i("WebSocket", "Error "+ e.getMessage());
             }
         };
+    }
+
+    private void speakUtterance(String utterance){
+
     }
 
     private void startPlaying(){
