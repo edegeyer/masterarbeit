@@ -27,6 +27,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
+import com.segway.robot.algo.dts.Person;
 import com.segway.robot.sdk.base.bind.ServiceBinder;
 import com.segway.robot.sdk.locomotion.head.Head;
 import com.segway.robot.sdk.locomotion.sbv.Base;
@@ -47,6 +48,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.ByteBuffer;
 import java.util.Locale;
+import java.util.Timer;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -104,7 +106,7 @@ public class AudioRecordActivity extends AppCompatActivity {
 
     private String SERVER = "192.168.0.109";
     private int PORT  = 65432;
-    String messageBusAddress = "ws://192.168.178.31:8181/core";
+    String messageBusAddress = "ws://192.168.0.109:8181/core";
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -162,15 +164,35 @@ public class AudioRecordActivity extends AppCompatActivity {
             public void onMessage(String message){
                 try {
                     final JSONObject jsonObject = new JSONObject(message);
-                    System.out.println(message);
-                    if(jsonObject.get("type").equals("connected")){
-                        System.out.println("it's connected");
-                    }
+
                     if(jsonObject.get("type").equals("speak")){
                         JSONObject jsonObject1 = jsonObject.getJSONObject("data");
                         String utterance = jsonObject1.get("utterance").toString();
                         System.out.println("UTTERANCE: "+ utterance);
                         //   mTTS.speak(utterance, TextToSpeech.QUEUE_FLUSH, null);
+                    }
+                    if (jsonObject.get("type").equals("loomoInstruction")){
+                        try {
+                            JSONObject jsonObject1 = jsonObject.getJSONObject("data");
+                            System.out.println(jsonObject1.toString());
+                            String action = jsonObject1.get("action").toString();
+                            String direction = jsonObject1.get("direction").toString();
+                            detectTurnDirection(direction);
+                            if (action.equals("turn")){
+                                detectTurnDirection(direction);
+                            }
+                            else if (action.equals("go to")){
+                                System.out.println("Going to, dummy function");
+                                // TODO. implement Dummy
+                            }
+                            else {
+                                System.out.println("No idea what to do");
+                                // TODO: implement action
+                            }
+                        }
+                        catch (Throwable t){
+                            System.out.println("Issue: " + t);
+                        }
                     }
                 }
                 catch (Throwable t){
@@ -181,7 +203,6 @@ public class AudioRecordActivity extends AppCompatActivity {
             @Override
             public void onClose(int i, String s, boolean b){
                 Log.i("WebSocket", "Closed" + s);
-                // conntected = false;
             }
 
             @Override
@@ -191,10 +212,6 @@ public class AudioRecordActivity extends AppCompatActivity {
         };
     }
 
-    private void speakUtterance(String utterance){
-
-    }
-
     private void startPlaying(){
 
     }
@@ -202,16 +219,10 @@ public class AudioRecordActivity extends AppCompatActivity {
     private void startRecording() {
         recorder = new AudioRecord(MediaRecorder.AudioSource.DEFAULT, SAMPLING_RATE_IN_HZ,
                 CHANNEL_CONFIG, AUDIO_FORMAT, BUFFER_SIZE);
-
         recorder.startRecording();
-
         recordingInProgress.set(true);
         recordingThread = new Thread(new RecordingRunnable(), "Recording Thread");
-        //listeningThread = new Thread(new ListeningRunnable(), "Listening Thread");
-        System.out.println("created both Threads");
         recordingThread.start();
-        //listeningThread.start();
-        System.out.println("startetd both Threads");
     }
 
     private void stopRecording() {
@@ -259,35 +270,68 @@ public class AudioRecordActivity extends AppCompatActivity {
         mVision = Vision.getInstance();
     }
 
-    // This thread is only for playing the sound, actions get triggered by the messageds received from the message bus
-    private class ListeningRunnable implements Runnable {
-        private BufferedReader input;
-        @Override
-        public void run(){
-            System.out.println("in listening thread");
-            try{
-                // using the same port as the recording won't work, as there's constantly data written on by the client
-                Socket s = new Socket(SERVER, PORT+1);
-                this.input = new BufferedReader(new InputStreamReader(s.getInputStream()));
-                String message = input.readLine();
-                // there won't be any data written by the server if no recorded data has been sent over
-                while (recordingInProgress.get()){
-                    if (!message.isEmpty()) {
-                        System.out.println("message is: " + message);
-                    }
-                    // TODO: play the sound, when data has been sent
-                }
-            }
-            catch (Exception e){
-                System.out.println("Exception in listeneing Thread "+ e);
-            }
+
+    public void detectTurnDirection(String direction) {
+        mBase.setControlMode(Base.CONTROL_MODE_RAW);
+        switch (direction) {
+            case "left":
+                turn((float) 2.2);
+                break;
+            case "right":
+                turn((float) -2.2);
+                break;
+            case "around":
+                turn((float) 4.4);
+                break;
+            default:
+                break;
         }
     }
+
+    public void turn(final float velocity) {
+        new Thread() {
+            @Override
+            public void run() {
+                System.out.println(mHead.getHeadJointYaw());
+                mHead.setMode(Head.MODE_ORIENTATION_LOCK);
+                mBase.setAngularVelocity(velocity);
+                mHead.setYawAngularVelocity(velocity);
+                try {
+                    // sets for how long the robot is turning with that speed
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                // make the robot stop
+                mBase.setAngularVelocity(0);
+                mHead.setYawAngularVelocity(0);
+                mHead.setMode(Head.MODE_SMOOTH_TACKING);
+            }
+        }.start();
+    }
+
+    public void initateDetect() {
+        //mDts.startDetectingPerson(mPersonDetectListener);
+        //DTSPerson person[] = mDts.detectPersons(3 * 1000 * 1000);
+        //System.out.println("PErsons: " + person.length);
+        //    mVisionBindStateListener.onBind();
+        if (isVisionBind) {
+            Person[] persons = mDts.detectPersons(3 * 1000 * 1000);
+            System.out.println("PErsoons: " + persons.length);
+            if (persons.length > 0){
+                turn(2);
+                turn(-4);
+                turn(2);
+            }
+        } else {
+            System.out.println("not bound");
+        }
+    }
+
     private class RecordingRunnable implements Runnable {
 
         @Override
         public void run() {
-            System.out.println("in recording thread");
             try {
                 Socket s = new Socket(SERVER, PORT);
                 DataOutputStream dataOutputStream = new DataOutputStream(s.getOutputStream());
@@ -301,11 +345,7 @@ public class AudioRecordActivity extends AppCompatActivity {
                     }
                     dataOutputStream.write(buffer.array(), 0, BUFFER_SIZE);
                     buffer.clear();
-                    // String message = inputStream.readLine();
-                    //  System.out.println(message);
-
                 }
-                // dataOutputStream.write("killsrv".getBytes());
                 s.close();
             }
             catch (IOException e){
