@@ -326,6 +326,8 @@ class TTS(metaclass=ABCMeta):
                     self.save_phonemes(key, phonemes)
                 LOG.info("wav_file ", wav_file)
             vis = self.viseme(phonemes)
+            # TODO: das ist hier scheinbar die Stelle, an der der Text ausgegeben wird ->  das auf den bus schreiben??
+           # self.bus.emit(Message("testmessage:test"))
             self.queue.put((self.audio_ext, wav_file, vis, ident))
 
     def viseme(self, phonemes):
