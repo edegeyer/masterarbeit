@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+
 package com.example.audiorecord;
 
 import android.media.AudioFormat;
@@ -25,6 +26,13 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+
+import com.segway.robot.sdk.base.bind.ServiceBinder;
+import com.segway.robot.sdk.locomotion.head.Head;
+import com.segway.robot.sdk.locomotion.sbv.Base;
+import com.segway.robot.sdk.vision.DTS;
+import com.segway.robot.sdk.vision.Vision;
+import com.segway.robot.support.control.HeadPIDController;
 
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
@@ -45,6 +53,16 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * Sample that demonstrates how to record a device's microphone using {@link AudioRecord}.
  */
 public class AudioRecordActivity extends AppCompatActivity {
+
+    Base mBase;
+    Head mHead;
+    private Vision mVision;
+
+    private DTS mDts;
+    private HeadPIDController mHeadPIDController = new HeadPIDController();
+    private boolean isVisionBind;
+    private boolean isHeadBind;
+    private boolean isBaseBind;
 
     private static final int SAMPLING_RATE_IN_HZ = 16000;
 
@@ -86,6 +104,7 @@ public class AudioRecordActivity extends AppCompatActivity {
 
     private String SERVER = "192.168.0.109";
     private int PORT  = 65432;
+    String messageBusAddress = "ws://192.168.178.31:8181/core";
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -97,6 +116,7 @@ public class AudioRecordActivity extends AppCompatActivity {
                 mTTS.setLanguage(Locale.UK);
             }
         });
+        setUpLoomo();
         connectWebSocket();
         mWebSocketClient.connect();
         stopButton = (Button) findViewById(R.id.btnStop);
@@ -126,8 +146,7 @@ public class AudioRecordActivity extends AppCompatActivity {
     private void connectWebSocket(){
         URI uri;
         try {
-            // TODO: adjust if connected to different network
-            uri = new URI("ws://192.168.0.109:8181/core");
+            uri = new URI(messageBusAddress);
         }
         catch (URISyntaxException e){
             e.printStackTrace();
@@ -151,7 +170,7 @@ public class AudioRecordActivity extends AppCompatActivity {
                         JSONObject jsonObject1 = jsonObject.getJSONObject("data");
                         String utterance = jsonObject1.get("utterance").toString();
                         System.out.println("UTTERANCE: "+ utterance);
-                     //   mTTS.speak(utterance, TextToSpeech.QUEUE_FLUSH, null);
+                        //   mTTS.speak(utterance, TextToSpeech.QUEUE_FLUSH, null);
                     }
                 }
                 catch (Throwable t){
@@ -162,7 +181,7 @@ public class AudioRecordActivity extends AppCompatActivity {
             @Override
             public void onClose(int i, String s, boolean b){
                 Log.i("WebSocket", "Closed" + s);
-               // conntected = false;
+                // conntected = false;
             }
 
             @Override
@@ -208,6 +227,37 @@ public class AudioRecordActivity extends AppCompatActivity {
         recordingThread = null;
     }
 
+    public void setUpLoomo() {
+        // setup the base
+        mBase = Base.getInstance();
+        mBase.bindService(this.getBaseContext(), new ServiceBinder.BindStateListener() {
+            @Override
+            public void onBind() {
+                isBaseBind = true;
+            }
+
+            @Override
+            public void onUnbind(String reason) {
+                isHeadBind = false;
+            }
+        });
+        // setup the head
+        mHead = Head.getInstance();
+        mHead.bindService(this.getApplicationContext(), new ServiceBinder.BindStateListener() {
+            @Override
+            public void onBind() {
+                isHeadBind = true;
+                mHeadPIDController.init(new HeadControlHandlerImpl(mHead));
+                mHeadPIDController.setHeadFollowFactor(1.0f);
+            }
+
+            @Override
+            public void onUnbind(String reason) {
+                isHeadBind = false;
+            }
+        });
+        mVision = Vision.getInstance();
+    }
 
     // This thread is only for playing the sound, actions get triggered by the messageds received from the message bus
     private class ListeningRunnable implements Runnable {
@@ -251,11 +301,11 @@ public class AudioRecordActivity extends AppCompatActivity {
                     }
                     dataOutputStream.write(buffer.array(), 0, BUFFER_SIZE);
                     buffer.clear();
-                   // String message = inputStream.readLine();
-                  //  System.out.println(message);
+                    // String message = inputStream.readLine();
+                    //  System.out.println(message);
 
                 }
-               // dataOutputStream.write("killsrv".getBytes());
+                // dataOutputStream.write("killsrv".getBytes());
                 s.close();
             }
             catch (IOException e){
