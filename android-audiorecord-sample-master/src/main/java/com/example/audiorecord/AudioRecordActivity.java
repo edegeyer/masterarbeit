@@ -20,31 +20,26 @@ import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaRecorder;
 import android.os.Bundle;
-import android.os.Environment;
 import android.speech.tts.TextToSpeech;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
+import org.java_websocket.client.WebSocketClient;
+import org.java_websocket.handshake.ServerHandshake;
+import org.json.JSONObject;
+
 import java.io.BufferedReader;
-import java.io.DataInputStream;
 import java.io.DataOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.InetAddress;
 import java.net.Socket;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.ByteBuffer;
 import java.util.Locale;
 import java.util.concurrent.atomic.AtomicBoolean;
-
-import org.java_websocket.client.WebSocketClient;
-import org.java_websocket.handshake.ServerHandshake;
-import org.json.JSONObject;
 
 /**
  * Sample that demonstrates how to record a device's microphone using {@link AudioRecord}.
@@ -89,7 +84,7 @@ public class AudioRecordActivity extends AppCompatActivity {
 
     private Button playButton;
 
-    private String SERVER = "192.168.178.31";
+    private String SERVER = "192.168.0.109";
     private int PORT  = 65432;
 
     @Override
@@ -132,7 +127,7 @@ public class AudioRecordActivity extends AppCompatActivity {
         URI uri;
         try {
             // TODO: adjust if connected to different network
-            uri = new URI("ws://192.168.178.31:8181/core");
+            uri = new URI("ws://192.168.0.109:8181/core");
         }
         catch (URISyntaxException e){
             e.printStackTrace();
@@ -148,6 +143,7 @@ public class AudioRecordActivity extends AppCompatActivity {
             public void onMessage(String message){
                 try {
                     final JSONObject jsonObject = new JSONObject(message);
+                    System.out.println(message);
                     if(jsonObject.get("type").equals("connected")){
                         System.out.println("it's connected");
                     }
@@ -155,7 +151,7 @@ public class AudioRecordActivity extends AppCompatActivity {
                         JSONObject jsonObject1 = jsonObject.getJSONObject("data");
                         String utterance = jsonObject1.get("utterance").toString();
                         System.out.println("UTTERANCE: "+ utterance);
-                        mTTS.speak(utterance, TextToSpeech.QUEUE_FLUSH, null);
+                     //   mTTS.speak(utterance, TextToSpeech.QUEUE_FLUSH, null);
                     }
                 }
                 catch (Throwable t){
