@@ -118,12 +118,9 @@ class AudioProducer(Thread):
             #self.print_lock.acquire()
             print("Connected to: ", addr)
             self.isStreaming = True
-            print("set is streaming")
             while True:
                 data = conn.recv(7168)
-                # TODO: Daten so zwischenspeichern, dass sie als Input für den Stream genutzt werden können
                 audiostream.write(data)
-                #conn.send("HAVE DATA")
                 if not data:
                     print("Bye")
                     self.isStreaming = False

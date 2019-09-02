@@ -135,6 +135,9 @@ def play_wav(uri):
 
         Returns: subprocess.Popen object
     """
+
+    # TODO: hier das versenden der Datei? ?
+
     config = mycroft.configuration.Configuration.get()
     play_cmd = config.get("play_wav_cmdline")
     play_wav_cmd = str(play_cmd).split(" ")
