@@ -110,24 +110,7 @@ class PlaybackThread(Thread):
                         self.bus.emit(Message(
                             "PLAYBACK1",
                             {'action': data}))
-
                         # TODO: öffnen der dateien funktioniert noch nicht
-                        # probieren mit wave?
-                        wf = wave.open(data, 'rb')
-                        p = pyaudio.PyAudio()
-                        chunk = 1024
-                        stream = p.open(format=pyaudio.paInt16, channels=1, rate=16000, output=True)
-                        mydata = wf.readframes(chunk)
-                        '''self.bus.emit(Message(
-                            "PLAYBACK1",
-                            {'action': mydata}))
-                        '''
-                        '''
-                        while mydata != '':
-                            stream.write(mydata)
-                            mydata = wf.readframes(chunk)
-                        stream.close()
-                        p.terminate()'''
                         self.p = play_wav(data, self.bus)
                     elif snd_type == 'mp3':
                         self.p = play_mp3(data)
