@@ -39,6 +39,7 @@ import socket
 import pyaudio
 import threading
 import subprocess
+import mycroft.fileOpener as fileOpener
 
 myHOST = '192.168.0.109'  # Standard loopback interface address (localhost)
 #myHost = '192.168.178.31'
@@ -69,7 +70,7 @@ class PlaybackThread(Thread):
         self.queue = queue
         self._terminated = False
         self._processing_queue = False
-
+        self.fileOpener = fileOpener.fileOpener()
 
 
     def init(self, tts, bus):
@@ -102,6 +103,7 @@ class PlaybackThread(Thread):
                     self.tts.begin_audio()
                 stopwatch = Stopwatch()
                 # TODO: hier die daten verschicken
+                self.fileOpener.openFile(data, self.bus)
                 self.bus.emit(Message(
                     "PLAYBACK1",
                     {'action': "heiha"}))
