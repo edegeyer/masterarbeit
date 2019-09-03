@@ -42,6 +42,7 @@ from mycroft.util.log import LOG
 from mycroft.util.parse import extract_datetime, extract_number, normalize
 from mycroft.util.signal import *
 
+from mycroft.messagebus.message import Message
 
 def resolve_resource_file(res_name):
     """Convert a resource into an absolute filename.
@@ -123,7 +124,7 @@ def play_audio_file(uri: str):
         return None
 
 
-def play_wav(uri):
+def play_wav(uri, bus):
     """ Play a wav-file.
 
         This will use the application specified in the mycroft config
@@ -141,6 +142,12 @@ def play_wav(uri):
     config = mycroft.configuration.Configuration.get()
     play_cmd = config.get("play_wav_cmdline")
     play_wav_cmd = str(play_cmd).split(" ")
+    bus.emit(Message(
+        "PLAYBACK1",
+        {'action': uri,
+         'play cmd': play_cmd,
+         'play wav': play_wav_cmd}))
+
     for index, cmd in enumerate(play_wav_cmd):
         if cmd == "%1":
             play_wav_cmd[index] = (get_http(uri))

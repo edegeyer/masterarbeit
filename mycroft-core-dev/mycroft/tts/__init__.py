@@ -41,6 +41,7 @@ import threading
 import subprocess
 
 myHOST = '192.168.0.109'  # Standard loopback interface address (localhost)
+#myHost = '192.168.178.31'
 myPORT = 65432  # Port to listen on (non-privileged ports are > 1023)
 audioPort = 65433 # Port to send audio to client
 
@@ -108,16 +109,26 @@ class PlaybackThread(Thread):
                     if snd_type == 'wav':
                         self.bus.emit(Message(
                             "PLAYBACK1",
-                            {'action': "haha"}))
+                            {'action': data}))
+
                         # TODO: öffnen der dateien funktioniert noch nicht
-                        contents = subprocess.Popen(data)
-                        self.bus.emit(Message(
+                        # probieren mit wave?
+                        wf = wave.open(data, 'rb')
+                        p = pyaudio.PyAudio()
+                        chunk = 1024
+                        stream = p.open(format=pyaudio.paInt16, channels=1, rate=16000, output=True)
+                        mydata = wf.readframes(chunk)
+                        '''self.bus.emit(Message(
                             "PLAYBACK1",
-                            {'action': "huhu"}))
-                        self.bus.emit(Message(
-                            "PLAYBACK1",
-                            {'action': contents}))
-                        self.p = play_wav(data)
+                            {'action': mydata}))
+                        '''
+                        '''
+                        while mydata != '':
+                            stream.write(mydata)
+                            mydata = wf.readframes(chunk)
+                        stream.close()
+                        p.terminate()'''
+                        self.p = play_wav(data, self.bus)
                     elif snd_type == 'mp3':
                         self.p = play_mp3(data)
 

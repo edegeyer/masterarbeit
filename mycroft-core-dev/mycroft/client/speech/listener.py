@@ -33,6 +33,7 @@ from mycroft.util import find_input_device
 from queue import Queue, Empty
 import json
 from copy import deepcopy
+import mycroft.socketServer
 
 AUDIO_DATA = 0
 STREAM_START = 1
@@ -79,11 +80,13 @@ class AudioProducer(Thread):
         self.emitter = emitter
         self.stream_handler = stream_handler
         self.isStreaming = False
-        thread = threading.Thread(target=self.createListener)
+        self.server = mycroft.socketServer.socketServer()
+        self.server.start()
+        #thread = threading.Thread(target=self.createListener)
         #audioThread = threading.Thread(target=self.audioWriter())
-        thread.daemon = True
+        #thread.daemon = True
         #audioThread.daemon = True
-        thread.start()
+        #thread.start()
         #audioThread.start()
 
 
