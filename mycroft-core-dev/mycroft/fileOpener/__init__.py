@@ -5,20 +5,19 @@ class fileOpener():
         self.fileLocation = '/home/martin/Desktop/masterarbeit/sampleAudio/turnLeft.wav'
 
     def openFile(self, uri, bus):
-        chunk = 128
+        chunk = 2048
         f = open(self.fileLocation, "rb")
-        bus.emit(Message(
-            "AUDIO",
-            {'action': uri}))
         while True:
-            piece  = f.read(chunk)
+            piece = f.read(chunk)
             print(piece)
             stringPiece = str(piece)
             bus.emit(Message(
-                "AUDIO",
+                "Audio",
                 {'action': stringPiece}))
             if piece == b'':
-                print("end of file")
+                bus.emit(Message(
+                    "Audio",
+                    {'action': "end"}))
                 break
 
         #print(f.read())

@@ -20,7 +20,7 @@ class socketServer(Thread):
         p = pyaudio.PyAudio()
         audiostream = p.open(format=pyaudio.paInt16, channels=1, rate=16000, output=True)
         #audiostream = self.audio.open(format=pyaudio.paInt16, channels=1, rate=16000, input=True)
-        self.writeOnServer()
+        #self.writeOnServer()
         print("created socket at: ", socket.gethostname(), " ", myPORT)
         self.socket.listen(1)
         print("now listening...")
