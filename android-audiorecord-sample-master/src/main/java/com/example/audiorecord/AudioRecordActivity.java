@@ -19,7 +19,9 @@ package com.example.audiorecord;
 
 import android.media.AudioFormat;
 import android.media.AudioRecord;
+import android.media.MediaPlayer;
 import android.media.MediaRecorder;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
 import android.support.v7.app.AppCompatActivity;
@@ -40,9 +42,15 @@ import org.java_websocket.handshake.ServerHandshake;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
+import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -90,11 +98,12 @@ public class AudioRecordActivity extends AppCompatActivity {
      * Signals whether a recording is in progress (true) or not (false).
      */
     private final AtomicBoolean recordingInProgress = new AtomicBoolean(false);
+    private final AtomicBoolean listeningInProgress = new AtomicBoolean(false);
 
     private AudioRecord recorder = null;
 
     private Thread recordingThread = null;
-    private Thread listeningThread = null;
+    private Thread playerThread = null;
 
     private Button startButton;
     TextToSpeech mTTS = null;
@@ -103,11 +112,13 @@ public class AudioRecordActivity extends AppCompatActivity {
     private Button stopButton;
 
     private Button playButton;
+    MediaPlayer player;
 
     private String SERVER = "192.168.0.109";
+    //private String SERVER = "192.168.178.31";
     private int PORT  = 65432;
     String messageBusAddress = "ws://192.168.0.109:8181/core";
-
+    //String messageBusAddress = "ws://192.168.178.31:8181/core";
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -125,14 +136,6 @@ public class AudioRecordActivity extends AppCompatActivity {
         stopButton.setEnabled(true);
         playButton = (Button) findViewById(R.id.playButton);
         playButton.setEnabled(true);
-
-        playButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                startPlaying();
-            }
-        });
-
         stopButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -162,9 +165,49 @@ public class AudioRecordActivity extends AppCompatActivity {
 
             @Override
             public void onMessage(String message){
+               // System.out.println(message);
                 try {
                     final JSONObject jsonObject = new JSONObject(message);
+                    // check if a sound file has been sent
+                    if(jsonObject.get("type").equals("Audio")){
+                        String soundstring = "";
+                        try {
+                            JSONObject jsonData = jsonObject.getJSONObject("data");
 
+
+                            String action = jsonData.get("action").toString();
+                            if (action.equals("end")){
+                                // TODO: convert to byte & play sound
+                                byte[] bytes = soundstring.getBytes("UTF-8");
+                                File file = File.createTempFile("mySound", "wav", getCacheDir());
+                                file.deleteOnExit();
+                                FileOutputStream fos = new FileOutputStream(file);
+                                fos.write(bytes);
+                                fos.close();
+                                FileInputStream fis = new FileInputStream(file);
+                                System.out.println("SOUNDSTRING " + soundstring);
+                                MediaPlayer player = new MediaPlayer();
+                                player.setDataSource(fis.getFD());
+                                player.prepare();
+                                player.start();
+                                player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                                    @Override
+                                    public void onCompletion(MediaPlayer mp) {
+                                        // TODO Auto-generated method stub
+                                        mp.release();
+                                    }
+                                });
+                            }
+                            else {
+                                soundstring.concat(action);
+                            }
+                        }catch (Exception e){
+                            System.out.println("Issue " + e);
+                        }
+
+                        System.out.println(jsonObject.toString());
+
+                    }
                     if(jsonObject.get("type").equals("speak")){
                         JSONObject jsonObject1 = jsonObject.getJSONObject("data");
                         String utterance = jsonObject1.get("utterance").toString();
@@ -173,17 +216,24 @@ public class AudioRecordActivity extends AppCompatActivity {
                     }
                     if (jsonObject.get("type").equals("loomoInstruction")){
                         try {
-                            JSONObject jsonObject1 = jsonObject.getJSONObject("data");
-                            System.out.println(jsonObject1.toString());
-                            String action = jsonObject1.get("action").toString();
-                            String direction = jsonObject1.get("direction").toString();
-                            detectTurnDirection(direction);
+                            JSONObject jsonData = jsonObject.getJSONObject("data");
+                            System.out.println(jsonData.toString());
+                            String action = jsonData.get("action").toString();
+                            //detectTurnDirection(direction);
                             if (action.equals("turn")){
+                                String direction = jsonData.get("direction").toString();
                                 detectTurnDirection(direction);
                             }
-                            else if (action.equals("go to")){
-                                System.out.println("Going to, dummy function");
-                                // TODO. implement Dummy
+                            else if (action.equals("goPlace")){
+                                mBase.setControlMode(Base.CONTROL_MODE_RAW);
+                                String destination = jsonData.get("destination").toString();
+                                goTo(destination);
+
+                            }
+                            else if (action.equals("getItem")){
+                                mBase.setControlMode(Base.CONTROL_MODE_RAW);
+                                String item = jsonData.get("item").toString();
+                                getItem(item);
                             }
                             else {
                                 System.out.println("No idea what to do");
@@ -210,10 +260,6 @@ public class AudioRecordActivity extends AppCompatActivity {
                 Log.i("WebSocket", "Error "+ e.getMessage());
             }
         };
-    }
-
-    private void startPlaying(){
-
     }
 
     private void startRecording() {
@@ -270,6 +316,38 @@ public class AudioRecordActivity extends AppCompatActivity {
         mVision = Vision.getInstance();
     }
 
+    public void goTo(String destination){
+        new Thread(){
+            @Override
+            public void run(){
+                mBase.setLinearVelocity(1);
+                try {
+                    // sets for how long the robot is turning with that speed
+                    Thread.sleep(2500);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                mBase.setLinearVelocity(0);
+
+
+            }
+        }.start();
+
+    }
+
+    public void getItem(String item){
+        new Thread(){
+            @Override
+            public void run(){
+                mBase.setLinearVelocity(1);
+                turn((float)4.4);
+                mBase.setLinearVelocity(1);
+
+            }
+        }.start();
+
+
+    }
 
     public void detectTurnDirection(String direction) {
         mBase.setControlMode(Base.CONTROL_MODE_RAW);
@@ -318,6 +396,7 @@ public class AudioRecordActivity extends AppCompatActivity {
         if (isVisionBind) {
             Person[] persons = mDts.detectPersons(3 * 1000 * 1000);
             System.out.println("PErsoons: " + persons.length);
+            mWebSocketClient.send("{\"loomo\": \"personDetect\"}");
             if (persons.length > 0){
                 turn(2);
                 turn(-4);
@@ -327,6 +406,8 @@ public class AudioRecordActivity extends AppCompatActivity {
             System.out.println("not bound");
         }
     }
+
+
 
     private class RecordingRunnable implements Runnable {
 
