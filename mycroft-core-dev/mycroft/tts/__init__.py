@@ -16,6 +16,7 @@ import hashlib
 import os
 import random
 import re
+import wave
 import sys
 from abc import ABCMeta, abstractmethod
 from threading import Thread
@@ -35,6 +36,10 @@ from mycroft.util import (
 from mycroft.util.log import LOG
 from queue import Queue, Empty
 import mycroft.fileOpener as fileOpener
+myHOST = '192.168.0.109'  # Standard loopback interface address (localhost)
+#myHost = '192.168.178.31'
+myPORT = 65432  # Port to listen on (non-privileged ports are > 1023)
+audioPort = 65433 # Port to send audio to client
 
 def send_playback_metric(stopwatch, ident):
     """
@@ -55,13 +60,13 @@ class PlaybackThread(Thread):
         viseme data to enclosure.
     """
 
-    def __init__(self, queue, bus):
+    def __init__(self, queue):
         super(PlaybackThread, self).__init__()
         self.queue = queue
         self._terminated = False
         self._processing_queue = False
-        self.bus = bus
         self.fo = fileOpener.fileOpener()
+
 
     def init(self, tts, bus):
         self.tts = tts
@@ -78,6 +83,7 @@ class PlaybackThread(Thread):
         except Exception:
             pass
 
+
     def run(self):
         """
             Thread main loop. get audio and viseme data from queue
@@ -90,10 +96,14 @@ class PlaybackThread(Thread):
                 if not self._processing_queue:
                     self._processing_queue = True
                     self.tts.begin_audio()
-                    self.fo.openFile()#data, self.bus)
                 stopwatch = Stopwatch()
+                self.fo.openFile(data, self.bus)
+                # TODO: hier die daten verschicken
                 with stopwatch:
                     if snd_type == 'wav':
+
+
+                        # TODO: öffnen der dateien funktioniert noch nicht
                         self.p = play_wav(data)
                     elif snd_type == 'mp3':
                         self.p = play_mp3(data)
@@ -224,7 +234,7 @@ class TTS(metaclass=ABCMeta):
             bus:    Mycroft messagebus connection
         """
         self.bus = bus
-        self.playback.init(self, bus=bus)
+        self.playback.init(self, bus=self.bus)
         self.enclosure = EnclosureAPI(self.bus)
         self.playback.enclosure = self.enclosure
 
@@ -315,11 +325,9 @@ class TTS(metaclass=ABCMeta):
         for sentence in chunks:
             key = str(hashlib.md5(
                 sentence.encode('utf-8', 'ignore')).hexdigest())
-            wav_file = os.path.join(
-                mycroft.util.get_cache_directory("tts/" + self.tts_name),
+            wav_file = os.path.join(mycroft.util.get_cache_directory("tts/"+ self.tts_name)
+                ,
                 key + '.' + self.audio_ext)
-
-            # TODO: hier wird entweder die wav datei gesucht&gefunden oder aber diese datei dargstellt
             if os.path.exists(wav_file):
                 LOG.debug("TTS cache hit")
                 phonemes = self.load_phonemes(key)
@@ -329,9 +337,13 @@ class TTS(metaclass=ABCMeta):
                     self.save_phonemes(key, phonemes)
                 LOG.info("wav_file ", wav_file)
             vis = self.viseme(phonemes)
-            # TODO: das ist hier scheinbar die Stelle, an der der Text ausgegeben wird ->  das auf den bus schreiben??
-           # self.bus.emit(Message("testmessage:test"))
+            # TODO: wav datei in byte transformieren und versenden
+
+
             self.queue.put((self.audio_ext, wav_file, vis, ident))
+
+
+
 
     def viseme(self, phonemes):
         """

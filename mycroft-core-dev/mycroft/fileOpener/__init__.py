@@ -4,12 +4,12 @@ class fileOpener():
     def __init__(self):
         self.fileLocation = '/home/martin/Desktop/masterarbeit/sampleAudio/booting.wav'
 
-    def openFile(self):#, uri, bus):
+    def openFile(self, uri, bus):
         chunk = 2048
         f = open(self.fileLocation, "rb")
-        #bus.emit(Message(
-        #    "OPENFILE",
-        #    {'uri': "uri"}))
+        bus.emit(Message(
+            "OPENFILE",
+            {'uri': uri}))
         '''while True:
             piece = f.read(chunk)
             print(piece)
