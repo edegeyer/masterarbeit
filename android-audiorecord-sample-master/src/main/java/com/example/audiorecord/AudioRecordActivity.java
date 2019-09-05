@@ -17,6 +17,7 @@
 
 package com.example.audiorecord;
 
+import android.content.Context;
 import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaPlayer;
@@ -50,6 +51,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.URI;
@@ -110,15 +112,16 @@ public class AudioRecordActivity extends AppCompatActivity {
     private final int ACT_CHECK_TTS_DATA = 1000;
     WebSocketClient mWebSocketClient;
     private Button stopButton;
+    String soundstring = "";
 
     private Button playButton;
-    MediaPlayer player;
+    MediaPlayer player = new MediaPlayer();
 
-    private String SERVER = "192.168.0.109";
-    //private String SERVER = "192.168.178.31";
+    //private String SERVER = "192.168.0.109";
+    private String SERVER = "192.168.178.31";
     private int PORT  = 65432;
-    String messageBusAddress = "ws://192.168.0.109:8181/core";
-    //String messageBusAddress = "ws://192.168.178.31:8181/core";
+    //String messageBusAddress = "ws://192.168.0.109:8181/core";
+    String messageBusAddress = "ws://192.168.178.31:8181/core";
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -167,12 +170,12 @@ public class AudioRecordActivity extends AppCompatActivity {
 
             @Override
             public void onMessage(String message){
-               // System.out.println(message);
+                //System.out.println(message);
                 try {
                     final JSONObject jsonObject = new JSONObject(message);
                     // check if a sound file has been sent
                     if(jsonObject.get("type").equals("Audio")){
-                        String soundstring = "";
+
                         try {
                             JSONObject jsonData = jsonObject.getJSONObject("data");
 
@@ -181,14 +184,26 @@ public class AudioRecordActivity extends AppCompatActivity {
                             if (action.equals("end")){
                                 // TODO: convert to byte & play sound
                                 byte[] bytes = soundstring.getBytes("UTF-8");
+                                try {
+                                    OutputStreamWriter outputStreamWriter = new OutputStreamWriter(getApplicationContext().openFileOutput("audio.wav", Context.MODE_PRIVATE));
+                                    outputStreamWriter.write(soundstring);
+                                    outputStreamWriter.close();
+                                    // TODO: Stirng is empty
+                                    System.out.println("Wrote file " + soundstring);
+                                }
+                                catch (IOException e){
+                                    Log.e("Exception", "File write failed "+ e.toString());
+                                }
+                                // https://stackoverflow.com/questions/1972027/android-playing-mp3-from-byte
+
                                 File file = File.createTempFile("mySound", "wav", getCacheDir());
                                 file.deleteOnExit();
                                 FileOutputStream fos = new FileOutputStream(file);
                                 fos.write(bytes);
                                 fos.close();
                                 FileInputStream fis = new FileInputStream(file);
-                                System.out.println("SOUNDSTRING " + soundstring);
-                                MediaPlayer player = new MediaPlayer();
+                                player.reset();
+                                //MediaPlayer player = new MediaPlayer();
                                 player.setDataSource(fis.getFD());
                                 player.prepare();
                                 player.start();
@@ -199,22 +214,29 @@ public class AudioRecordActivity extends AppCompatActivity {
                                         mp.release();
                                     }
                                 });
+                                // when finished, clean the soundstring for a new message
+                                soundstring = "";
                             }
                             else {
-                                soundstring.concat(action);
+                                // möglicherweise kommt es deswegen zu den problemen
+                                String tempSound = soundstring + action;
+                                //System.out.println("extended audio string: " + soundstring.length() + " e " +tempSound.length());
+                                soundstring = tempSound;
+
                             }
                         }catch (Exception e){
                             System.out.println("Issue " + e);
                         }
 
-                        System.out.println(jsonObject.toString());
+                        // System.out.println(jsonObject.toString());
 
                     }
                     if(jsonObject.get("type").equals("speak")){
                         JSONObject jsonObject1 = jsonObject.getJSONObject("data");
                         String utterance = jsonObject1.get("utterance").toString();
+                        System.out.println(jsonObject.toString());
                         System.out.println("UTTERANCE: "+ utterance);
-                        mTTS.speak(utterance, TextToSpeech.QUEUE_FLUSH, null);
+                        //mTTS.speak(utterance, TextToSpeech.QUEUE_FLUSH, null);
                         // TODO: Wiedergabe der Soundfiles
                     }
                     if (jsonObject.get("type").equals("loomoInstruction")){
@@ -341,7 +363,14 @@ public class AudioRecordActivity extends AppCompatActivity {
             @Override
             public void run(){
                 mBase.setLinearVelocity(1);
-                turn((float)4.4);
+                mBase.setAngularVelocity((float)4.4);
+                try {
+                    // sets for how long the robot is turning with that speed
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                mBase.setAngularVelocity((float)0);
                 mBase.setLinearVelocity(1);
 
             }
@@ -398,6 +427,7 @@ public class AudioRecordActivity extends AppCompatActivity {
                 if (isVisionBind) {
                     Person[] persons = mDts.detectPersons(3 * 1000 * 1000);
                     System.out.println("PErsoons: " + persons.length);
+                    // TODO: Datenstruktur wie für eine utterance, nur so, dass das system denkt, es wurde eine utterance gesprochen
                     mWebSocketClient.send("{\"loomo\": \"personDetect\"}");
                     if (persons.length > 0){
                         turn(2);

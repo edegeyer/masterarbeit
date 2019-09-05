@@ -1,4 +1,6 @@
 from mycroft.messagebus.message import Message
+import  mycroft.messagebus.client.ws as ws
+
 
 class fileOpener():
     def __init__(self):
@@ -7,12 +9,13 @@ class fileOpener():
     def openFile(self, uri, bus):
         chunk = 2048
         f = open(self.fileLocation, "rb")
+        #bus.emit(Message("HELLO", "HELLO"))
         bus.emit(Message(
             "OPENFILE",
             {'uri': uri}))
-        '''while True:
+        while True:
             piece = f.read(chunk)
-            print(piece)
+            #print(piece)
             stringPiece = str(piece)
             bus.emit(Message(
                 "Audio",
@@ -22,7 +25,7 @@ class fileOpener():
                     "Audio",
                     {'action': "end"}))
                 break
-'''
+
         print(f.read())
 
         #bus.emit(Message )

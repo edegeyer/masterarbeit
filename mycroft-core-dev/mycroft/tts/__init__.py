@@ -101,9 +101,6 @@ class PlaybackThread(Thread):
                 # TODO: hier die daten verschicken
                 with stopwatch:
                     if snd_type == 'wav':
-
-
-                        # TODO: öffnen der dateien funktioniert noch nicht
                         self.p = play_wav(data)
                     elif snd_type == 'mp3':
                         self.p = play_mp3(data)
