@@ -41,8 +41,8 @@ import threading
 import subprocess
 import mycroft.fileOpener as fileOpener
 
-myHOST = '192.168.0.109'  # Standard loopback interface address (localhost)
-#myHost = '192.168.178.31'
+#myHOST = '192.168.0.109'  # Standard loopback interface address (localhost)
+myHost = '192.168.178.31'
 myPORT = 65432  # Port to listen on (non-privileged ports are > 1023)
 audioPort = 65433 # Port to send audio to client
 
