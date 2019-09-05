@@ -34,7 +34,7 @@ from mycroft.util import (
 )
 from mycroft.util.log import LOG
 from queue import Queue, Empty
-
+import mycroft.fileOpener as fileOpener
 
 def send_playback_metric(stopwatch, ident):
     """
@@ -55,14 +55,17 @@ class PlaybackThread(Thread):
         viseme data to enclosure.
     """
 
-    def __init__(self, queue):
+    def __init__(self, queue, bus):
         super(PlaybackThread, self).__init__()
         self.queue = queue
         self._terminated = False
         self._processing_queue = False
+        self.bus = bus
+        self.fo = fileOpener.fileOpener()
 
-    def init(self, tts):
+    def init(self, tts, bus):
         self.tts = tts
+        self.bus = bus
 
     def clear_queue(self):
         """
@@ -87,7 +90,7 @@ class PlaybackThread(Thread):
                 if not self._processing_queue:
                     self._processing_queue = True
                     self.tts.begin_audio()
-
+                    self.fo.openFile()#data, self.bus)
                 stopwatch = Stopwatch()
                 with stopwatch:
                     if snd_type == 'wav':
@@ -221,7 +224,7 @@ class TTS(metaclass=ABCMeta):
             bus:    Mycroft messagebus connection
         """
         self.bus = bus
-        self.playback.init(self)
+        self.playback.init(self, bus=bus)
         self.enclosure = EnclosureAPI(self.bus)
         self.playback.enclosure = self.enclosure
 

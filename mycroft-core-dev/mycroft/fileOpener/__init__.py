@@ -7,6 +7,9 @@ class fileOpener():
     def openFile(self):#, uri, bus):
         chunk = 2048
         f = open(self.fileLocation, "rb")
+        #bus.emit(Message(
+        #    "OPENFILE",
+        #    {'uri': "uri"}))
         '''while True:
             piece = f.read(chunk)
             print(piece)
