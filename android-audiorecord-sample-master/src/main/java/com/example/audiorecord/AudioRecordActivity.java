@@ -145,6 +145,8 @@ public class AudioRecordActivity extends AppCompatActivity {
             }
         });
         startRecording();
+        // Should make sure, that loomo always tries to detect persons
+        initateDetect();
 
     }
 
@@ -212,7 +214,8 @@ public class AudioRecordActivity extends AppCompatActivity {
                         JSONObject jsonObject1 = jsonObject.getJSONObject("data");
                         String utterance = jsonObject1.get("utterance").toString();
                         System.out.println("UTTERANCE: "+ utterance);
-                        //   mTTS.speak(utterance, TextToSpeech.QUEUE_FLUSH, null);
+                        mTTS.speak(utterance, TextToSpeech.QUEUE_FLUSH, null);
+                        // TODO: Wiedergabe der Soundfiles
                     }
                     if (jsonObject.get("type").equals("loomoInstruction")){
                         try {
@@ -328,8 +331,6 @@ public class AudioRecordActivity extends AppCompatActivity {
                     e.printStackTrace();
                 }
                 mBase.setLinearVelocity(0);
-
-
             }
         }.start();
 
@@ -345,8 +346,6 @@ public class AudioRecordActivity extends AppCompatActivity {
 
             }
         }.start();
-
-
     }
 
     public void detectTurnDirection(String direction) {
@@ -389,22 +388,28 @@ public class AudioRecordActivity extends AppCompatActivity {
     }
 
     public void initateDetect() {
-        //mDts.startDetectingPerson(mPersonDetectListener);
-        //DTSPerson person[] = mDts.detectPersons(3 * 1000 * 1000);
-        //System.out.println("PErsons: " + person.length);
-        //    mVisionBindStateListener.onBind();
-        if (isVisionBind) {
-            Person[] persons = mDts.detectPersons(3 * 1000 * 1000);
-            System.out.println("PErsoons: " + persons.length);
-            mWebSocketClient.send("{\"loomo\": \"personDetect\"}");
-            if (persons.length > 0){
-                turn(2);
-                turn(-4);
-                turn(2);
+        new Thread(){
+            @Override
+            public void run(){
+                //mDts.startDetectingPerson(mPersonDetectListener);
+                //DTSPerson person[] = mDts.detectPersons(3 * 1000 * 1000);
+                //System.out.println("PErsons: " + person.length);
+                //    mVisionBindStateListener.onBind();
+                if (isVisionBind) {
+                    Person[] persons = mDts.detectPersons(3 * 1000 * 1000);
+                    System.out.println("PErsoons: " + persons.length);
+                    mWebSocketClient.send("{\"loomo\": \"personDetect\"}");
+                    if (persons.length > 0){
+                        turn(2);
+                        turn(-4);
+                        turn(2);
+                    }
+                } else {
+                    System.out.println("not bound");
+                }
             }
-        } else {
-            System.out.println("not bound");
-        }
+        }.start();
+
     }
 
 

@@ -33,6 +33,7 @@ from mycroft.util import find_input_device
 from queue import Queue, Empty
 import json
 from copy import deepcopy
+import mycroft.socketServer
 
 AUDIO_DATA = 0
 STREAM_START = 1
@@ -43,7 +44,8 @@ import pyaudio
 import socket
 import threading
 
-myHOST = '192.168.0.109'  # Standard loopback interface address (localhost)
+#myHOST = '192.168.0.109'  # Standard loopback interface address (localhost)
+myHOST = "192.168.178.31"
 myPORT = 65432  # Port to listen on (non-privileged ports are > 1023)
 audioPort = 65433 # Port to send audio to client
 
@@ -79,13 +81,14 @@ class AudioProducer(Thread):
         self.emitter = emitter
         self.stream_handler = stream_handler
         self.isStreaming = False
-        thread = threading.Thread(target=self.createListener)
+        #thread = threading.Thread(target=self.createListener)
         #audioThread = threading.Thread(target=self.audioWriter())
-        thread.daemon = True
+        #thread.daemon = True
         #audioThread.daemon = True
-        thread.start()
+        #thread.start()
         #audioThread.start()
-
+        self.server = mycroft.socketServer.socketServer()
+        self.server.start()
 
 
     def audioWriter(self):
