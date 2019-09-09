@@ -75,8 +75,10 @@ class AudioProducer(Thread):
         self.emitter = emitter
         self.stream_handler = stream_handler
         self.isStreaming = False
-        self.server = mycroft.socketServer.socketServer()
-        self.server.start()
+        self.micServer = mycroft.socketServer.socketServer(port=65432)
+        self.audioServer = mycroft.socketServer.socketServer(port=65433)
+        self.micServer.start()
+        self.audioServer.start()
 
 
     def run(self):

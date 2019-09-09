@@ -5,25 +5,25 @@ import sys
 
 myHOST = '192.168.0.109'  # Standard loopback interface address (localhost)
 #myHOST = "192.168.178.31"
-myPORT = 65432  # Port to listen on (non-privileged ports are > 1023)
+#myPORT = 65432  # Port to listen on (non-privileged ports are > 1023)
 
 class socketServer(Thread):
 
-    def __init__(self):
+    def __init__(self, port):
         super(socketServer, self).__init__()
+        self.myPORT = port
         thread = Thread(target=self.createListener)
         thread.daemon = True
         thread.start()
 
-
     def createListener(self):
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        s.bind((myHOST, myPORT))
+        s.bind((myHOST, self.myPORT))
         p = pyaudio.PyAudio()
         audiostream = p.open(format=pyaudio.paInt16, channels=1, rate=16000, output=True)
         #audiostream = self.audio.open(format=pyaudio.paInt16, channels=1, rate=16000, input=True)
 
-        print("created socket at: ", socket.gethostname(), " ", myPORT)
+        print("created socket at: ", socket.gethostname(), " ", self.myPORT)
         s.listen(1)
         print("now listening...")
         while True:
