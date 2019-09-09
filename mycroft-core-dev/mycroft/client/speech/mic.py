@@ -46,13 +46,8 @@ from mycroft.util.log import LOG
 
 
 
-import socket
-import sys
-from _thread import  *
-import threading
 
-myHOST = '192.168.178.31'  # Standard loopback interface address (localhost)
-myPORT = 65432  # Port to listen on (non-privileged ports are > 1023)
+
 class MutableStream:
 
 
@@ -61,11 +56,6 @@ class MutableStream:
     def __init__(self, wrapped_stream, format, muted=False):
         assert wrapped_stream is not None
         self.wrapped_stream = wrapped_stream
-
-        #self.wrapped_stream = datastream
-        #LOG.info("HELLO")
-        #LOG.info("Stream ", self.wrapped_stream)
-        #LOG.info("HUHU")
         self.muted = muted
         if muted:
             self.mute()

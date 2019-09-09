@@ -3,8 +3,8 @@ import socket
 import pyaudio
 import sys
 
-#myHOST = '192.168.0.109'  # Standard loopback interface address (localhost)
-myHOST = "192.168.178.31"
+myHOST = '192.168.0.109'  # Standard loopback interface address (localhost)
+#myHOST = "192.168.178.31"
 myPORT = 65432  # Port to listen on (non-privileged ports are > 1023)
 
 class socketServer(Thread):

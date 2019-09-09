@@ -19,11 +19,14 @@ package com.example.audiorecord;
 
 import android.content.Context;
 import android.media.AudioFormat;
+import android.media.AudioManager;
 import android.media.AudioRecord;
 import android.media.MediaPlayer;
 import android.media.MediaRecorder;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
 import android.speech.tts.TextToSpeech;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -47,6 +50,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -115,13 +119,13 @@ public class AudioRecordActivity extends AppCompatActivity {
     String soundstring = "";
 
     private Button playButton;
-    MediaPlayer player = new MediaPlayer();
+    private MediaPlayer player;
 
-    //private String SERVER = "192.168.0.109";
-    private String SERVER = "192.168.178.31";
+    private String SERVER = "192.168.0.109";
+    //private String SERVER = "192.168.178.31";
     private int PORT  = 65432;
-    //String messageBusAddress = "ws://192.168.0.109:8181/core";
-    String messageBusAddress = "ws://192.168.178.31:8181/core";
+    String messageBusAddress = "ws://192.168.0.109:8181/core";
+    //String messageBusAddress = "ws://192.168.178.31:8181/core";
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -177,43 +181,54 @@ public class AudioRecordActivity extends AppCompatActivity {
                     if(jsonObject.get("type").equals("Audio")){
 
                         try {
+                            player = new  MediaPlayer();
                             JSONObject jsonData = jsonObject.getJSONObject("data");
-
-
                             String action = jsonData.get("action").toString();
                             if (action.equals("end")){
-                                // TODO: convert to byte & play sound
                                 byte[] bytes = soundstring.getBytes("UTF-8");
+                                // TODO: write file to path
+                                // TODO: feed that file into the Mediaplayer, preferably using MediaPlayer.create
+
+
+                                File tempMp3 = File.createTempFile("audioFile", "wav", getCacheDir());
+                                tempMp3.deleteOnExit();
+                                FileOutputStream fos = new FileOutputStream(tempMp3);
+                                fos.write(bytes);
+                                fos.close();
+                                FileInputStream fis = new FileInputStream(tempMp3);
+                                player.reset();
+                                player.setDataSource(fis.getFD());
+                                player.prepare();
+                                player.start();
+
+                                //player = MediaPlayer.create(Context, Uri)
+                                //player = MediaPlayer.create(getApplicationContext(), R.raw.booting);
+                                //player.start();
+                                /*
+                                player = new MediaPlayer();
+                                Uri uri = Uri.parse("android.resource://com.example.audiorecord/raw/booting.mp3");
+                                player.setDataSource(getApplicationContext(), uri);
+                                player.prepare();
+                                player.start();
+                                */
+                                // writes the string to a file
+                                /*
                                 try {
                                     OutputStreamWriter outputStreamWriter = new OutputStreamWriter(getApplicationContext().openFileOutput("audio.wav", Context.MODE_PRIVATE));
                                     outputStreamWriter.write(soundstring);
                                     outputStreamWriter.close();
                                     // TODO: Stirng is empty
                                     System.out.println("Wrote file " + soundstring);
+
                                 }
                                 catch (IOException e){
                                     Log.e("Exception", "File write failed "+ e.toString());
                                 }
-                                // https://stackoverflow.com/questions/1972027/android-playing-mp3-from-byte
+                                */
+                                // TODO: open the file that was saved earlier
 
-                                File file = File.createTempFile("mySound", "wav", getCacheDir());
-                                file.deleteOnExit();
-                                FileOutputStream fos = new FileOutputStream(file);
-                                fos.write(bytes);
-                                fos.close();
-                                FileInputStream fis = new FileInputStream(file);
-                                player.reset();
-                                //MediaPlayer player = new MediaPlayer();
-                                player.setDataSource(fis.getFD());
-                                player.prepare();
-                                player.start();
-                                player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-                                    @Override
-                                    public void onCompletion(MediaPlayer mp) {
-                                        // TODO Auto-generated method stub
-                                        mp.release();
-                                    }
-                                });
+
+
                                 // when finished, clean the soundstring for a new message
                                 soundstring = "";
                             }
