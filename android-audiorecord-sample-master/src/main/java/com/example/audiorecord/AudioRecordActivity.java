@@ -34,6 +34,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 
 import com.segway.robot.algo.dts.Person;
 import com.segway.robot.sdk.base.bind.ServiceBinder;
@@ -147,18 +148,7 @@ public class AudioRecordActivity extends AppCompatActivity {
         setUpLoomo();
         connectWebSocket();
         mWebSocketClient.connect();
-        stopButton = (Button) findViewById(R.id.btnStop);
-        stopButton.setEnabled(true);
-        playButton = (Button) findViewById(R.id.playButton);
-        playButton.setEnabled(true);
-        stopButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                stopRecording();
-                startButton.setEnabled(true);
-                stopButton.setEnabled(false);
-            }
-        });
+
         startRecording();
         // Should make sure, that loomo always tries to detect persons
         initateDetect();
@@ -186,32 +176,45 @@ public class AudioRecordActivity extends AppCompatActivity {
 
                 try {
                     final JSONObject jsonObject = new JSONObject(message);
-                    //check if a sound file has been sent
+                    ImageView img = (ImageView) findViewById(R.id.imageView);
 
-                    if (jsonObject.get("type").equals("loomoInstruction")){
+                    //check if a sound file has been sent
+                    if (jsonObject.get("type").equals("recognizer_loop:wakeword")){
+                        // TODO: change image view
+                        img.setImageResource(R.drawable.ear);
+                    }
+                    else if (jsonObject.get("type").equals("recognizer_loop:utterance")){
+                        img.setImageResource(R.drawable.neutral);
+                    }
+                    else if (jsonObject.get("type").equals("loomoInstruction")){
                         try {
                             JSONObject jsonData = jsonObject.getJSONObject("data");
                             System.out.println(jsonData.toString());
                             String action = jsonData.get("action").toString();
                             //detectTurnDirection(direction);
-                            if (action.equals("turn")){
-                                String direction = jsonData.get("direction").toString();
-                                detectTurnDirection(direction);
-                            }
-                            else if (action.equals("goPlace")){
-                                mBase.setControlMode(Base.CONTROL_MODE_RAW);
-                                String destination = jsonData.get("destination").toString();
-                                goTo(destination);
-
-                            }
-                            else if (action.equals("getItem")){
-                                mBase.setControlMode(Base.CONTROL_MODE_RAW);
-                                String item = jsonData.get("item").toString();
-                                getItem(item);
-                            }
-                            else {
-                                System.out.println("No idea what to do");
-                                // TODO: implement action
+                            switch (action){
+                                case "turn":
+                                    mBase.setControlMode(Base.CONTROL_MODE_RAW);
+                                    String direction = jsonData.get("direction").toString();
+                                    detectTurnDirection(direction);
+                                    break;
+                                case "goPlace":
+                                    mBase.setControlMode(Base.CONTROL_MODE_RAW);
+                                    String destination = jsonData.get("destination").toString();
+                                    goTo(destination);
+                                    break;
+                                case "getItem":
+                                    mBase.setControlMode(Base.CONTROL_MODE_RAW);
+                                    String item = jsonData.get("item").toString();
+                                    getItem(item);
+                                    break;
+                                case "outofway":
+                                    mBase.setControlMode(Base.CONTROL_MODE_RAW);
+                                    outofway();
+                                    break;
+                                default:
+                                    System.out.println("No idea what to do");
+                                    break;
                             }
                         }
                         catch (Throwable t){
@@ -308,19 +311,22 @@ public class AudioRecordActivity extends AppCompatActivity {
 
     }
 
+    public void outofway() {
+        new Thread() {
+            @Override
+            public void run() {
+                detectTurnDirection("left");
+                mBase.setLinearVelocity(1);
+            }
+        }.start();
+    }
+
     public void getItem(String item){
         new Thread(){
             @Override
             public void run(){
                 mBase.setLinearVelocity(1);
-                mBase.setAngularVelocity((float)4.4);
-                try {
-                    // sets for how long the robot is turning with that speed
-                    Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                mBase.setAngularVelocity((float)0);
+                detectTurnDirection("around");
                 mBase.setLinearVelocity(1);
 
             }
@@ -328,7 +334,6 @@ public class AudioRecordActivity extends AppCompatActivity {
     }
 
     public void detectTurnDirection(String direction) {
-        mBase.setControlMode(Base.CONTROL_MODE_RAW);
         switch (direction) {
             case "left":
                 turn((float) 2.2);
@@ -448,28 +453,12 @@ public class AudioRecordActivity extends AppCompatActivity {
                 mediaPlayer.setDataSource(path);
                 mediaPlayer.prepare();
                 mediaPlayer.start();
-
-                //mediaPlayer.setDataSource(path);
-                //mediaPlayer.start();
             output.flush();
             }
             catch (Exception e){
                 e.printStackTrace();
             }
             try {
-                // TODO: daten die kommen als bytes lesen und nicht als string
-
-
-
-
-                /*StringBuilder message = new StringBuilder();
-                for (String line;
-                     (line = r.readLine()) != null;){
-                        message.append(line).append('\n');
-                }
-                System.out.println(message);*/
-                //clientSocket.getInputStream().read();
-
                 System.out.println("closing connecting");
                 clientSocket.close();
             } catch (IOException e){
@@ -477,27 +466,7 @@ public class AudioRecordActivity extends AppCompatActivity {
             }
         }
     }
-    private class playAudioRunnanble implements Runnable{
-        @Override
-        public void run(){
-            try {
-                // create serverSocket
-                ServerSocket serverSocket = new ServerSocket(65433);
-                while (true) {
-                    Socket audioSocket = serverSocket.accept();
-                    System.out.println("Created socket at " + audioSocket.getInetAddress().toString() + " "+ audioSocket.getLocalPort());
-                    //TODO: Reaktion auf  Nachricht
-                    // TODO: Aufrufen einer entsprechenden Funktion, die eine Nachricht verabeitet und das enthaltene Audio abspielt
-                    // TODO: optional: Funktion, die entsprechend dann auf den Socket schreibt, wenn eine Person entdeckt wurde, damit dann angesprichen wird -> dafür müsste aber der Client immer verbunden sein
 
-                }
-            }
-
-            catch (Exception e){
-                e.printStackTrace();
-            }
-        }
-    }
     private class RecordingRunnable implements Runnable {
 
         @Override

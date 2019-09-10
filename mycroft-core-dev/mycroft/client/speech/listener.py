@@ -40,9 +40,6 @@ STREAM_START = 1
 STREAM_DATA = 2
 STREAM_STOP = 3
 
-import pyaudio
-import socket
-
 
 class AudioStreamHandler(object):
     def __init__(self, queue):
@@ -75,11 +72,8 @@ class AudioProducer(Thread):
         self.emitter = emitter
         self.stream_handler = stream_handler
         self.isStreaming = False
-        self.micServer = mycroft.socketServer.socketServer(port=65432)
-        #self.audioServer = mycroft.socketServer.socketServer(port=65433)
+        self.micServer = mycroft.socketServer.socketServer()
         self.micServer.start()
-        #self.audioServer.start()
-        #self.audioServer.writeData("TEST")
 
 
     def run(self):
