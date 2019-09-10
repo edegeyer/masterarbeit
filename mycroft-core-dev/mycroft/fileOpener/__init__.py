@@ -21,7 +21,7 @@ class fileOpener():
             with open (self.fileLocation, 'rb') as f:
                 message = f.read()
                 s.sendall(message)
-                print(message)
+            #    print(message)
             #s.sendall(b'Hello World')
             #s.sendall(f.read())
             #for line in f:

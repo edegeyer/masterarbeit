@@ -17,6 +17,7 @@
 
 package com.example.audiorecord;
 
+import android.app.Activity;
 import android.content.Context;
 import android.media.AudioFormat;
 import android.media.AudioManager;
@@ -27,6 +28,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
+import android.provider.MediaStore;
 import android.speech.tts.TextToSpeech;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -45,7 +47,9 @@ import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
 import org.json.JSONObject;
 
+import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
@@ -55,14 +59,18 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.ByteBuffer;
 import java.util.Locale;
 import java.util.Timer;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -175,31 +183,76 @@ public class AudioRecordActivity extends AppCompatActivity {
             @Override
             public void onMessage(String message){
                 //System.out.println(message);
+
                 try {
                     final JSONObject jsonObject = new JSONObject(message);
-                    // check if a sound file has been sent
+                    //check if a sound file has been sent
                     if(jsonObject.get("type").equals("Audio")){
 
                         try {
-                            player = new  MediaPlayer();
+                            //player = new  MediaPlayer();
                             JSONObject jsonData = jsonObject.getJSONObject("data");
                             String action = jsonData.get("action").toString();
                             if (action.equals("end")){
                                 byte[] bytes = soundstring.getBytes("UTF-8");
+                                String mypath = getApplicationContext().getFilesDir().getAbsolutePath() + "/audioFile.wav";
+                                Uri mypathUri = Uri.parse(mypath);
+                                System.out.println("PATH: "+ mypath);
+                                File file = new File(mypath);
+                                if (file.exists()){
+                                    System.out.println("length original " + file.length());
+                                    boolean delted=  file.delete();
+                                    System.out.println("File deleted" + delted);
+                                }
+                                else {
+                                    System.out.println("File doesnt exist");
+                                }
                                 // TODO: write file to path
                                 // TODO: feed that file into the Mediaplayer, preferably using MediaPlayer.create
 
+                                // TODO: kann es sein, dass der Append Mode entscheidend ist?
+                                FileOutputStream fos = openFileOutput("audioFile.wav", MODE_APPEND);
+                                OutputStreamWriter outputStreamWriter = new OutputStreamWriter(fos);
+                                outputStreamWriter.write(soundstring);
 
-                                File tempMp3 = File.createTempFile("audioFile", "wav", getCacheDir());
-                                tempMp3.deleteOnExit();
-                                FileOutputStream fos = new FileOutputStream(tempMp3);
-                                fos.write(bytes);
-                                fos.close();
-                                FileInputStream fis = new FileInputStream(tempMp3);
-                                player.reset();
-                                player.setDataSource(fis.getFD());
-                                player.prepare();
-                                player.start();
+
+                                if (file.exists()){
+                                    System.out.println("File exists");
+                                    System.out.println("File length after " + file.length());
+                                    System.out.println(file.toString());
+                                }
+                                else {
+                                    System.out.println("File doesnt exist");
+                                }
+                                // TODO: fileexists, but player doesn't start
+                                MediaPlayer mediaPlayer = new MediaPlayer();
+                                try{
+                                    mediaPlayer.setDataSource(mypath);
+                                    mediaPlayer.prepare();
+                                    mediaPlayer.start();
+                                }
+                                catch (Exception e){
+                                    System.out.println("mediaplayer error: " + e);
+                                }
+
+                                //player = MediaPlayer.create(getApplicationContext(), mypathUri);
+                                //player.start();
+                                //System.out.println("PATH: "+ path);
+                                //File directory = new File(path);
+                                //File[] files = directory.listFiles();
+                                //for (int i = 0; i < files.length; i++){
+                                //    System.out.println("Files: " + files[i].getName());
+                                //}
+                                //File tempMp3 = File.createTempFile("audioFile", "wav", getCacheDir());
+                                //tempMp3.deleteOnExit();
+                                //FileOutputStream fos = new FileOutputStream(tempMp3);
+                                //fos.write(bytes);
+                                //fos.close();
+                                //FileInputStream fis = new FileInputStream(tempMp3);
+                                //player.reset();
+                                //player.setDataSource(fis.getFD());
+                                //player.prepare();
+                                //player.start();
 
                                 //player = MediaPlayer.create(Context, Uri)
                                 //player = MediaPlayer.create(getApplicationContext(), R.raw.booting);
@@ -303,12 +356,13 @@ public class AudioRecordActivity extends AppCompatActivity {
     }
 
     private void startRecording() {
-        recorder = new AudioRecord(MediaRecorder.AudioSource.DEFAULT, SAMPLING_RATE_IN_HZ,
-                CHANNEL_CONFIG, AUDIO_FORMAT, BUFFER_SIZE);
-        recorder.startRecording();
-        recordingInProgress.set(true);
-        recordingThread = new Thread(new RecordingRunnable(), "Recording Thread");
-        recordingThread.start();
+        //recorder = new AudioRecord(MediaRecorder.AudioSource.DEFAULT, SAMPLING_RATE_IN_HZ,
+        //        CHANNEL_CONFIG, AUDIO_FORMAT, BUFFER_SIZE);
+        //recorder.startRecording();
+        //recordingInProgress.set(true);
+        //recordingThread = new Thread(new RecordingRunnable(), "Recording Thread");
+        //recordingThread.start();
+        startAudioProcessingServer();
     }
 
     private void stopRecording() {
@@ -458,7 +512,132 @@ public class AudioRecordActivity extends AppCompatActivity {
     }
 
 
+    public void startAudioProcessingServer(){
+        final ExecutorService clientProcessingPool = Executors.newFixedThreadPool(10);
 
+        Runnable serverTask = new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    ServerSocket serverSocket = new ServerSocket(65433);
+                    System.out.println("Created socket. Listening....");
+
+                    while (true){
+                        Socket clientSocket = serverSocket.accept();
+
+                        // TODO: das hier ersetzen, hier direkt die verarbeitung
+                        clientProcessingPool.submit(new ClientTask((clientSocket)));
+                    }
+                } catch (IOException e){
+                    System.out.println("Unable to process client reuqest");
+                    e.printStackTrace();
+                }
+
+            }
+        };
+        Thread serverThread = new Thread(serverTask);
+        serverThread.start();
+    }
+
+    private class ClientTask implements  Runnable{
+        public String convertStreamToString(InputStream is) throws Exception {
+            BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+            StringBuilder sb = new StringBuilder();
+            String line = null;
+            while ((line = reader.readLine()) != null) {
+                sb.append(line).append("\n");
+            }
+            reader.close();
+            return sb.toString();
+        }
+
+        private final Socket clientSocket;
+        MediaPlayer mediaPlayer;
+
+        private ClientTask(Socket clientSocket){
+            this.clientSocket = clientSocket;
+
+        }
+
+        @Override
+        public void run(){
+            System.out.println("Got a client");
+
+            File file = new File(getCacheDir(), "cachedAudio.wav");
+            try(OutputStream output = new FileOutputStream(file)){
+                DataInputStream dataInputStream = new DataInputStream(clientSocket.getInputStream());
+                byte[] buffer = new byte[4 * 1024];
+                int read;
+                while ((read = dataInputStream.read(buffer)) != -1){
+                    output.write(buffer, 0, read);
+                }
+                String path = getCacheDir().getPath().concat("/cachedAudio.wav");
+                System.out.println(path);
+                File directory = new File(getCacheDir().getPath());
+                File[] files = directory.listFiles();
+                for (int i = 0; i < files.length; i++)
+                {
+                    Log.d("Files", "FileName:" + files[i].getName());
+                }
+                File fl = new File(path);
+                FileInputStream fin = new FileInputStream(fl);
+                String ret = convertStreamToString(fin);
+                fin.close();
+                System.out.println(ret);
+                mediaPlayer = new MediaPlayer();
+                mediaPlayer.setDataSource(path);
+                mediaPlayer.prepare();
+                mediaPlayer.start();
+
+                //mediaPlayer.setDataSource(path);
+                //mediaPlayer.start();
+            output.flush();
+            }
+            catch (Exception e){
+                e.printStackTrace();
+            }
+            try {
+                // TODO: daten die kommen als bytes lesen und nicht als string
+
+
+
+
+                /*StringBuilder message = new StringBuilder();
+                for (String line;
+                     (line = r.readLine()) != null;){
+                        message.append(line).append('\n');
+                }
+                System.out.println(message);*/
+                //clientSocket.getInputStream().read();
+
+                System.out.println("closing connecting");
+                clientSocket.close();
+            } catch (IOException e){
+                e.printStackTrace();
+            }
+        }
+    }
+    private class playAudioRunnanble implements Runnable{
+        @Override
+        public void run(){
+            try {
+                // create serverSocket
+                ServerSocket serverSocket = new ServerSocket(65433);
+                while (true) {
+                    Socket audioSocket = serverSocket.accept();
+                    System.out.println("Created socket at " + audioSocket.getInetAddress().toString() + " "+ audioSocket.getLocalPort());
+                    //TODO: Reaktion auf  Nachricht
+                    // TODO: Aufrufen einer entsprechenden Funktion, die eine Nachricht verabeitet und das enthaltene Audio abspielt
+                    // TODO: optional: Funktion, die entsprechend dann auf den Socket schreibt, wenn eine Person entdeckt wurde, damit dann angesprichen wird -> dafür müsste aber der Client immer verbunden sein
+
+                }
+            }
+
+            catch (Exception e){
+                e.printStackTrace();
+            }
+        }
+    }
     private class RecordingRunnable implements Runnable {
 
         @Override
