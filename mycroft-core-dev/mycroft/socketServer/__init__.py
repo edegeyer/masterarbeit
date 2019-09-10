@@ -17,17 +17,17 @@ class socketServer(Thread):
         thread.start()
 
     def createListener(self):
-        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        s.bind((myHOST, self.myPORT))
+        self.mysocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.mysocket.bind((myHOST, self.myPORT))
         p = pyaudio.PyAudio()
         audiostream = p.open(format=pyaudio.paInt16, channels=1, rate=16000, output=True)
         #audiostream = self.audio.open(format=pyaudio.paInt16, channels=1, rate=16000, input=True)
 
         print("created socket at: ", socket.gethostname(), " ", self.myPORT)
-        s.listen(1)
+        self.mysocket.listen(1)
         print("now listening...")
         while True:
-            conn, addr = s.accept()
+            conn, addr = self.mysocket.accept()
             #self.print_lock.acquire()
             print("Connected to: ", addr)
             self.isStreaming = True
@@ -41,3 +41,8 @@ class socketServer(Thread):
                 elif data == 'killsrv':
                     conn.close()
                     sys.exit()
+
+
+    def writeData(self, data):
+        # TODO: write the required data
+        self.mysocket.send(data)
