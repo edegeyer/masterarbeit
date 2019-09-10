@@ -112,7 +112,7 @@ public class AudioRecordActivity extends AppCompatActivity {
      * Signals whether a recording is in progress (true) or not (false).
      */
     private final AtomicBoolean recordingInProgress = new AtomicBoolean(false);
-    private final AtomicBoolean listeningInProgress = new AtomicBoolean(false);
+    private final AtomicBoolean playingInProgress = new AtomicBoolean(false);
 
     private AudioRecord recorder = null;
 
@@ -187,126 +187,7 @@ public class AudioRecordActivity extends AppCompatActivity {
                 try {
                     final JSONObject jsonObject = new JSONObject(message);
                     //check if a sound file has been sent
-                    if(jsonObject.get("type").equals("Audio")){
 
-                        try {
-                            //player = new  MediaPlayer();
-                            JSONObject jsonData = jsonObject.getJSONObject("data");
-                            String action = jsonData.get("action").toString();
-                            if (action.equals("end")){
-                                byte[] bytes = soundstring.getBytes("UTF-8");
-                                String mypath = getApplicationContext().getFilesDir().getAbsolutePath() + "/audioFile.wav";
-                                Uri mypathUri = Uri.parse(mypath);
-                                System.out.println("PATH: "+ mypath);
-                                File file = new File(mypath);
-                                if (file.exists()){
-                                    System.out.println("length original " + file.length());
-                                    boolean delted=  file.delete();
-                                    System.out.println("File deleted" + delted);
-                                }
-                                else {
-                                    System.out.println("File doesnt exist");
-                                }
-                                // TODO: write file to path
-                                // TODO: feed that file into the Mediaplayer, preferably using MediaPlayer.create
-
-                                // TODO: kann es sein, dass der Append Mode entscheidend ist?
-                                FileOutputStream fos = openFileOutput("audioFile.wav", MODE_APPEND);
-                                OutputStreamWriter outputStreamWriter = new OutputStreamWriter(fos);
-                                outputStreamWriter.write(soundstring);
-
-
-                                if (file.exists()){
-                                    System.out.println("File exists");
-                                    System.out.println("File length after " + file.length());
-                                    System.out.println(file.toString());
-                                }
-                                else {
-                                    System.out.println("File doesnt exist");
-                                }
-                                // TODO: fileexists, but player doesn't start
-                                MediaPlayer mediaPlayer = new MediaPlayer();
-                                try{
-                                    mediaPlayer.setDataSource(mypath);
-                                    mediaPlayer.prepare();
-                                    mediaPlayer.start();
-                                }
-                                catch (Exception e){
-                                    System.out.println("mediaplayer error: " + e);
-                                }
-
-                                //player = MediaPlayer.create(getApplicationContext(), mypathUri);
-                                //player.start();
-                                //System.out.println("PATH: "+ path);
-                                //File directory = new File(path);
-                                //File[] files = directory.listFiles();
-                                //for (int i = 0; i < files.length; i++){
-                                //    System.out.println("Files: " + files[i].getName());
-                                //}
-                                //File tempMp3 = File.createTempFile("audioFile", "wav", getCacheDir());
-                                //tempMp3.deleteOnExit();
-                                //FileOutputStream fos = new FileOutputStream(tempMp3);
-                                //fos.write(bytes);
-                                //fos.close();
-                                //FileInputStream fis = new FileInputStream(tempMp3);
-                                //player.reset();
-                                //player.setDataSource(fis.getFD());
-                                //player.prepare();
-                                //player.start();
-
-                                //player = MediaPlayer.create(Context, Uri)
-                                //player = MediaPlayer.create(getApplicationContext(), R.raw.booting);
-                                //player.start();
-                                /*
-                                player = new MediaPlayer();
-                                Uri uri = Uri.parse("android.resource://com.example.audiorecord/raw/booting.mp3");
-                                player.setDataSource(getApplicationContext(), uri);
-                                player.prepare();
-                                player.start();
-                                */
-                                // writes the string to a file
-                                /*
-                                try {
-                                    OutputStreamWriter outputStreamWriter = new OutputStreamWriter(getApplicationContext().openFileOutput("audio.wav", Context.MODE_PRIVATE));
-                                    outputStreamWriter.write(soundstring);
-                                    outputStreamWriter.close();
-                                    // TODO: Stirng is empty
-                                    System.out.println("Wrote file " + soundstring);
-
-                                }
-                                catch (IOException e){
-                                    Log.e("Exception", "File write failed "+ e.toString());
-                                }
-                                */
-                                // TODO: open the file that was saved earlier
-
-
-
-                                // when finished, clean the soundstring for a new message
-                                soundstring = "";
-                            }
-                            else {
-                                // möglicherweise kommt es deswegen zu den problemen
-                                String tempSound = soundstring + action;
-                                //System.out.println("extended audio string: " + soundstring.length() + " e " +tempSound.length());
-                                soundstring = tempSound;
-
-                            }
-                        }catch (Exception e){
-                            System.out.println("Issue " + e);
-                        }
-
-                        // System.out.println(jsonObject.toString());
-
-                    }
-                    if(jsonObject.get("type").equals("speak")){
-                        JSONObject jsonObject1 = jsonObject.getJSONObject("data");
-                        String utterance = jsonObject1.get("utterance").toString();
-                        System.out.println(jsonObject.toString());
-                        System.out.println("UTTERANCE: "+ utterance);
-                        //mTTS.speak(utterance, TextToSpeech.QUEUE_FLUSH, null);
-                        // TODO: Wiedergabe der Soundfiles
-                    }
                     if (jsonObject.get("type").equals("loomoInstruction")){
                         try {
                             JSONObject jsonData = jsonObject.getJSONObject("data");
@@ -356,12 +237,12 @@ public class AudioRecordActivity extends AppCompatActivity {
     }
 
     private void startRecording() {
-        //recorder = new AudioRecord(MediaRecorder.AudioSource.DEFAULT, SAMPLING_RATE_IN_HZ,
-        //        CHANNEL_CONFIG, AUDIO_FORMAT, BUFFER_SIZE);
-        //recorder.startRecording();
-        //recordingInProgress.set(true);
-        //recordingThread = new Thread(new RecordingRunnable(), "Recording Thread");
-        //recordingThread.start();
+        recorder = new AudioRecord(MediaRecorder.AudioSource.DEFAULT, SAMPLING_RATE_IN_HZ,
+                CHANNEL_CONFIG, AUDIO_FORMAT, BUFFER_SIZE);
+        recorder.startRecording();
+        recordingInProgress.set(true);
+        recordingThread = new Thread(new RecordingRunnable(), "Recording Thread");
+        recordingThread.start();
         startAudioProcessingServer();
     }
 
@@ -540,16 +421,7 @@ public class AudioRecordActivity extends AppCompatActivity {
     }
 
     private class ClientTask implements  Runnable{
-        public String convertStreamToString(InputStream is) throws Exception {
-            BufferedReader reader = new BufferedReader(new InputStreamReader(is));
-            StringBuilder sb = new StringBuilder();
-            String line = null;
-            while ((line = reader.readLine()) != null) {
-                sb.append(line).append("\n");
-            }
-            reader.close();
-            return sb.toString();
-        }
+
 
         private final Socket clientSocket;
         MediaPlayer mediaPlayer;
@@ -572,18 +444,6 @@ public class AudioRecordActivity extends AppCompatActivity {
                     output.write(buffer, 0, read);
                 }
                 String path = getCacheDir().getPath().concat("/cachedAudio.wav");
-                System.out.println(path);
-                File directory = new File(getCacheDir().getPath());
-                File[] files = directory.listFiles();
-                for (int i = 0; i < files.length; i++)
-                {
-                    Log.d("Files", "FileName:" + files[i].getName());
-                }
-                File fl = new File(path);
-                FileInputStream fin = new FileInputStream(fl);
-                String ret = convertStreamToString(fin);
-                fin.close();
-                System.out.println(ret);
                 mediaPlayer = new MediaPlayer();
                 mediaPlayer.setDataSource(path);
                 mediaPlayer.prepare();

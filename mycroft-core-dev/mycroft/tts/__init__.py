@@ -97,7 +97,7 @@ class PlaybackThread(Thread):
                     self._processing_queue = True
                     self.tts.begin_audio()
                 stopwatch = Stopwatch()
-                self.fo.openFile(data, self.bus)
+                self.fo.openFile(data)
                 # TODO: hier die daten verschicken
                 with stopwatch:
                     if snd_type == 'wav':
