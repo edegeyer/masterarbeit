@@ -113,7 +113,7 @@ public class AudioRecordActivity extends AppCompatActivity {
      * Signals whether a recording is in progress (true) or not (false).
      */
     private final AtomicBoolean recordingInProgress = new AtomicBoolean(false);
-
+    MediaPlayer mplayer = new MediaPlayer();
     private AudioRecord recorder = null;
 
     private Thread recordingThread = null;
@@ -139,10 +139,11 @@ public class AudioRecordActivity extends AppCompatActivity {
                 mTTS.setLanguage(Locale.UK);
             }
         });
+        mplayer = MediaPlayer.create(getApplicationContext(), R.raw.beep);
+
         setUpLoomo();
         connectWebSocket();
         mWebSocketClient.connect();
-
         startRecording();
         // Should make sure, that loomo always tries to detect persons
 
@@ -167,17 +168,18 @@ public class AudioRecordActivity extends AppCompatActivity {
 
             @Override
             public void onMessage(String message){
-               // System.out.println(message);
+                System.out.println(message);
 
                 try {
                     final JSONObject jsonObject = new JSONObject(message);
                     ImageView img = (ImageView) findViewById(R.id.imageView);
 
                     //check if a sound file has been sent
-                    if (jsonObject.get("type").equals("recognizer_loop:wakeword")){
+                    if (jsonObject.get("type").equals("recognizer_loop:record_begin")){
                         // TODO: change image view
                         System.out.println("WAKEWORD");
-                        img.setImageResource(R.drawable.thinking);
+                        MediaPlayer mPlayer = MediaPlayer.create(getApplicationContext(), R.raw.beep);
+                        mPlayer.start();
                     }
                     else if (jsonObject.get("type").equals("recognizer_loop:utterance")){
                         img.setImageResource(R.drawable.neutral);
@@ -191,6 +193,8 @@ public class AudioRecordActivity extends AppCompatActivity {
                     }
                     else if (jsonObject.get("type").equals("loomoInstruction")){
                         System.out.println(message);
+                        MediaPlayer mPlayer = MediaPlayer.create(getApplicationContext(), R.raw.beep);
+                        mPlayer.start();
 
                         try {
                             JSONObject jsonData = jsonObject.getJSONObject("data");
@@ -243,6 +247,7 @@ public class AudioRecordActivity extends AppCompatActivity {
     }
 
     private void stop(){
+
         mBase.setLinearVelocity(0);
         mBase.setAngularVelocity(0);
 
