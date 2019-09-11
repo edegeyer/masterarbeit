@@ -11,16 +11,16 @@ from adapt.intent import IntentBuilder
 from mycroft.skills.core import MycroftSkill, intent_handler
 from mycroft.util.log import LOG
 from mycroft.messagebus.message import Message
+import time
 
 # Each skill is contained within its own class, which inherits base methods
 # from the MycroftSkill class.  You extend this class as shown below.
 
-# TODO: Change "Template" to a unique name for your skill
-class TemplateSkill(MycroftSkill):
+class LoomoSkill(MycroftSkill):
 
     # The constructor of the skill, which calls MycroftSkill's constructor
     def __init__(self):
-        super(TemplateSkill, self).__init__(name="TemplateSkill")
+        super(LoomoSkill, self).__init__(name="TemplateSkill")
         
         # Initialize working variables used within the skill.
         self.count = 0
@@ -37,58 +37,64 @@ class TemplateSkill(MycroftSkill):
     #   'Howdy you great big world'
     #   'Greetings planet earth'
 
-
+    # TODO: Funktion muss noch richtig implementiert werden
     @intent_handler(IntentBuilder("").require("person"))
-    # TODO: see, if it's possible to call a skill in a better way
     def handle_person_detected_intent(self, message):
         self.set_context('personDetected', "true")
         self.speak_dialog("detected.person", expect_response=True)
 
     @intent_handler(IntentBuilder("").require("personDetected").require("confirmation"))
     def handle_direction_confirmation(self, message):
-        answer = message.data["confirmation"]
+        answer = message.data["confirmation.voc"]
         if answer == "yes":
             self.speak("Currently I'm only able to turn")
             self.speak("All commands have to be including the term turn and a direction", expect_response=True)
         elif answer == "no":
             self.speak("Ok, let me know when I can assist you")
 
+
+
     @intent_handler(IntentBuilder("").require("turn").require("Direction"))
     def handle_turn_intent(self,message):
-        #direction = message.data.get("Direction")
         direction = message.data["Direction"]
-        # hard coded seems better, as certain instructions need to be passed over to Loomo
-        if direction == "right":
-            pass
-        elif direction == "left":
-            pass
-        elif direction == "around":
-            pass
-        else:
-           # anything else the user says, that's in the Direction file, means that the roboter has to turn to the user
-            pass
+        # Message Bus gets the information, that turning is needed & the direction
         self.bus.emit(Message(
             "loomoInstruction",
             {'action': 'turn',
              'direction': direction}))
-        #self.speak_dialog("location.test", data={"direction": direction})
+
+    @intent_handler(IntentBuilder("").require("go").require("destination"))
+    def handle_destination(self, message):
+        destination = message.data['destination']
+        self.speak("Going to " + destination)
+        self.bus.emit(Message(
+            "loomoInstruction",
+            {'action': "goPlace",
+             'destination':destination}
+        ))
+
+    @intent_handler(IntentBuilder("").require("get").require("item"))
+    def handle_get_item(self, message):
+        item = message.data["item"]
+        self.speak("Getting " + item)
+        self.bus.emit(Message(
+            "loomoInstruction",
+            {'action': "getItem",
+             'item': item}
+        ))
 
 
-    @intent_handler(IntentBuilder("").require('action').require('direction').require('confirmation'))
-    def handle_direction_confirmation_intent(self, message):
-        # depending on the users answer, do the action or ask again what to do
-        answer = message.data["confirmation"]
-        action = message.data["action"]
-        direction = message.data["direction"]
-        if answer == "yes":
-            self.speak("Will {} {}".format(action, direction))
-            self.bus.emit(Message(
-                "loomoInstruction",
-                {'action': 'turn',
-                 'direction': direction}))
-        else:
-            self.speak_dialog("misunderstood", expect_response=True)
+    @intent_handler(IntentBuilder("").require('outofmyway'))
+    def go_out_of_way(self, message):
+        self.bus.emit(Message(
+            "loomoInstruction",
+            {"action": "outofway"}
+        ))
 
+
+'''
+
+    # Function that makes Loomo either go to a place or get an item
     @intent_handler(IntentBuilder("").require('destAction').require('destination'))
     def handle_destination(self, message):
         action = message.data["destAction"]
@@ -96,24 +102,36 @@ class TemplateSkill(MycroftSkill):
         self.set_context('actionHandle', action)
         self.set_context('destinationHandle', destination)
         if action == "get":
-            self.speak_dialog("getting", expect_response=True)
+            item = destination
+            # before getting something, Loomo waits for a confirmation.voc
+            # TODO: send the item variable over to the dialog
+            #self.speak_dialog("getting.stuff", expect_response=True)
+
+
+            self.speak_dialog("getting.stuff", data={"item":item}, expect_response=True)
             self.bus.emit(Message(
                 "loomoInstruction",
                 {'action': "getItem",
-                 'item': destination}))
+                 'item': item})) 
         else:
             self.speak("Going to {}".format(destination))
+            time.sleep(1)
             self.bus.emit(Message(
                 "loomoInstruction",
                 {'action': "goPlace",
                  'destination': destination}))
 
-    @intent_handler(IntentBuilder("").require('actionHandle').require('directionHandle').require('confirmation'))
+
+    # gets called, when Loomo detected, that he needs to get something, function reassures, that understanding was correct
+    @intent_handler(IntentBuilder("").require('actionHandle').require('directionHandle').require('confirmation.voc'))
     def handle_destination_confirmation(self, message):
-        answer = message.data["confirmation"]
+        # TODO: allow more confirmations than yes -> e.g yeah
+        answer = message.data["confirmation.voc"]
         action = message.data["actionHandle"]
         destination = message.data["directionHandle"]
-        if answer == "yes":
+        if answer == "no" or answer == "nope":
+            self.speak("I didd't get your request right then. Please repeat", expect_response=True)
+        else:
             self.speak("OK")
             if action == "get":
                 self.bus.emit(Message(
@@ -125,7 +143,11 @@ class TemplateSkill(MycroftSkill):
                     "loomoInstruction",
                     {'action': "goPlace",
                      'destination': destination}))
+     '''
 
+
+
+    # TODO: Skill to always stop the current action
     # The "stop" method defines what Mycroft does when told to stop during
     # the skill's execution. In this case, since the skill's functionality
     # is extremely simple, there is no need to override it.  If you DO
@@ -138,4 +160,4 @@ class TemplateSkill(MycroftSkill):
 # The "create_skill()" method is used to create an instance of the skill.
 # Note that it's outside the class itself.
 def create_skill():
-    return TemplateSkill()
+    return LoomoSkill()

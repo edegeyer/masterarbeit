@@ -113,21 +113,15 @@ public class AudioRecordActivity extends AppCompatActivity {
      * Signals whether a recording is in progress (true) or not (false).
      */
     private final AtomicBoolean recordingInProgress = new AtomicBoolean(false);
-    private final AtomicBoolean playingInProgress = new AtomicBoolean(false);
 
     private AudioRecord recorder = null;
 
     private Thread recordingThread = null;
     private Thread playerThread = null;
 
-    private Button startButton;
     TextToSpeech mTTS = null;
-    private final int ACT_CHECK_TTS_DATA = 1000;
     WebSocketClient mWebSocketClient;
-    private Button stopButton;
-    String soundstring = "";
 
-    private Button playButton;
     private MediaPlayer player;
 
     private String SERVER = "192.168.0.109";
@@ -151,6 +145,7 @@ public class AudioRecordActivity extends AppCompatActivity {
 
         startRecording();
         // Should make sure, that loomo always tries to detect persons
+
         initateDetect();
 
     }
@@ -172,7 +167,7 @@ public class AudioRecordActivity extends AppCompatActivity {
 
             @Override
             public void onMessage(String message){
-                //System.out.println(message);
+               // System.out.println(message);
 
                 try {
                     final JSONObject jsonObject = new JSONObject(message);
@@ -181,35 +176,43 @@ public class AudioRecordActivity extends AppCompatActivity {
                     //check if a sound file has been sent
                     if (jsonObject.get("type").equals("recognizer_loop:wakeword")){
                         // TODO: change image view
-                        img.setImageResource(R.drawable.ear);
+                        System.out.println("WAKEWORD");
+                        img.setImageResource(R.drawable.thinking);
                     }
                     else if (jsonObject.get("type").equals("recognizer_loop:utterance")){
                         img.setImageResource(R.drawable.neutral);
                     }
+                    else if (jsonObject.get("type").equals("mycroft.skill.handler.start")){
+                        JSONObject jsonData = jsonObject.getJSONObject("data");
+                        if (jsonData.get("name").equals("StopSkill.handle_stop")){
+                            System.out.println("STOP");
+                            stop();
+                        }
+                    }
                     else if (jsonObject.get("type").equals("loomoInstruction")){
+                        System.out.println(message);
+
                         try {
                             JSONObject jsonData = jsonObject.getJSONObject("data");
                             System.out.println(jsonData.toString());
                             String action = jsonData.get("action").toString();
                             //detectTurnDirection(direction);
+                            mBase.setControlMode(Base.CONTROL_MODE_RAW);
+
                             switch (action){
                                 case "turn":
-                                    mBase.setControlMode(Base.CONTROL_MODE_RAW);
                                     String direction = jsonData.get("direction").toString();
                                     detectTurnDirection(direction);
                                     break;
                                 case "goPlace":
-                                    mBase.setControlMode(Base.CONTROL_MODE_RAW);
                                     String destination = jsonData.get("destination").toString();
                                     goTo(destination);
                                     break;
                                 case "getItem":
-                                    mBase.setControlMode(Base.CONTROL_MODE_RAW);
                                     String item = jsonData.get("item").toString();
                                     getItem(item);
                                     break;
                                 case "outofway":
-                                    mBase.setControlMode(Base.CONTROL_MODE_RAW);
                                     outofway();
                                     break;
                                 default:
@@ -239,6 +242,12 @@ public class AudioRecordActivity extends AppCompatActivity {
         };
     }
 
+    private void stop(){
+        mBase.setLinearVelocity(0);
+        mBase.setAngularVelocity(0);
+
+    }
+
     private void startRecording() {
         recorder = new AudioRecord(MediaRecorder.AudioSource.DEFAULT, SAMPLING_RATE_IN_HZ,
                 CHANNEL_CONFIG, AUDIO_FORMAT, BUFFER_SIZE);
@@ -249,18 +258,6 @@ public class AudioRecordActivity extends AppCompatActivity {
         startAudioProcessingServer();
     }
 
-    private void stopRecording() {
-        if (null == recorder) {
-            return;
-        }
-
-        recordingInProgress.set(false);
-
-        recorder.stop();
-        recorder.release();
-        recorder = null;
-        recordingThread = null;
-    }
 
     public void setUpLoomo() {
         // setup the base
@@ -301,7 +298,7 @@ public class AudioRecordActivity extends AppCompatActivity {
                 mBase.setLinearVelocity(1);
                 try {
                     // sets for how long the robot is turning with that speed
-                    Thread.sleep(2500);
+                    Thread.sleep(1000);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -316,7 +313,20 @@ public class AudioRecordActivity extends AppCompatActivity {
             @Override
             public void run() {
                 detectTurnDirection("left");
+                try {
+                    // sets for how long the robot is turning with that speed
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
                 mBase.setLinearVelocity(1);
+                try {
+                    // sets for how long the robot is turning with that speed
+                    Thread.sleep(2000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                mBase.setLinearVelocity(0);
             }
         }.start();
     }
@@ -326,9 +336,26 @@ public class AudioRecordActivity extends AppCompatActivity {
             @Override
             public void run(){
                 mBase.setLinearVelocity(1);
+                try {
+                    // sets for how long the robot is turning with that speed
+                    Thread.sleep(2000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
                 detectTurnDirection("around");
+                try {
+                    // sets for how long the robot is turning with that speed
+                    Thread.sleep(2000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
                 mBase.setLinearVelocity(1);
-
+                try {
+                    // sets for how long the robot is turning with that speed
+                    Thread.sleep(2000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
         }.start();
     }
@@ -353,7 +380,8 @@ public class AudioRecordActivity extends AppCompatActivity {
         new Thread() {
             @Override
             public void run() {
-                System.out.println(mHead.getHeadJointYaw());
+
+                mBase.setLinearVelocity(0);
                 mHead.setMode(Head.MODE_ORIENTATION_LOCK);
                 mBase.setAngularVelocity(velocity);
                 mHead.setYawAngularVelocity(velocity);
@@ -410,8 +438,6 @@ public class AudioRecordActivity extends AppCompatActivity {
 
                     while (true){
                         Socket clientSocket = serverSocket.accept();
-
-                        // TODO: das hier ersetzen, hier direkt die verarbeitung
                         clientProcessingPool.submit(new ClientTask((clientSocket)));
                     }
                 } catch (IOException e){
@@ -453,7 +479,7 @@ public class AudioRecordActivity extends AppCompatActivity {
                 mediaPlayer.setDataSource(path);
                 mediaPlayer.prepare();
                 mediaPlayer.start();
-            output.flush();
+                output.flush();
             }
             catch (Exception e){
                 e.printStackTrace();
