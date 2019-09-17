@@ -1,7 +1,9 @@
 
 package com.example.audiorecord;
 
+import android.content.Context;
 import android.media.AudioFormat;
+import android.media.AudioManager;
 import android.media.AudioRecord;
 import android.media.MediaPlayer;
 import android.media.MediaRecorder;
@@ -61,6 +63,8 @@ public class AudioRecordActivity extends AppCompatActivity {
 
     private static final int AUDIO_FORMAT = AudioFormat.ENCODING_PCM_16BIT;
 
+    AudioManager audioManager;
+
     /**
      * Factor by that the minimum buffer size is multiplied. The bigger the factor is the less
      * likely it is that samples will be dropped, but more memory will be used. The minimum buffer
@@ -87,7 +91,7 @@ public class AudioRecordActivity extends AppCompatActivity {
 
     TextToSpeech mTTS = null;
     WebSocketClient mWebSocketClient;
-
+    private String lastCommand;
     private MediaPlayer player;
 
     private String SERVER = "192.168.0.109";
@@ -100,6 +104,7 @@ public class AudioRecordActivity extends AppCompatActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.audio);
+        audioManager = (AudioManager) getApplicationContext().getSystemService(Context.AUDIO_SERVICE);
         mTTS = new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
             @Override
             public void onInit(int i) {
@@ -136,9 +141,7 @@ public class AudioRecordActivity extends AppCompatActivity {
 
                 try {
                     final JSONObject jsonObject = new JSONObject(message);
-                    //ImageView img = (ImageView) findViewById(R.id.imageView);
 
-                    //check if a sound file has been sent
                     if (jsonObject.get("type").equals("recognizer_loop:record_begin")) {
                         MediaPlayer mPlayer = MediaPlayer.create(getApplicationContext(), R.raw.start_listening);
                         mPlayer.start();
@@ -157,18 +160,30 @@ public class AudioRecordActivity extends AppCompatActivity {
                             switch (action) {
                                 case "turn":
                                     String direction = jsonData.get("direction").toString();
+                                    lastCommand = action + " " +direction;
                                     detectTurnDirection(direction);
                                     break;
                                 case "goPlace":
                                     String destination = jsonData.get("destination").toString();
+                                    lastCommand = action;
                                     goTo(destination);
                                     break;
                                 case "getItem":
                                     String item = jsonData.get("item").toString();
+                                    lastCommand = action;
                                     getItem(item);
                                     break;
                                 case "outofway":
+                                    lastCommand = action;
                                     outofway();
+                                    break;
+                                case "comeback":
+                                    comeback(lastCommand);
+                                    lastCommand = "";
+                                    break;
+                                case "straight":
+                                    lastCommand = action;
+                                    goStraight();
                                     break;
                                 default:
                                     System.out.println("No idea what to do");
@@ -194,6 +209,89 @@ public class AudioRecordActivity extends AppCompatActivity {
                 Log.i("WebSocket", "Error " + e.getMessage());
             }
         };
+    }
+
+    private void comeback(String lastCommand){
+        System.out.println("last command is: " + lastCommand);
+        switch (lastCommand){
+            case "straight":
+                detectTurnDirection("around");
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                goStraight();
+                break;
+            case "outofway":
+                detectTurnDirection("around");
+                try {
+                    Thread.sleep(2000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                mBase.setLinearVelocity(1);
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                mBase.setLinearVelocity(0);
+                detectTurnDirection("left");
+                break;
+            case "getItem":
+                // can be empty, because robot should be back with the user
+                break;
+            case "goPlace":
+                detectTurnDirection("around");
+                try {
+                    Thread.sleep(2000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                mBase.setLinearVelocity(1);
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                mBase.setLinearVelocity(0);
+                break;
+            case "turn left":
+                detectTurnDirection("right");
+                break;
+            case "turn right":
+                detectTurnDirection("left");
+                break;
+            case "turn around":
+                detectTurnDirection("around");
+                break;
+            default:
+                break;
+        }
+        // set it to empty string
+        this.lastCommand = "";
+    }
+
+    private void goStraight(){
+        new Thread() {
+            @Override
+            public void run() {
+                mBase.setLinearVelocity(2);
+                try {
+                    Thread.sleep(600);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                mBase.setLinearVelocity(2);
+                try {
+                    Thread.sleep(600);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+               mBase.setLinearVelocity(0);
+            }
+        }.start();
     }
 
     private void stop() {
@@ -333,7 +431,7 @@ public class AudioRecordActivity extends AppCompatActivity {
                 turn((float) -2.2);
                 break;
             case "around":
-                turn((float) 4.8);
+                turn((float) 4.9);
                 break;
             default:
                 break;
@@ -378,7 +476,7 @@ public class AudioRecordActivity extends AppCompatActivity {
                 dts.start();
                 Person[] persons = dts.detectPersons(3 * 1000 * 1000);
                 if (persons.length > 0) {
-                    mplayer = MediaPlayer.create(getApplicationContext(), R.raw.beep);
+                    mplayer = MediaPlayer.create(getApplicationContext(), R.raw.start_listening);
                     mplayer.start();
                 }
 
@@ -450,10 +548,15 @@ public class AudioRecordActivity extends AppCompatActivity {
                     output.write(buffer, 0, read);
                 }
                 String path = getCacheDir().getPath().concat("/cachedAudio.wav");
+                // TODO: suspend/pause recording thread while playing
                 mediaPlayer = new MediaPlayer();
                 mediaPlayer.setDataSource(path);
                 mediaPlayer.prepare();
+                // pause micro recording while playing -> allows confirmation
+                audioManager.setMicrophoneMute(true);
                 mediaPlayer.start();
+                // activate micro when audio finished played
+                audioManager.setMicrophoneMute(false);
                 output.flush();
             } catch (Exception e) {
                 e.printStackTrace();

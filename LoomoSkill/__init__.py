@@ -9,9 +9,7 @@
 
 from adapt.intent import IntentBuilder
 from mycroft.skills.core import MycroftSkill, intent_handler
-from mycroft.util.log import LOG
 from mycroft.messagebus.message import Message
-import time
 
 # Each skill is contained within its own class, which inherits base methods
 # from the MycroftSkill class.  You extend this class as shown below.
@@ -43,6 +41,8 @@ class LoomoSkill(MycroftSkill):
         self.set_context('personDetected', "true")
         self.speak_dialog("detected.person", expect_response=True)
 
+
+    # TODO: person detected
     @intent_handler(IntentBuilder("").require("personDetected").require("confirmation"))
     def handle_direction_confirmation(self, message):
         answer = message.data["confirmation.voc"]
@@ -52,6 +52,19 @@ class LoomoSkill(MycroftSkill):
         elif answer == "no":
             self.speak("Ok, let me know when I can assist you")
 
+    @intent_handler(IntentBuilder("").require("comeback"))
+    def handle_comeBack(self, message):
+        self.bus.emit(Message(
+            "loomoInstruction",
+            {'action' : "comeback"}
+        ))
+
+    @intent_handler(IntentBuilder("").require("straight"))
+    def handle_goahead(self, message):
+        self.bus.emit(Message(
+            "loomoInstruction",
+            {"action" : "straight"}
+        ))
 
 
     @intent_handler(IntentBuilder("").require("turn").require("Direction"))
@@ -90,60 +103,6 @@ class LoomoSkill(MycroftSkill):
             "loomoInstruction",
             {"action": "outofway"}
         ))
-
-
-'''
-
-    # Function that makes Loomo either go to a place or get an item
-    @intent_handler(IntentBuilder("").require('destAction').require('destination'))
-    def handle_destination(self, message):
-        action = message.data["destAction"]
-        destination = message.data["destination"]
-        self.set_context('actionHandle', action)
-        self.set_context('destinationHandle', destination)
-        if action == "get":
-            item = destination
-            # before getting something, Loomo waits for a confirmation.voc
-            # TODO: send the item variable over to the dialog
-            #self.speak_dialog("getting.stuff", expect_response=True)
-
-
-            self.speak_dialog("getting.stuff", data={"item":item}, expect_response=True)
-            self.bus.emit(Message(
-                "loomoInstruction",
-                {'action': "getItem",
-                 'item': item})) 
-        else:
-            self.speak("Going to {}".format(destination))
-            time.sleep(1)
-            self.bus.emit(Message(
-                "loomoInstruction",
-                {'action': "goPlace",
-                 'destination': destination}))
-
-
-    # gets called, when Loomo detected, that he needs to get something, function reassures, that understanding was correct
-    @intent_handler(IntentBuilder("").require('actionHandle').require('directionHandle').require('confirmation.voc'))
-    def handle_destination_confirmation(self, message):
-        # TODO: allow more confirmations than yes -> e.g yeah
-        answer = message.data["confirmation.voc"]
-        action = message.data["actionHandle"]
-        destination = message.data["directionHandle"]
-        if answer == "no" or answer == "nope":
-            self.speak("I didd't get your request right then. Please repeat", expect_response=True)
-        else:
-            self.speak("OK")
-            if action == "get":
-                self.bus.emit(Message(
-                    "loomoInstruction",
-                    {'action': "getItem",
-                     'item': destination}))
-            else:
-                self.bus.emit(Message(
-                    "loomoInstruction",
-                    {'action': "goPlace",
-                     'destination': destination}))
-     '''
 
 
 
