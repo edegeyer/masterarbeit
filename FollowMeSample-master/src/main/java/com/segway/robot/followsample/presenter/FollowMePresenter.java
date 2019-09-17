@@ -1,5 +1,6 @@
 package com.segway.robot.followsample.presenter;
 
+import android.content.Context;
 import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaPlayer;
@@ -14,6 +15,7 @@ import com.segway.robot.algo.dts.PersonTrackingListener;
 import com.segway.robot.algo.dts.PersonTrackingProfile;
 import com.segway.robot.algo.dts.PersonTrackingWithPlannerListener;
 import com.segway.robot.followsample.CustomApplication;
+import com.segway.robot.followsample.R;
 import com.segway.robot.followsample.interfaces.PresenterChangeInterface;
 import com.segway.robot.followsample.interfaces.ViewChangeInterface;
 import com.segway.robot.followsample.util.HeadControlHandlerImpl;
@@ -100,6 +102,7 @@ public class FollowMePresenter {
     private int PORT = 65432;
     String messageBusAddress = "ws://192.168.0.109:8181/core";
 
+
     //String messageBusAddress = "ws://192.168.178.31:8181/core";
 
     public enum RobotStateType {
@@ -115,7 +118,6 @@ public class FollowMePresenter {
         mVision = Vision.getInstance();
         mHead = Head.getInstance();
         mBase = Base.getInstance();
-
         mVision.bindService(CustomApplication.getContext(), mVisionBindStateListener);
         mHead.bindService(CustomApplication.getContext(), mHeadBindStateListener);
         mBase.bindService(CustomApplication.getContext(), mBaseBindStateListener);
@@ -163,7 +165,7 @@ public class FollowMePresenter {
                     final JSONObject jsonObject = new JSONObject(message);
 
                     if (jsonObject.get("type").equals("recognizer_loop:record_begin")) {
-                        //MediaPlayer mPlayer = MediaPlayer.create(getApplicationContext(), R.raw.start_listening);
+                        MediaPlayer mPlayer = MediaPlayer.create(CustomApplication.getContext(), R.raw.start_listening);
                         //mPlayer.start();
                     } else if (jsonObject.get("type").equals("mycroft.skill.handler.start")) {
                         JSONObject jsonData = jsonObject.getJSONObject("data");
@@ -181,29 +183,29 @@ public class FollowMePresenter {
                                 case "turn":
                                     String direction = jsonData.get("direction").toString();
                                     lastCommand = action + " " +direction;
-                                    //detectTurnDirection(direction);
+                                    detectTurnDirection(direction);
                                     break;
                                 case "goPlace":
                                     String destination = jsonData.get("destination").toString();
                                     lastCommand = action;
-                                    //goTo(destination);
+                                    goTo(destination);
                                     break;
                                 case "getItem":
                                     String item = jsonData.get("item").toString();
                                     lastCommand = action;
-                                    //getItem(item);
+                                    getItem(item);
                                     break;
                                 case "outofway":
                                     lastCommand = action;
-                                    //outofway();
+                                    outofway();
                                     break;
                                 case "comeback":
-                                    //comeback(lastCommand);
+                                    comeback(lastCommand);
                                     lastCommand = "";
                                     break;
                                 case "straight":
                                     lastCommand = action;
-                                    //goStraight();
+                                    goStraight();
                                     break;
                                 default:
                                     System.out.println("No idea what to do");
@@ -253,7 +255,7 @@ public class FollowMePresenter {
 
                     while (true) {
                         Socket clientSocket = serverSocket.accept();
-                        //clientProcessingPool.submit(new ClientTask((clientSocket)));
+                        clientProcessingPool.submit(new ClientTask((clientSocket)));
                     }
                 } catch (IOException e) {
                     System.out.println("Unable to process client reuqest");
@@ -280,8 +282,8 @@ public class FollowMePresenter {
         @Override
         public void run() {
             System.out.println("Got a client");
-/*
-            File file = new File(getCacheDir(), "cachedAudio.wav");
+
+            File file = new File(CustomApplication.getContext().getCacheDir(), "cachedAudio.wav");
             try (OutputStream output = new FileOutputStream(file)) {
                 DataInputStream dataInputStream = new DataInputStream(clientSocket.getInputStream());
                 byte[] buffer = new byte[4 * 1024];
@@ -289,7 +291,7 @@ public class FollowMePresenter {
                 while ((read = dataInputStream.read(buffer)) != -1) {
                     output.write(buffer, 0, read);
                 }
-                String path = getCacheDir().getPath().concat("/cachedAudio.wav");
+                String path = CustomApplication.getContext().getCacheDir().getPath().concat("/cachedAudio.wav");
                 // TODO: suspend/pause recording thread while playing
                 mediaPlayer = new MediaPlayer();
                 mediaPlayer.setDataSource(path);
@@ -309,7 +311,7 @@ public class FollowMePresenter {
                 clientSocket.close();
             } catch (IOException e) {
                 e.printStackTrace();
-            }*/
+            }
         }
     }
 
@@ -354,10 +356,223 @@ public class FollowMePresenter {
         }
     }
 
+    /******************************************* functions to control loomo ***********************/
+    public void goTo(String destination) {
+        new Thread() {
+            @Override
+            public void run() {
+                try {
+                    Thread.sleep(2000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                if (keepGoing) {
+                    mBase.setLinearVelocity(1);
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    mBase.setLinearVelocity(0);
+                }
+            }
+        }.start();
+
+    }
+
+    public void outofway() {
+        new Thread() {
+            @Override
+            public void run() {
+
+                if (keepGoing) {
+                    detectTurnDirection("left");
+                    try {
+                        Thread.sleep(2000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+                if (keepGoing) {
+                    mBase.setLinearVelocity(1);
+                    try {
+                        Thread.sleep(2000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+                mBase.setLinearVelocity(0);
+                keepGoing = true;
+            }
+        }.start();
+    }
+
+    public void getItem(String item) {
+        new Thread() {
+            @Override
+            public void run() {
+                try {
+                    Thread.sleep(2000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                if (keepGoing) {
+                    mBase.setLinearVelocity(1);
+                    try {
+                        Thread.sleep(2000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+                if (keepGoing) {
+                    detectTurnDirection("around");
+                    try {
+                        Thread.sleep(2000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+                if (keepGoing) {
+                    mBase.setLinearVelocity(1);
+                    try {
+                        Thread.sleep(2000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+                mBase.setLinearVelocity(0);
+                mBase.setAngularVelocity(0);
+                keepGoing = true;
+            }
+        }.start();
+    }
+
+    public void detectTurnDirection(String direction) {
+        switch (direction) {
+            case "left":
+                turn((float) 2.2);
+                break;
+            case "right":
+                turn((float) -2.2);
+                break;
+            case "around":
+                turn((float) 4.9);
+                break;
+            default:
+                break;
+        }
+    }
+
+    public void turn(final float velocity) {
+        new Thread() {
+            @Override
+            public void run() {
+
+                mBase.setLinearVelocity(0);
+                mBase.setAngularVelocity(velocity);
+                try {
+                    // sets for how long the robot is turning with that speed
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                // make the robot stop
+                mBase.setAngularVelocity(0);
+            }
+        }.start();
+    }
 
 
     /******************************************* button actions ***********************************/
+    private void comeback(String lastCommand){
+        System.out.println("last command is: " + lastCommand);
+        switch (lastCommand){
+            case "straight":
+                detectTurnDirection("around");
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                goStraight();
+                break;
+            case "outofway":
+                detectTurnDirection("around");
+                try {
+                    Thread.sleep(2000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                mBase.setLinearVelocity(1);
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                mBase.setLinearVelocity(0);
+                detectTurnDirection("left");
+                break;
+            case "getItem":
+                // can be empty, because robot should be back with the user
+                break;
+            case "goPlace":
+                detectTurnDirection("around");
+                try {
+                    Thread.sleep(2000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                mBase.setLinearVelocity(1);
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                mBase.setLinearVelocity(0);
+                break;
+            case "turn left":
+                detectTurnDirection("right");
+                break;
+            case "turn right":
+                detectTurnDirection("left");
+                break;
+            case "turn around":
+                detectTurnDirection("around");
+                break;
+            default:
+                break;
+        }
+        // set it to empty string
+        this.lastCommand = "";
+    }
 
+    private void goStraight(){
+        new Thread() {
+            @Override
+            public void run() {
+                mBase.setLinearVelocity(2);
+                try {
+                    Thread.sleep(600);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                mBase.setLinearVelocity(2);
+                try {
+                    Thread.sleep(600);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                mBase.setLinearVelocity(0);
+            }
+        }.start();
+    }
+
+    private void stop() {
+        keepGoing = false;
+        mBase.setLinearVelocity(0);
+        mBase.setAngularVelocity(0);
+
+    }
 
     public void actionInitiateDetect() {
         if (mCurrentState == RobotStateType.INITIATE_DETECT) {
