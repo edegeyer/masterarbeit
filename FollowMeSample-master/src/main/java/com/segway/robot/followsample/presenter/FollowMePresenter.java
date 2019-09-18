@@ -2,6 +2,7 @@ package com.segway.robot.followsample.presenter;
 
 import android.content.Context;
 import android.media.AudioFormat;
+import android.media.AudioManager;
 import android.media.AudioRecord;
 import android.media.MediaPlayer;
 import android.media.MediaRecorder;
@@ -101,6 +102,8 @@ public class FollowMePresenter {
     //private String SERVER = "192.168.178.31";
     private int PORT = 65432;
     String messageBusAddress = "ws://192.168.0.109:8181/core";
+    private int audioDuration;
+    private AudioManager audioManager;
 
 
     //String messageBusAddress = "ws://192.168.178.31:8181/core";
@@ -121,6 +124,8 @@ public class FollowMePresenter {
         mVision.bindService(CustomApplication.getContext(), mVisionBindStateListener);
         mHead.bindService(CustomApplication.getContext(), mHeadBindStateListener);
         mBase.bindService(CustomApplication.getContext(), mBaseBindStateListener);
+        audioManager = (AudioManager) CustomApplication.getContext().getSystemService(Context.AUDIO_SERVICE);
+
         connectWebSocket();
         mWebSocketClient.connect();
         startRecording();
@@ -159,7 +164,7 @@ public class FollowMePresenter {
 
             @Override
             public void onMessage(String message) {
-                //System.out.println(message);
+                System.out.println(message);
 
                 try {
                     final JSONObject jsonObject = new JSONObject(message);
@@ -203,6 +208,7 @@ public class FollowMePresenter {
                                     comeback(lastCommand);
                                     lastCommand = "";
                                     break;
+
                                 case "straight":
                                     lastCommand = action;
                                     goStraight();
@@ -296,12 +302,22 @@ public class FollowMePresenter {
                 mediaPlayer = new MediaPlayer();
                 mediaPlayer.setDataSource(path);
                 mediaPlayer.prepare();
+                audioDuration = mediaPlayer.getDuration();
+                System.out.println("audio duration is: " + audioDuration);
+               // recordingThread.interrupt();
+
+
                 // pause micro recording while playing -> allows confirmation
                 // TODO: funktioniert so noch nicht -> eventuell manuelle Manipulation mgl?
-                //audioManager.setMicrophoneMute(true);
+                audioManager.setMicrophoneMute(true);
                 mediaPlayer.start();
+                try {
+                    Thread.sleep(audioDuration);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
                 // activate micro when audio finished played
-                //audioManager.setMicrophoneMute(false);
+                audioManager.setMicrophoneMute(false);
                 output.flush();
             } catch (Exception e) {
                 e.printStackTrace();
@@ -322,7 +338,6 @@ public class FollowMePresenter {
             try {
                 Socket s = new Socket(SERVER, PORT);
                 DataOutputStream dataOutputStream = new DataOutputStream(s.getOutputStream());
-                dataOutputStream.write("Connected to mic".getBytes());
                 final ByteBuffer buffer = ByteBuffer.allocateDirect(BUFFER_SIZE);
                 while (recordingInProgress.get()) {
                     int result = recorder.read(buffer, BUFFER_SIZE);
@@ -339,6 +354,7 @@ public class FollowMePresenter {
             }
 
         }
+
 
         private String getBufferReadFailureReason(int errorCode) {
             switch (errorCode) {
@@ -600,18 +616,32 @@ public class FollowMePresenter {
 
     private PersonDetectListener mPersonDetectListener = new PersonDetectListener() {
         @Override
-        public void onPersonDetected(DTSPerson[] person) {
-            if (person == null || person.length == 0) {
+        public void onPersonDetected(DTSPerson[] persons) {
+            if (persons == null || persons.length == 0) {
                 if (System.currentTimeMillis() - startTime > TIME_OUT) {
                     resetHead();
                 }
                 return;
             }
             startTime = System.currentTimeMillis();
-            mPresenterChangeInterface.drawPersons(person);
+            mPresenterChangeInterface.drawPersons(persons);
+
+
+            persons[0].getId();
+            mWebSocketClient.send("{\"type\": \"recognizer_loop:utterance\"," +
+                        "\"data\":{\"utterances\":[\"loomo1234567\"], \"lang\": \"en-us\"}, \"context\":{}}");
+
+
+            // TODO: hier die Reaktion für Person entdeckt einfügen
+            // TODO: Nachricht so anpassen, dass sie Struktur von Utterance hat, allerdings einer "unmöglichen"
+            // TODO: dann diese Nachricht via Skill abfragen und damit dann entsprechend auf die Person reagieren
+           // mWebSocketClient.send("{\"loomo\": \"personDetect\"}");
+
+            // TODO: globale Variable setzen
+
             if (isServicesAvailable()) {
                 mHead.setMode(Head.MODE_ORIENTATION_LOCK);
-                mHeadPIDController.updateTarget(person[0].getTheta(), person[0].getDrawingRect(), 480);
+                mHeadPIDController.updateTarget(persons[0].getTheta(), persons[0].getDrawingRect(), 480);
             }
 
         }
@@ -628,15 +658,6 @@ public class FollowMePresenter {
         }
     };
 
-
-
-
-
-    private void setBaseVelocity(float linearVelocity, float angularVelocity) {
-        mBase.setControlMode(Base.CONTROL_MODE_RAW);
-        mBase.setLinearVelocity(linearVelocity);
-        mBase.setAngularVelocity(angularVelocity);
-    }
 
 
     /***************************************** bind services **************************************/
