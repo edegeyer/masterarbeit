@@ -17,7 +17,9 @@ import os
 import random
 import re
 import wave
+import time as t
 import sys
+import contextlib
 from abc import ABCMeta, abstractmethod
 from threading import Thread
 from time import time, sleep
@@ -98,10 +100,16 @@ class PlaybackThread(Thread):
                     self.tts.begin_audio()
                 stopwatch = Stopwatch()
                 self.fo.openFile(data)
-                # TODO: hier die daten verschicken
                 with stopwatch:
                     if snd_type == 'wav':
-                        self.p = play_wav(data)
+                        with contextlib.closing(wave.open(data, "r")) as f:
+                            frames = f.getnframes()
+                            rate  = f.getframerate()
+                            duration = frames/float(rate)
+                            print("DURATION ", duration)
+                            t.sleep(duration)
+                        #self.p = play_wav(data)
+                        pass
                     elif snd_type == 'mp3':
                         self.p = play_mp3(data)
 

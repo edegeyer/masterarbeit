@@ -1,5 +1,6 @@
 
 import socket
+import pyaudio
 
 class fileOpener():
     def __init__(self):
