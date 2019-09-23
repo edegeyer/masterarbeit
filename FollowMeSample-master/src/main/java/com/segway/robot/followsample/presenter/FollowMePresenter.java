@@ -39,6 +39,11 @@ import java.net.Socket;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -51,6 +56,11 @@ import org.json.JSONObject;
  * @author jacob
  * @date 5/29/18
  */
+
+class DetectedPerson{
+    public long timestamp = System.currentTimeMillis();
+    public Boolean asked = false;
+}
 
 public class FollowMePresenter {
 
@@ -74,8 +84,8 @@ public class FollowMePresenter {
 
     private DTS mDts;
 
-
-
+    //private List personList = Collections.synchronizedList(new ArrayList());
+    private DetectedPerson detectedPerson = new DetectedPerson();
     private long startTime;
 
     private RobotStateType mCurrentState;
@@ -125,7 +135,8 @@ public class FollowMePresenter {
         mHead.bindService(CustomApplication.getContext(), mHeadBindStateListener);
         mBase.bindService(CustomApplication.getContext(), mBaseBindStateListener);
         audioManager = (AudioManager) CustomApplication.getContext().getSystemService(Context.AUDIO_SERVICE);
-
+        //detectedPerson.asked = false;
+        //detectedPerson.time = Calendar.getInstance().getTime();
         connectWebSocket();
         mWebSocketClient.connect();
         startRecording();
@@ -164,19 +175,21 @@ public class FollowMePresenter {
 
             @Override
             public void onMessage(String message) {
-                System.out.println(message);
+                //System.out.println(message);
 
                 try {
                     final JSONObject jsonObject = new JSONObject(message);
 
                     if (jsonObject.get("type").equals("recognizer_loop:record_begin")) {
+                        // play sound, when wakeword was detected -> user knows then, that loomo is listening
                         MediaPlayer mPlayer = MediaPlayer.create(CustomApplication.getContext(), R.raw.start_listening);
-                        //mPlayer.start();
+                        mPlayer.start();
                     } else if (jsonObject.get("type").equals("mycroft.skill.handler.start")) {
+                        // make loomo stop during an action
                         JSONObject jsonData = jsonObject.getJSONObject("data");
                         if (jsonData.get("name").equals("StopSkill.handle_stop")) {
                             System.out.println("STOP");
-                            //stop();
+                            stop();
                         }
                     } else if (jsonObject.get("type").equals("loomoInstruction")) {
                         try {
@@ -298,17 +311,11 @@ public class FollowMePresenter {
                     output.write(buffer, 0, read);
                 }
                 String path = CustomApplication.getContext().getCacheDir().getPath().concat("/cachedAudio.wav");
-                // TODO: suspend/pause recording thread while playing
                 mediaPlayer = new MediaPlayer();
                 mediaPlayer.setDataSource(path);
                 mediaPlayer.prepare();
                 audioDuration = mediaPlayer.getDuration();
-                System.out.println("audio duration is: " + audioDuration);
-               // recordingThread.interrupt();
-
-
-                // pause micro recording while playing -> allows confirmation
-                // TODO: funktioniert so noch nicht -> eventuell manuelle Manipulation mgl?
+                // mute microphone for the duration of the audio
                 audioManager.setMicrophoneMute(true);
                 mediaPlayer.start();
                 try {
@@ -316,7 +323,7 @@ public class FollowMePresenter {
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-                // activate micro when audio finished played
+                // reactivate micro when audio finished played
                 audioManager.setMicrophoneMute(false);
                 output.flush();
             } catch (Exception e) {
@@ -428,12 +435,12 @@ public class FollowMePresenter {
             @Override
             public void run() {
                 try {
-                    Thread.sleep(2000);
+                    Thread.sleep(1000);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
                 if (keepGoing) {
-                    mBase.setLinearVelocity(1);
+                    goStraight();
                     try {
                         Thread.sleep(2000);
                     } catch (InterruptedException e) {
@@ -443,13 +450,13 @@ public class FollowMePresenter {
                 if (keepGoing) {
                     detectTurnDirection("around");
                     try {
-                        Thread.sleep(2000);
+                        Thread.sleep(4000);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
                 }
                 if (keepGoing) {
-                    mBase.setLinearVelocity(1);
+                    goStraight();
                     try {
                         Thread.sleep(2000);
                     } catch (InterruptedException e) {
@@ -472,7 +479,7 @@ public class FollowMePresenter {
                 turn((float) -2.2);
                 break;
             case "around":
-                turn((float) 4.9);
+                turn((float) 4.8);
                 break;
             default:
                 break;
@@ -499,7 +506,6 @@ public class FollowMePresenter {
     }
 
 
-    /******************************************* button actions ***********************************/
     private void comeback(String lastCommand){
         System.out.println("last command is: " + lastCommand);
         switch (lastCommand){
@@ -618,8 +624,11 @@ public class FollowMePresenter {
         @Override
         public void onPersonDetected(DTSPerson[] persons) {
             if (persons == null || persons.length == 0) {
+                detectedPerson.asked = false;
+
                 if (System.currentTimeMillis() - startTime > TIME_OUT) {
                     resetHead();
+                    // when person left the camera area, assume person was never asked
                 }
                 return;
             }
@@ -627,17 +636,26 @@ public class FollowMePresenter {
             mPresenterChangeInterface.drawPersons(persons);
 
 
-            persons[0].getId();
-            mWebSocketClient.send("{\"type\": \"recognizer_loop:utterance\"," +
+            if (!detectedPerson.asked){
+                // ask person, if first seen
+                detectedPerson.asked = true;
+                detectedPerson.timestamp = System.currentTimeMillis();
+                mWebSocketClient.send("{\"type\": \"recognizer_loop:utterance\"," +
                         "\"data\":{\"utterances\":[\"loomo1234567\"], \"lang\": \"en-us\"}, \"context\":{}}");
-
-
-            // TODO: hier die Reaktion für Person entdeckt einfügen
-            // TODO: Nachricht so anpassen, dass sie Struktur von Utterance hat, allerdings einer "unmöglichen"
-            // TODO: dann diese Nachricht via Skill abfragen und damit dann entsprechend auf die Person reagieren
-           // mWebSocketClient.send("{\"loomo\": \"personDetect\"}");
-
-            // TODO: globale Variable setzen
+            }
+            else{
+                // when person wasn't seen for defined time, ask again if help can be provided
+                long timedifference = System.currentTimeMillis() - detectedPerson.timestamp;
+                // check if person was asked over 30s before
+                System.out.println("ASKED BEFORE " +timedifference/1000);
+                if (timedifference > 30000){
+                    // TODO: ask again
+                    System.out.println("ASKING AGAIN");
+                    detectedPerson.timestamp = System.currentTimeMillis();
+                    mWebSocketClient.send("{\"type\": \"recognizer_loop:utterance\"," +
+                            "\"data\":{\"utterances\":[\"loomo1234567\"], \"lang\": \"en-us\"}, \"context\":{}}");
+                }
+            }
 
             if (isServicesAvailable()) {
                 mHead.setMode(Head.MODE_ORIENTATION_LOCK);
