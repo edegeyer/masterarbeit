@@ -9,7 +9,7 @@ class fileOpener():
 
     def openFile(self, uri):
 
-        LoomoIP = '192.168.0.108'
+        LoomoIP = '192.168.43.52'#0.108'
         LoomoPort = 65433
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
 
