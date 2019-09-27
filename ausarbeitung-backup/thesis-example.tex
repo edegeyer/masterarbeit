@@ -1,0 +1,177 @@
+
+% **************************************************
+% Document Class Definition
+% **************************************************
+\documentclass[%
+	paper=A4,					% paper size --> A4 is default in Germany
+	twoside=true,				% onesite or twoside printing
+	openright,					% doublepage cleaning ends up right side
+	parskip=full,				% spacing value / method for paragraphs
+	chapterprefix=true,			% prefix for chapter marks
+	11pt,						% font size
+	headings=normal,			% size of headings
+	bibliography=totoc,			% include bib in toc
+	listof=totoc,				% include listof entries in toc
+	titlepage=on,				% own page for each title page
+	captions=tableabove,		% display table captions above the float env
+	draft=false,				% value for draft version
+]{scrreprt}%
+
+% **************************************************
+% Debug LaTeX Information
+% **************************************************
+%\listfiles
+
+% **************************************************
+% Information and Commands for Reuse
+% **************************************************
+\newcommand{\thesisTitle}{Aufbau einer unabh\"angigen nat\"urlich-sprachlichen Mensch-Roboter-Interaktion}
+\newcommand{\thesisName}{Martin Eisoldt}
+\newcommand{\thesisSubject}{Masterarbeit}
+\newcommand{\thesisDate}{31.10.2019}
+
+\newcommand{\thesisFirstReviewer}{Prof. Dr. rer. nat. habil. Gerhard Weber}
+\newcommand{\thesisFirstReviewerUniversity}{\protect{Technische Universit\"at Dresden}}
+\newcommand{\thesisFirstReviewerDepartment}{Professur f\"ur Mensch-Computer-Interaktion}
+
+\newcommand{\thesisSecondReviewer}{??}
+\newcommand{\thesisSecondReviewerUniversity}{\protect{Technische Universit\"at Dresden}}
+\newcommand{\thesisSecondReviewerDepartment}{??}
+
+\newcommand{\thesisFirstSupervisor}{M. Sc. David Gollasch}
+%\newcommand{\thesisSecondSupervisor}{John Smith}
+
+\newcommand{\thesisUniversity}{\protect{Technische Universit\"at Dresden}}
+\newcommand{\thesisUniversityDepartment}{Fakult\"at Informatik}
+\newcommand{\thesisUniversityInstitute}{Institut f\"ur angewandte Informatik}
+\newcommand{\thesisUniversityGroup}{Professur f\"ur Mensch-Computer-Interaktion}
+\newcommand{\thesisUniversityCity}{Dresden}
+\newcommand{\thesisUniversityStreetAddress}{Mommsenstr. 9 }
+\newcommand{\thesisUniversityPostalCode}{01069}
+
+% **************************************************
+% Load and Configure Packages
+% **************************************************
+\usepackage{url}
+\usepackage[utf8]{inputenc} 
+ \usepackage[ngerman]{babel}
+\usepackage{float}
+\usepackage{tikz}
+\usepackage{tabularx}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{algorithmic}
+\usepackage{graphicx}
+\usepackage{textcomp}
+\usepackage{xcolor}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{acronym}
+\usepackage{glossaries}
+%\usepackage[latin1]{inputenc}
+
+\usepackage[					% clean thesis style
+	figuresep=colon,%
+	sansserif=false,%
+	hangfigurecaption=false,%
+	hangsection=true,%
+	hangsubsection=true,%
+	colorize=full,%
+	colortheme=bluemagenta,%
+	bibsys=bibtex,%
+	bibfile=bib-refs,%
+	bibstyle=alphabetic,%
+]{cleanthesis}
+
+\hypersetup{					% setup the hyperref-package options
+	pdftitle={\thesisTitle},	% 	- title (PDF meta)
+	pdfsubject={\thesisSubject},% 	- subject (PDF meta)
+	pdfauthor={\thesisName},	% 	- author (PDF meta)
+	plainpages=false,			% 	-
+	colorlinks=false,			% 	- colorize links?
+	pdfborder={0 0 0},			% 	-
+	breaklinks=true,			% 	- allow line break inside links
+	bookmarksnumbered=true,		%
+	bookmarksopen=true			%
+}
+
+% **************************************************
+% Document CONTENT
+% **************************************************
+\begin{document}
+
+% --------------------------
+% rename document parts
+% --------------------------
+\renewcaptionname{ngerman}{\figurename}{Abb.}
+\renewcaptionname{ngerman}{\tablename}{Tab.}
+%\renewcaptionname{english}{\figurename}{Fig.}
+%\renewcaptionname{english}{\tablename}{Tab.}
+
+% --------------------------
+% Front matter
+% --------------------------
+\pagenumbering{roman}			% roman page numbing (invisible for empty page style)
+\pagestyle{empty}				% no header or footers
+\input{content/grundstruktur/titlepages}		% INCLUDE: all titlepages
+\cleardoublepage
+
+\pagestyle{plain}				% display just page numbers
+\input{content/grundstruktur/abstract}		% INCLUDE: the abstracts (english and german)
+\cleardoublepage
+%
+\input{content/grundstruktur/acknowledgement.tex} % INCLUDE: acknowledgement
+\cleardoublepage
+%
+\setcounter{tocdepth}{2}		% define depth of toc
+\tableofcontents				% display table of contents
+\cleardoublepage
+
+% --------------------------
+% Body matter
+% --------------------------
+\pagenumbering{arabic}			% arabic page numbering
+\setcounter{page}{1}			% set page counter
+\pagestyle{maincontentstyle} 	% fancy header and footer
+
+\input{content/1-einleitung.tex} % INCLUDE: introduction
+\input{content/2-analyse-systeme.tex} % INCLUDE: related work
+\input{content/3-analyse-szenarien.tex}
+\input{content/4-konzepte.tex}	% INCLUDE: system
+\input{content/5-Umsetzung.tex} % INCLUDE: concepts
+\input{content/6-bewertung-prototyp.tex} % INCLUDE: conclusion
+\input{content/7-fazit.tex}
+\cleardoublepage
+
+% --------------------------
+% Back matter
+% --------------------------
+{%
+\setstretch{1.1}
+\renewcommand{\bibfont}{\normalfont\small}
+\setlength{\biblabelsep}{0pt}
+\setlength{\bibitemsep}{0.5\baselineskip plus 0.5\baselineskip}
+\makeglossaries
+\include{content/grundstruktur/abkuerzung}
+\printbibliography[nottype=online]
+\printbibliography[heading=subbibliography,title={Webseiten},type=online,prefixnumbers={@}]
+}
+\cleardoublepage
+
+\listoffigures
+\cleardoublepage
+
+\listoftables
+\cleardoublepage
+
+\input{content/grundstruktur/colophon}
+\cleardoublepage
+
+\input{content/grundstruktur/declaration}
+\clearpage
+\newpage
+\mbox{}
+
+% **************************************************
+% End of Document CONTENT
+% **************************************************
+\end{document}

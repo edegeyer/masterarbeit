@@ -3,7 +3,8 @@ import socket
 import pyaudio
 import sys
 
-myHOST = '192.168.43.138'  # Standard loopback interface address (localhost)
+#myHOST = '192.168.0.109'  # Standard loopback interface address (localhost)
+myHOST = "192.168.43.138"
 myPORT = 65432  # Port to listen on (non-privileged ports are > 1023)
 
 class socketServer(Thread):
@@ -28,7 +29,7 @@ class socketServer(Thread):
             print("Connected to: ", addr)
             self.isStreaming = True
             while True:
-                data = conn.recv(7168)
+                data = conn.recv(1024)
                 audiostream.write(data)
                 if not data:
                     print("Bye")

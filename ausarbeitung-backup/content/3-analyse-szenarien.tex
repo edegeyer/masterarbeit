@@ -1,0 +1,83 @@
+\chapter{Analyse der Assistenzroboter}
+\label{sec:einsatzszenarien}
+\cleanchapterquote{A service robot is a robot which operates semi or fully autonomously to perform services useful to the wellbeing of humans and equipment, excluding manufacturing operations.}{International Federation of Robotics}{\cite{karlsson2000world}}
+
+
+DAS KAPTIEL KANN NOCH AUSFÜHRLICHER WERDEN, INSBESONDERE MEHR ZU DEN EINSATZSZENARIEN (BEISPIELE FINDEN SICH MEIST IN DEN EINLEITUNGEN DER PAPER)
+
+Im vorherigen Teil dieser Arbeit wurde die Wirkungsweise von Sprachassistenten untersucht. Dieses Kapitel soll sich damit beschäftigen, an welchen Stellen es sich überhaupt lohnt, Assistenzroboter gemeinsam mit Sprachsteuerung einzusetzen. \\
+Für die Definition von Assistenzrobotern gibt es verschiedene Möglichkeiten, in dieser Arbeit wird die der \glqq International Federation of Robotics\grqq{} verwendet. Diese beagt, dass Assistenzroboter (teil-)autonom Aufgaben erfüllen, die Menschen helfen. Allerdings handelt es sich dabei nicht um Produktionsaufgaben \cite{karlsson2000world}. Dem gegenüber stehen die Industrieroboter, deren Hauptaufgabe in der Herstellung von Produkten oder der Unterstützung des Herstellungsprozesses liegt \cite{kumar2005industrial}. \\
+Um ein tiefergehendes Verständnis für die Funktionsweise der Assistenzroboter ist es außerdem sinnvoll, die Architektur der Roboter sowie die Mensch-Roboter Interaktion genauer zu betrachten. 
+
+\section{Einsatzszenarien für Assistenzroboter}
+\label{sec:einsatzszenarien:roboter}
+
+
+Prinzipiell sollten mögliche Einsatzgebiete von Robotern in der Ausgangsanalyse nicht davon abhängen, wie sie aussehen (z.B. Arme, nur Räder, o.ä) und somit ihren speziellen Fähigkeiten. Vielmehr sollte der Roboter mit seinen Möglichkeiten zur Erfüllung von Aufgaben daran orientieren, wofür er eingesetzt wird \cite{bohme2002serviceroboter}. \\
+Für den Einsatz von Assistenzrobotern ergeben sich unterschiedliche Möglichkeiten. So können sie beispielsweise zur Unterstützung von älteren oder behinderten Menschen eingesetzt werden. Dieser Einsatz erfolgt in erster Linie in dem Wohnumfeld der zu unterstützenden Person. Dabei sind Basisfunktionen eines solchen Roboters zum einen die unterbrechungslose Beobachtung des Patienten, um so mögliche Notfallsituationen zu erkennen und nach Bedarf Hilfe zu holen. Außerdem gehören einfache Auskunftssysteme mit Sprachsteuerung (z.B. Wetter) zu den benötigten Funktionen QUELLE. Des Weiteren ist eine \glqq Telepräsenz\grqq{} sowohl von Pflegepersonal als auch Verwandten eine sinnvolle Funktion, um somit für soziale Interaktion zu sorgen QUELLE. Zeitgleich können die Pfleger entlastet werden, indem das System automatisch an Routineaufgaben erinnert. Dies sind neben der Medikamenteneinnahme auch Tätigkeiten wie Essen und Trinken \cite{pollack2002pearl}. erinnert. Eine weitere nötige Grundfunktion ist im Smart-Home Umfeld, in dem der Roboter beispielsweise Licht und Heizung regeln kann \cite{bohme2002serviceroboter}. Zusätzlich ist es vorstellbar, dass ein solcher Roboter auch eine integrierte Gehhilfe, wie sie bei den \texttt{Care-O-bot} in der zweiten Generation eingeführt wurde. Dadurch kann der Nutzer in seiner Mobilität unterstützt werden \cite{graf2004care}. \\
+
+Es ist auch möglich, die Roboter zu Informations- und Navigationszwecken in öffentlichen Umgebungen (z.B. Museen, Supermärkte) einsetzen \cite{bohme2002serviceroboter}. Beispielsweise wurde mit \texttt{SCITOS} ein Roboter entwickelt, der Kunden in einem Baumarkt den Weg zu gesuchten Produkten zeigt \cite{bohme2002serviceroboter}. Der Roboter \texttt{RHINO} wurde entwickelt, um als Museumsführer zu agieren. Dafür erkennt er selbständig Menschen, spricht sie an und gibt ihnen auf Wunsch eine Tour durch das Museum. Dabei ist aber keine Interaktion auf natürlicher Spracheebene möglich, sondern nur mittels Touchscreeneingaben \cite{buhmann1995mobile}. \\
+Ein anderes Einsatzszenario ist als Reinigungshelfer. Bekannte Einsatzszenarien sind beispielsweise als Mäh-, Saug- oder Poolreinigungsroboter \cite{kumar2005industrial}. Ähnliche Reinigungsfunktionen finden sich aber auch in Robotern wieder, die als allgemeine Haushaltshilfe eingesetzt werden können \cite{yamazaki2012home}. \\
+Es ist auch möglich, die Roboter zur Unterstützung von Menschen einzusetzen, die an Demenz erkrankt sind. Für einen solchen Einsatz wurde beispielsweise der robbenähnliche Roboter \texttt{PARO} entwickelt \cite{chang2013use}. Dessen Rolle ist es, dem Patienten soziale Nähe zu geben, indem physische Nähe gegeben wird. Er ist in der Lage, auf Berührungen und Geräusche zu reagieren. Durch die Interaktion sollen die Patienten wieder gesprächiger werden. ZITIERUNGEN PRÜFEN, IRGENDWAS STIMMT HIER NICHT (SIEHE AUCH ABBILDUNG MIT DEN ROBOTERN)
+
+\section{Architektur von Assistenzrobotern}
+
+ Wie in Abbildung \ref{fig:einsatzszenarien:robots} zu sehen, kann die physische Erscheinung der Assistenzroboter sehr unterschiedlich sein. So kann ein solcher Roboter Tiergestalt haben (z.B. \texttt{PARO} \cite{chang2013use}) oder sehr menschenähnlich sein (z.B. \texttt{Pepper}). Auch ist es möglich, dass ein solcher Roboter nur sehr abstrakte Ähnlichkeiten mit dem menschlichen Aussehen hat (z.B. \texttt{TOOMAS} \cite{gross2009toomas}). \\
+ Dieses unterschiedliche Erscheinungsbild hängt mit dem Einsatzszenarien zusammen. So soll \texttt{PARO} den Einsatz von Tieren in der Therapie simulieren \cite{chang2013use}. Bei \texttt{TOOMAS} und \texttt{Pepper} ist der Zweck des Roboters der Ersatz von Menschen. In einem solchen Fall wird es als nötig angesehen, dass der Roboter menschenähnliches Aussehen aufweist QUELLE. Jedoch muss bei dabei auch beachtet werden, dass es von Menschen als unangenehm gesehen wird, wenn ein Roboter zwar menschlich sein soll, aber diese Funktionen nicht genau ausführen kann QUELLE, BESSER FORMULIEREN
+ 
+ 
+\begin{figure}
+    \centering
+    \includegraphics[width=1.0\textwidth]{grafiken/szenarien/robots.png}
+    \caption{Roboter \texttt{PARO} \cite{chang2013use}, \texttt{TOOMAS} \cite{gross2009toomas}, \texttt{PARO} \cite{calo2011ethical}}
+    \label{fig:einsatzszenarien:robots}
+\end{figure}
+
+
+
+\section{Mensch-Roboter-Interaktion}
+\label{sec:einsatzszenarien:menschRoboInteraktion}
+
+Wie in Abbildung \ref{fig:einsatzszenarien:roboInteraktion} dargestellt, können Mensch und Roboter auf verschiedene Arten miteinander interagieren. Um gemeinsam ein Ziel zu erreichen, können sie zum einen kollaborieren, das heißt, dass die Aufgaben der beiden Partner direkt voneinander abhängig sind. Außerdem können sie auch Aufgaben mittels Kooperation lösen. Dabei hat jeder Partner eigene Aufgaben, allerdings besteht zwischen diesen keine direkte Abhängigkeit. Es kann aber auch sein, dass beide Partner ihre eigenen Ziele haben, dafür aber keine Unterstützung des anderen benötigen. Da beide trotzdem auf Aktionen des anderen Rücksicht nehmen müssen, handelt es sich dabei um eine Ko-Existenz \cite{onnasch2016mensch}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1.0\textwidth]{grafiken/szenarien/interaktion.png}
+    \caption{Darstellung der verschiedenen Interaktionsarten zwischen Mensch und Roboter aus \cite{onnasch2016mensch}}
+    \label{fig:einsatzszenarien:roboInteraktion}
+\end{figure}
+
+\paragraph{Arten der Mensch-Roboter Interaktion}
+Die Interaktion zwischen Mensch und Roboter kann auf verschieden Arten geschehen. Zum einen kann dies mittels grafischen Oberflächen (beispielsweise Touchscreens) geschehen. Diese behindern allerdings die Nutzung durch Personen mit motorischen Einschränkungen \cite{lazewatsky2014accessible}. Ein weiteres Problem mit grafischen Darstellungen ergibt sich dann, wenn der Nutzer nur begrenzte Sehfähigkeiten besitzt \cite{zeng2018hapticrein} \\
+Eine andere Art ist die Möglichkeit, dass die Interaktion mittels natürlicher, gesprochener Sprache abläuft \cite{portet2013design}. \\
+Vorstellbar ist auch, dass der Roboter Verhaltensweisen des Menschen analysiert und daraus Rückschlüsse auf das Wohlbefinden des Pflegebedürftigen zieht. Dafür werden aber zusätzliche Sensordaten benötigt, um beispielsweise das Schlafverhalten analysieren zu können \cite{coradeschi2013giraffplus}. \\
+Außerdem ist es möglich, mittels Gesten zu interagieren, insbesondere unter als Eingabe für den Roboter. Dafür muss der Roboter allerdings in der Lage sein, einen Menschen visuell zu erkennen und danach auch die richtigen Rückschlüsse aus den Gesten ziehen zu können. Die Erkennung dieser kann einerseits durch vorherige Definition von \glqq Gestentemplates\grqq{} oder mittels künstlicher Intelligenz geschehen \cite{waldherr2000gesture}. Dabei wird eine Geste in der Regel als Bewegung der Hände und des Kopfes einer Person aufgefasst \cite{bohme2002serviceroboter}. \\
+Für eine erfolgreiche Interaktion ist es auch nötig, dass der Roboter dem Nutzer ein Feedback gibt. Dies kann er durch akustische Signale, Ausgaben auf dem Display oder aber Bewegungen realisieren \cite{loitsch2015position}. 
+
+\paragraph{Erzeugen von Nutzeraktzeptanz} 
+Damit eine Applikation jeglicher Art erfolgreich auf einem Assistenzroboter eingesetzt werden kann, ist die Mensch-Roboter Interaktion ein wesentlicher Faktor. Dafür ist es wichtig, dass sowohl Personen mit größerem technischen Verständnis als auch solche mit geringem Wissen ohne Problem mit dem Roboter interagieren können. Dafür eignet sich besonders die natürliche Sprache, da sich die Nutzung somit intuitiv anfühlt und nicht als zusätzliche Last empfunden wird \cite{bohme2002serviceroboter}. Dafür darf der Roboter allerdings nicht auf bestimmtes Vokabular beschränkt sein, da der Nutzer dieses dann kennen müsste, sondern sollte anhand der gesprochenen Wörter möglichst problemlos eigene Aktionen ableiten können \cite{bohme2002serviceroboter}. Wichtig ist hierbei auch, dass die Spracherkennung mit einer ausreichenden Genauigkeit durchgeführt wird \cite{wang2016user}. \\
+Auch ist es wichtig, dass der Nutzer erfährt, wie der Roboter auf seine Eingabe reagiert. Damit mögliche Korrekturen durch den Nutzer vorgenommen werden können, ist dafür ein sprachliches Feedback sicherlich am geeignetsten. Dadurch bleibt auch die Natürlichkeit der Interaktion erhalten \cite{bohme2002serviceroboter}. \\
+Dafür ist ein Ablauf wie er von Green et al. vorgestellt wurde ein vielversprechender Ansatz. Dieser wird in Abbildung \ref{fig:konzept:dialog} dargestellt. Durch diese direkte Antwort kann der Nutzer sofort nachvollziehen, ob der Roboter etwas falsch verstanden hat. Außerdem hat er somit die Möglichkeit, eine Handlung abzubrechen, bevor diese ungewollt ausgeführt wird.
+\begin{figure}[H]
+    \centering
+    \begin{verbatim}
+        Nutzer: Roboter, hole Kaffee aus der Küche!
+        Roboter: Kaffee aus der Küche holen?
+        Roboter performt Geste
+        Nutzer: Ja, bitte
+        Roboter: Hole Kaffee aus der Küche
+    \end{verbatim}
+    \caption{Dialog zwischen Mensch und Roboter mit natürlicher Sprache aus \cite{green2000user}}
+    \label{fig:konzept:dialog}
+\end{figure}
+
+Wichtig sind aber auch die Eigenschaften der Bewegung des Roboters. Sollte sich dieser mit zu großer Geschwindigkeit bewegen, kann dies als aggressiv betrachtet werden. Besser ist an dieser Stelle eine Anpassung der Geschwindigkeit an die Bedürfnisse des Nutzers \cite{lohse2007nutzerfreundliche}. \\
+Eine nicht zu vernachlässigende Rolle spielt auch das Verhalten des Roboters. Zum einen können Bewegungen mit großer Geschwindigkeit als aggressiv empfunden werden. Besser ist es, wenn sich der Roboter an die Bedürfnisse des Nutzers anpasst \cite{lohse2007nutzerfreundliche}. Außerdem ist das Sozialverhalten wichtig, um eine möglichst natürliche Interaktion zu ermögliche. Hierfür sind allgemeine Normen, wie Einhalten des personal space (HIER RICHTIGES DEUTSCHES WORT), von großer Relevanz \cite{pacchierotti2005human}. \\
+Eine Nutzerbefragung von Green et al. hat gezeigt, dass 82\% der Befragten die Interaktion mit einem Roboter auf Basis von natürlicher Sprache bevorzugen. Lediglich 52\% empfinden demnach die Gestensteuerung als praktikablen Weg \cite{green2000user}.\\
+
+HIER AUCH NOCH VERWEIS AUF DAS MENSCHENÄHNLICHE AUSSEHEN/GESICHT -> sollte auch in der Habil von Böhmer stehen
+
+
+\section{Zusammenfassung}
+\label{sec:einsatzszenarien:zusammenfassung}
+In diesem Kapitel lag der Fokus darauf, zu untersuchen, für welche Aufgaben Assistenzroboter eingesetzt werden können und wie sie mit dem Nutzer interagieren. Dabei sind alle Tätigkeiten solche unterstützenden Tätigkeiten, die nicht Teil eines Herstellungsprozesses sind. Dies sind neben einfachen Kurieraufgaben auch Navigations- oder Reinigungsaufgaben. Damit der Nutzer dem Roboter die gewünschten Interaktionen kommunizieren kann, bieten sich neben natürlicher, gesprochener Sprache auch Eingaben auf Gesten- oder Touchdisplay Eingabe an. Wichtig ist dabei, dass der Nutzer diese Aktionen ohne größeres technisches Vorwissen erledigen kann und sie auch zuverlässig Funktionen. Außerdem sollte der Roboter bei seinem Verhalten Sozialnormen beachten und dem Nutzer eine Rückmeldung geben, welche Aktion er ausführen wird. MUSS NOCH ENTSPRECHEND UM DEN ARCHITEKTUR TEIL ERWEITERT WERDEN
