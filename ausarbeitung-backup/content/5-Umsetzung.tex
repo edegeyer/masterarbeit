@@ -1,0 +1,135 @@
+% !TEX root = ../thesis-example.tex
+%
+\chapter{prototypische Umsetzung des Konzepts}
+\label{sec:umsetzung}
+
+In diesem Kapitel wird gezeigt, dass das zuvor erarbeitete Konzept für die Interaktion von Mensch und Roboter mittels natürlicher Sprache auch funktionsfähig ist. Dafür wird eine prototypische Anwendung auf einem Android-basierten Roboter implementiert. Dabei handelt es sich um ein Gerät von Segway Robotics mit dem Namen Loomo. Dieser ist selbst-balancierend und fährt auf zwei Rädern, für komplexere Aufgaben kann er auch mit Hilfsmitteln erweitert werden. Dabei werden die Funktionen prototypisch so implementiert, dass sie mindestens das gewünschte Verhalten simulieren. Dies ist der teilweise hohen Komplexität von einzelnen Teilaufgaben geschuldet, jedoch ist es ausreichend, die Funktionen nur zu simulieren um die Funktionsfähigkeit des Konzepts zeigen zu können. \\
+
+
+
+
+ (https://unix.stackexchange.com/questions/263274/pipe-mix-line-in-to-output-in-pulseaudio
+https://askubuntu.com/questions/171287/how-to-pass-record-audio-output-as-an-input-device
+https://unix.stackexchange.com/questions/130774/creating-a-virtual-microphone
+
+
+
+
+
+auch erklären, was schon bei der nutzung mit android anders ist (thema mycroft core instanz), auch irgendwo mal so aufzeichnen mit dem mycroft core etc, auch sagen, welche sprache genutzt wird (deutsch, englisch) \\
+außerdem erwähnen, warum websockets für anwendung (echtzeit) \\
+eingehen auf die Messung mit der Ododmetry beziehungsweise sollte das als theoretische Grundlage möglicherweise auch einfach in den analyse teil zu robotern
+
+\section{Technologieauswahl}
+\label{sec:umsetzung:auswahl}
+
+Der Prototyp wird mit einem Roboter Loomo von Segway Robotics erstellt. Dabei handelt es sich um einen selbst-balancierenden Roboter, welcher sowohl für den Transport von Personen als auch als autonom agierende Einheit eingesetzt werden kann. Dieser Roboter wird in Abbildung \ref{fig:umsetzung:loomoBild} dargestellt. Er verfügt über zwei Räder sowie eine zentrale Einheit, die sowohl Sensoren als auch die Recheneinheit umfasst. Dabei werden die Berechnungen mittels eines Intel Atom Z8750 mit 4 Kernen die jeweils auf 2,4 GHz takten durchgeführt. \\
+Der Kopf des Roboters lässt sich dabei unabhängig vom restlichen Roboter bewegen. Die Rotation ist dabei sowohl horizontal als auch vertikal möglich. In diesem Kopf befindet sich ein LCD Touchbildschirm sowie eine HD Kamera. Der Bildschirm kann dabei sowohl für Ein- als auch Ausgaben verwendet werden. Unterhalb des Kopfes befindet sich außerdem ein Array Mikrofon, mit dem die Richtung der Geräusche festgestellt werden kann. Außerdem ist es möglich, mittels eines Lautsprechers Sound Ausgaben zu erzeugen. \footnote{https://developer.segwayrobotics.com/developer/documents/segway-robot-overview.html} Für die Umsetzung des Konzepts wird der Roboter im autonome Modus betrieben. Es ist außerdem möglich, zusätzliche Hardware, wie beispielsweise Arme, mittels des \glqq Hardware Extension Bays\grqq{} an den Roboter anzubringen. \\
+Wie in Kapitel \ref{sec:konzept} erläutert, wird der Roboter mit der Sorachassistenzsoftware Mycroft interagieren. Diese wird dabei auf einem Laptop mit folgender Konfiguration zur Verfügung gestellt:
+\begin{my_list_item}
+    \item CPU: Intel Core i7-5600 @ 2,60 GHz
+    \item Arbeitsspeicher: 8 GB DDR3
+    \item Betriebssystem: Manjaro Linux KDE 18.04
+\end{my_list_item}
+
+Die Konfiguration von Mycroft entspricht dabei der, die in Kapitel \ref{tab:konzept:bestandteile} festgelegt wurden.
+
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.5\textwidth]{grafiken/prototyp/loomo.png}
+    \caption[Loomo Assistenzroboter]{Loomo Assistenzroboter \footnotemark}
+    \label{fig:umsetzung:loomoBild}
+     
+\end{figure}
+\footnotetext{https://www.indiegogo.com/projects/loomo-mini-transporter-meets-robot-sidekick\#/}
+
+
+
+\section{Entwicklung von Apps mit Loomo}
+\label{sec:umsetzung:loomo}
+
+Bei dem Betriebssystem von Loomo handelt es sich um Android 5.1, API 22, ohne Google Play Services. Somit können alle frei zugänglichen Teile von Android eingesetzt werden. \footnote{\label{segwaysenv}https://developer.segwayrobotics.com/developer/documents/setup-developing-environment.html}  \\
+Um die einzelnen Bestandteile von Loomo, zum Beispiel den Kopf oder die Räder, steuern zu können, wird durch Segway ein eigenes SDK zur Verfügung gestellt. Dieses kann mittels der Dependencies in der Gradle Datei einer Android Anwendung importiert werden. \textsuperscript{\ref{segwaysdk}} \\
+Das SDK besteht dabei aus vier Hauptbestandteilen. Zum einen ist dies das Vision Pakekt, mit dem auf die Intel Real Sense sowie die Fischaugen Kamera zugegriffen werden kann. Außerdem ist ein \glqq Detection-tracking system (DTS)\grqq in diesem Paket integriert. Damit können automatisch Personen mittels der HD Kamera entdeckt werden und durch Kopfbewegungen verfolgt werden. Dieses System funktioniert dann am besten, wenn sch eine Person zwischen 0,35m und 5m entfernt von dem Loomo befindet. \footnote{\label{segwaysdk}https://developer.segwayrobotics.com/developer/documents/segway-robots-sdk.html}\\
+Ein weiterer Bestandteil ist das Speech Paket, mit dem auf das Array Mikrophon mit seinen fünf Kanälen zugegriffen werden kann. Außerdem umfasst dieses Paket ein Speaker Modul, mit dem es möglich ist, Sprache-zu-Text Umwandlung auf dem Gerät durchzuführen und das Ergebnis auszugeben.\textsuperscript{\ref{segwaysdk}} \\
+Um die Bewegungen des Roboters zu steuern, wird das Locomotion Paket benötigt. Dies Erlaubt die Steuerung der Fortbewegung sowie die Kopfbewegungen von Loomo. Dafür wird in ein Head und ein Base Modul unterschieden. \textsuperscript{\ref{segwaysdk}}  \\
+Außerdem gibt es noch ein Sensor Paket, mit dem der Zugriff auf die verschiedenen Sensordaten zugegriffen werden kann. Dies erlaubt beispielsweise den Zugriff auf die aktuelle Ausrichtung der einzelnen Roboterbestandteile oder die Bewegungsgeschwindigkeit. \textsuperscript{\ref{segwaysdk}} \\
+
+\section{Entwicklung von Skills mit Mycroft}
+\label{sec:umsetzung:skills}
+
+\section{Prototyp}
+\label{sec:umsetzung:prototyp}
+
+Der Prototyp beschränkt sich in seiner Funktionalität auf einige grundlegende Funktionen. Diese sind zum Teil auch nur als Simulationen umgesetzt, da eine echte Implementierung weitere Funktionen benötigen würde, die jeweils eine eigene genauere Betrachtung benötigen. Dabei handelt es sich beispielsweise um eine Objekterkennung oder die Fähigkeit, sich in der Umgebung zu orientieren. \\
+Aufgrund von Beschränkungen mit Mycroft ist es nur möglich mit dem Roboter auf Englisch zu kommunizieren. Dies stellt jedoch keine Einschränkung zu dem Konzept dar. VERBESSERN
+
+\subsection{Funktionen}
+
+Die umgesetzten Funktionen des Roboters besitzen unterschiedliche Komplexitätsgrade. Die einfachsten Funktionen sind dabei die, mit denen sich Loomo dreht. Es ist möglich, dass er sich um 90 Grad nach links beziehungsweise rechts sowie um 180 Grad dreht. Diese Funktionen stellen auch die Basis für weitere Funktionen dar, wobei auch in der Praxis durchaus Bedarf an diesen Fähigkeiten besteht. Beispielsweise, wenn der Roboter einen Gegenstand an den Nutzer übergeben soll. \\
+Außerdem hat der Roboter die Funktion, wieder zu dem Nutzer zu kommen. Da es jedoch nicht möglich war, so auf das Arraymikrofon zuzugreifen, dass die Richtung der Spracheingabe analysiert werden kann,fährt der Roboter bei diesem Befehl ein Stück nach vorne. \\
+Die Funktion mit der dem Nutzer ein Gegenstand gebracht wird, ist nur als Dummyfunktion umgesetzt. Dabei fährt der Roboter ein Stück nach vorne, dreht sich um die eigene Achse und kommt wieder zurück zu dem Nutzer. Bevor diese Handlung ausgeführt wird, wird der Nutzer gefragt, ob der verstandene Gegenstand der gewünschte ist. \\
+Außerdem kann der Nutzer dem Roboter mitteilen, dass er zu einem Ort fahren soll. Da die Logik hinter einer solchen Funktion sehr komplex ist, fährt der Roboter nur ein Stück nach vorne und bleibt dann stehen. Bevor diese Aktion durchgeführt wird, sagt der Roboter wo er hin fährt. Somit kann der Nutzer die Handlung bei Bedarf noch abbrechn. \\
+Da es auch passieren kann, dass der Roboter dem Nutzer im Weg steht, kann dieser auch aufgefordert werden, sich aus dem Weg zu bewegen. Dabei dreht sich der Roboter um 90 Grad und fährt ein Stück nach vorne. \\
+Die Phrasen für die einzelnen Funktionen können der Tabelle \ref{tab:umsetzung:prototyp} entnommen werden.
+
+\begin{table}[H]
+    \centering
+    \begin{tabular}{c|c}
+        Aktion & Phrase \\
+        \hline
+         Drehung & turn left/right/around  \\
+         \hline
+         Geradaus fahren & come to me \\
+         \hline
+         Gegenstand holen & get coffee/tea/milk/water \\
+         \hline
+         zu Ort fahren & go to kitchen/door \\
+         \hline
+         aus dem Weg fahren & out of my way \\
+         
+    \end{tabular}
+    \caption{Funktionen und zugehörige Phrasen}
+    \label{tab:umsetzung:prototyp}
+\end{table}
+
+
+
+
+\subsection{Architektur}
+
+HIER IRGENDEIN KLASSENDIAGRAMM
+
+\\
+
+Die Kommunikation zwischen dem Roboter und der Mycroftcore Einheit geschieht hierbei über Sockets. Zum einen werden Befehle durch die Basiseinheit über den von Mycroft benutzten Websocket verschickt. Dieser wird auch für die interne Kommunikation zwischen den einzelnen Systembestandteilen benutzt und versendet dafür JSON Nachrichten. Dabei wurde eine zusätzliche Nachricht des Typs \glqq loomoInstruction\grqq{} hinzugefügt. Der Inhalt dieser Nachrichten wird von Loomo genauer analysiert und auf dieser Basis werden dann entsprechende Befehle ausgeführt. \\
+Außerdem kommen noch zwei weitere Sockets zum Einsatz. Mittels einem Socket wird konstant das Mikrofoneingangssignal in Form eines Bytestreams von Loomo an die Basiseinheit gestreamt. Diese benutzt dann wiederum mit Pyaudio eine Klasse, die PulseAudio Befehle in Python verwendbar macht. Damit können beispielsweise Audiosignale ausgegeben werden oder das Eingangssignal des Mikrofons verwendet werden. Dieser Umstand wird sich hier zunutze gemacht, da es Mycroft nicht erlaubt, einen Byte Stream als Mikrofoneingang zu benutzen. Vielmehr greift es auf einen Stream von PyAudio zurück, eine Umwandlung eines beliebigen Audiostreams in einen solchen ist allerdings nicht möglich. Deshalb wurde das System so konfiguriert, dass die Basis das erhaltenen Audiosignal ausgibt und zeitgleich wieder als Eingabe benutzt. Dabei entsteht eine nicht wahrnehmbare Verzögerung. Das einzig Wichtige ist, dass mittels eines eingesteckten Klinkensteckers dem System vorgespielt wird, dass ein Lautsprecher angeschlossen ist. Andernfalls kommt es zu einem Echo, wenn sich Roboter und Basis in unmittelbarer Nähe befindet. \\
+Ein weiterer Socket kommt zum Einsatz, damit die Audioausgaben durch die Basis an den Roboter versendet werden können. Dafür erstellt Mimic automatisch Dateien im Wave Format. Normalerweise werden diese durch die Basiseinheit abgespielt, in dieser Anwendung kommt es aber zu einem Versenden dieser Datei als Bytes. Diese Eingabe kann Android mittels des integrierten MediaPlayers verwenden und abspielen. \\
+Die Entscheidung, mehrere Sockets zu verwenden wurde bewusst getroffen, damit ausgeschlossen werden kann, dass sich die Schreib- und Lesevorgänge auf demselben Socket gegenseitig beeinflussen. Durch die Verwendung von Threads, ist es somit möglich, diese Aktionen parallel auszuführen, ohne das es zu einer gegenseitigen Behinderung kommt.
+
+
+UMSETZUNG SOCKETS
+
+\paragraph{Loomo SDK} Das SDK von Loomo wird vor allem für die Bewegungssteuerung von Loomo eingesetzt. Dabei wird auf die Funktionen des Drehens um die eigene Achse sowie geradeaus fahren zurückgegriffen. Damit die Drehung korrekt abläuft, werden Odometrie Funktionen eingesetzt. HIER GENAUER Diese werden durch das SDK bereits so zu Verfügung gestellt, dass durch den Entwickler lediglich eine Bewegungsrichtung sowie die Dauer der Bewegung angegeben werden muss. \\
+HIER NOCH WAS, FALLS PERSONENERKENNUNG
+
+\paragraph{Mycroftskills} Damit es möglich ist, mit Mycroft die verschiedenen Funktionen korrekt zu den durch den Nutzer geäußerten Phrasen zuzuordnen, wurde ein eigener sogenannter Skill entwickelt. Dieser wurde möglichst einfach gehalten, damit ein große Robustheit gegeben ist. Soweit möglich, wurden auch verschiedene Phrasen in das Vokabular aufgenommen, damit der Nutzer auch durch verschiedene Formulierungen sein Ziel erreicht. Allerdings erhebt dieses Vokabluar keinen Anspruch auf Vollständigkeit sonder soll nur einen möglichst großen Teil möglicher Aussagen widerspiegeln. Beispielhaft werden die möglichen Aussagen für den Befehl, mit dem der Roboter aus dem Weg fährt, in Abbildung \ref{fig:umsetzung:prototyp:architektur:phrasen} dargestellt.
+\begin{figure}[H]
+        \begin{verbatim}
+            out of my way
+            go away
+            you are in the way
+            you are in my way
+            get out of my way
+            out of the way
+        \end{verbatim}
+        \label{fig:umsetzung:prototyp:architektur:phrasen}
+        \caption{mögliche Aussagen um dem Roboter zu signalisieren, dass er im Weg ist}
+\end{figure}
+
+
+
+\section{Zusammenfassung}
+\label{sec:umsetzung:zusammenfassung}
+

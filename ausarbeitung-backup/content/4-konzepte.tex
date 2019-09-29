@@ -1,0 +1,176 @@
+% !TEX root = ../thesis-example.tex
+%
+\chapter{Konzept für den Einsatz von Sprachassistenten mit einem Assistenzroboter}
+\label{sec:konzept}
+
+Basierend auf der Analyse  der Funktionsweise von Sprachassistenten (Kapitel \ref{sec:analyse}) und der Einsatzszenarien für Assistenzroboter wird in diesem Kapitel ein Konzept für den gemeinsamen Einsatz beider Systeme erstellt. \\
+Dabei sollen zuerst solche Szenarien ausgewählt werden, die sich für ein allgemeines Konzept eignen und danach ein geeigneter Sprachassistent gewählt werden. Da dieses Konzept allgemeingültig für Assistenzroboter sein soll, wird kein spezifischer Roboter gewählt. Basierend auf dieser Wahl und den möglichen Szenarien werden danach die Systemanforderungen formuliert. Abschließend wird dann ein Konzept erstellt, auf dessen Basis die beiden System miteinander arbeiten sollen.
+
+\section{Auswahl geeigneter Szenarien}
+\label{sec:konzept:szenarien}
+
+Um ein allgemeingültiges Konzept für die Interaktion zwischen Mensch und Roboter zu entwickeln, sollten dafür solche Szenarien ausgewählt werden, die auch häufig auftreten oder sich auf grundlegende Funktionen beschränken. Auf dieser Basis ist es anschließend auch möglich, das erstellte Konzept entsprechend zu abstrahieren, damit es auf ein anderes Szenario angewendet werden kann. Als Grundlage für diese Auswahl dienen die in Kapitel \ref{sec:einsatzszenarien} analysierten Einsatzszenarien. Diese sind im Wesentlichen:
+\renewcommand{\theenumi}{\roman{enumi}}%
+\begin{my_list_num}
+    \item Unterstützung bei der Pflege von Patienten
+    \item Einsatz als Gehhilfe
+    \item Navigationshilfe
+    \item Haushaltshilfe (z.B. Reinigung von Böden)
+\end{my_list_num}
+
+Bei den Szenarien (iii) und (iv) ist klar ersichtlich, dass der Roboter in der Lage sein muss, sich selbständig in einer Umgebung zurecht zu finden und ein Ziel zu erreichen. Als Navigationshilfe ist dies ein klar definiertes Ziel, als Haushaltshilfe ist dies abstrakter zu sehen. Allerdings soll auch da der Punkt erreicht werden, an dem der Roboter zuvor noch nicht war. Bei dem Einsatz als Gehhilfe (Szenario ii) ist es auch vorstellbar, dass der Roboter dabei hilft, den besten Weg zu einem, zuvor kommunizierten, Ziel zu finden. Bei der Unterstützung von Patienten kann es durchaus sein, dass durch Pfleger eine Aufgabenbeschreibung der Art: \glqq Gehe zu Patient X in Raum 3\grqq{} gegeben wird. Auch in dem Fall muss der Roboter seinen Weg zu einem Ziel finden. \\
+Aus diesen Szenarien geht somit eindeutig hervor, dass die Bewegung zu einem, vom Nutzer definierten, Zielpunkt eine immer wiederkehrende Aufgabe bei dem Einsatz von Assistenzrobotern darstellt. Damit ein solches Ziel durch den Nutzer definiert werden kann, benötigt dieser eine Schnittstelle, über die er dieses dem Roboter kommunizieren kann. Ein Konzept für diese Interaktion zur Zieldefinition erlaubt auch die Abstraktion auf andere Anwendungsgebiete. \\
+Außerdem haben diese erwähnten Szenarien alle gemeinsam, dass es keine spezifische Nutzergruppe gibt. Die Nutzer können sowohl Fachkräfte für ein Einsatzgebiet sein (z.B. Pfleger), als auch nicht technikaffine Personen, die möglicherweise auch motorisch eingeschränkt sind (z.B. Patienten in einem Pflegeheim).
+
+
+\section{Anforderungsanalyse}
+\label{sec:konzept:anforderungen}
+
+Ausgehend von den in Kapitel \ref{sec:konzept:szenarien} ermittelten Einsatzszenarien leiten sich entsprechende Anforderungen an das Konzept ab. Diese werden im Folgenden genauer betrachtet.
+\paragraph{Bewegung} Für das Konzept spielt es keine Rolle, auf welche Art sich der Roboter fortbewegt. Entscheidend ist lediglich, dass er die Ziele aus eigener Kraft erreichen kann. Vorstellbar ist, dass der Roboter sich mittels Rädern oder Beinen fortbewegt, die Umsetzung ist jedoch dem Roboterentwickler überlassen. Wichtig ist aber in dem Zusammenhang auch die Erkennung von Hindernissen und somit das Ausweichen von solchen Hindernissen. Dafür eignet sich ein Bildsensor am besten, zumal dieser die Einsatzmöglichkeiten um ein Vielfaches erhöht. Außerdem benötigt der Roboter eine Art von Karte, mit der er sich in der Umgebung zurechtfinden kann, um ein Ziel zu finden.  \\
+Zusätzlich sollte wie in Kapitel \ref{sec:einsatzszenarien:menschRoboInteraktion} herausgearbeitet, das Verhalten des Roboters möglichst den gängigen sozialen Normen entsprechen. Dies bedeutet, dass sich der Roboter mit einer angemessenen Geschwindigkeit bewegen sollte, damit kein Nutzer das Gefühl entwickelt, in einen Unfall mit dem Roboter verwickelt zu werden. Außerdem sollte der Roboter den Gesprächspartner anschauen, sofern dies möglich ist. Des weiteren ist aber auch wichtig, dass er nicht zu aufdringlich wirkt, was dadurch erreicht werden kann, indem eine gewisse Distanz zu dem Nutzer eingehalten wird, sofern die Aufgabe nichts anderes verlangt.
+
+\paragraph{Interaktion}
+Die Interaktion zwischen dem Nutzer und dem Roboter nimmt einen ganz wesentlichen Teil des Konzeptes ein. Gerade aufgrund der Durchmischung der Nutzergruppen, wie in Abschnitt \ref{sec:konzept:szenarien} festgestellt, muss das besonders die Interaktion so aufgebaut werden, dass sie von jedem möglichen Nutzer möglichst problemlos durchgeführt werden kann. Dies bedeutet, dass sowohl Personen Umgang mit dem System haben, die an den Umgang mit verschiedenen Technologien gewöhnt sind. Andererseits gibt es auch solche Nutzer, die sehr wenig bis keine Erfahrung im Umgang mit solchen Systemen haben. Außerdem sollte die Interaktion nicht als zusätzliche Last empfunden werden, da dies die Bereitschaft zur Nutzung des Systems einschränken kann \cite{bohme2002serviceroboter}. Die Interaktion muss möglichst natürlich stattfinden, was zwei verschiedenen Interkationsmöglichkeiten in den prinzipiellen Fokus rückt. \\
+Zum einen ist dies die Sprachsteurung und zum anderen Gestensteuerung. Letztere eignet sich aber nicht für motorisch eingeschränkte Personen, weshalb diese vor Schwierigkeiten bei gestellt werden könnten. Außerdem benötigt der Roboter dafür zwangsläufig eine Sichtverbindung zu der Person. Gleichzeitig muss diese Person nah genug an dem Roboter sein, so dass dieser verschiedene Gesten erkennen und unterscheiden kann \cite{waldherr2000gesture}.  \\
+Somit muss die Anforderung sein, dass es möglich ist, auf Basis von natürlicher, gesprochener Sprache mit dem Roboter interagieren zu können. Eine Interaktion auf diese Art sollte sich möglichst wie eine Mensch-Mensch-Interaktion anfühlen, wodurch nicht das Gefühl einer zusätzlichen Last für den Nutzer entsteht. Dafür ist aber entscheidend, dass diese gemäß Böhme \cite{bohme2002serviceroboter} nicht auf feste Befehle beschränkt. Vielmehr sollte der Nutzer seinen Interaktionswunsch mit seinen eigenen Worten ausdrücken können und das System leitet daraus die gewünschte Aktion ab. \\
+Damit der Roboter die gesprochene Sprache soweit verstehen kann, dass die gewünschte Aktion ausgeführt werden kann, benötigt er ein Mikrofon und idealerweise noch ein Lautsprecher. Mit diesem ist er in der Lage, dem Nutzer ein Feedback zu geben. Außerdem wird eine Software benötigt, die aus der gesprochenen Sprache maschinenverständliche Befehle generieren kann. \\
+Ein direktes Feedback an den Nutzer über die erkannten Intentionen ist bei komplexeren Handlungen wünschenswert. In Kapitel  \ref{sec:einsatzszenarien:menschRoboInteraktion} wurde analysiert, dass ein solches Feedback einen wichtigen Teil bei der Erzeugung von Nutzeraktzeptanz beiträgt. Denn nur so weiß der Nutzer, weshalb der Roboter eine bestimmte Aktion ausführt und eine fehlerhafte Aktion kann noch durch den Nutzer abgebrochen werden, bevor sie begonnen wurde. Allerdings kann es sich bei bestimmten Handlungen, zum Beispiel dem Nutzer Platz zu machen, zu Frustration führen, wenn das Feedback die Ausführung der Handlung verlangsamt.
+
+\paragraph{Datenschutz}
+Der Datenschutz des Systems ist keine Hauptanforderung, aber trotzdem nicht zu vernachlässigen. Denn gerade Bedenken im Zusammenhang mit dem Schutz der persönlichen Daten beeinflussen die Akzeptanz eines Sprachassistenten maßgeblich. Diese werden einerseits von Personen, die diese Systeme bereits einsetzen geäußert. So wurde von von Fruchter et al. festgestellt, dass Nutzer dieser Assistenzsysteme oft Bedenken haben, dass sie ausspioniert werden könnten. \cite{fruchter2018consumer} \\
+Auch wird durch eine bitkom Studie verdeutlicht, dass \glqq knapp drei Viertel (73\%) der Bundesbürger, die kein Interesse an einem Sprachassistenten haben, [..] die Geräte nicht nutzen [möchten], da sie keine Daten an Unternehmen abgeben möchten.\grqq{} \footnote{https://www.bitkom.org/Presse/Presseinformation/Digitale-Sprachassistenten-als-intelligente-Haushaltshelfer.html\#item-911-close} \\
+Gerade da sich die die Einsatzszenarien häufig im persönlichen Umfeld einer Person abspielen oder im Fall der Unterstützung von Pflegern auch stark in die Privatsphäre von Patienten eindringt, müssen diese Aspekte berücksichtigt werden.
+
+\paragraph{Infrastruktur am Einsatzort}
+DAS HIER NOCHMAL ÜBERARBEITEN
+Aufgrund der vielfältigen Einsatzszenarien kann nicht davon ausgegangen werden, dass am Einsatzort auch eine Internetverbindung zur Verfügung steht. Dies kann einerseits sein, weil entsprechende Infrastruktur (z.B. WLAN) überhaupt nicht vorhanden ist oder aber weil die Abdeckung nur lückenhaft ist. Damit kann es also passieren, dass der Roboter an seinem aktuellen Standort keine Internetverbindung aufbauen kann. Trotzdem wäre es wünschenswert, wenn eine Interaktion weiterhin möglich ist. Einige Aufgaben, wie beispielsweise Dokumentation von Ereignissen bei der Pflege von Patienten können in solchen Situationen sicherlich nicht ausgeführt werden, da diese weitere Funktionen benötigen, die nur per Internet verfügbar sind. Aber gut wäre, wenn ein Nutzer trotzdem noch Einfluss auf die Handlungen des Roboters nehmen kann, beispielsweise in dem eine Aktion abgebrochen werden kann. Sollte es zu einer Erteilung eines Befehls kommen, wäre im Falle einer nicht vorhandenen Internetverbindung zumindest ein Feedback an den Nutzer wichtig. Somit kann der Nutzer dann versuchen Maßnahmen zu ergreifen, mit denen der Roboter wieder eine Internetverbindung erhält, damit dann die gewünschten Befehl durchgeführt werden können. \\
+Damit ergeben sich zusammengefasst folgende Anforderungen:
+\begin{my_list_item}
+    \item Fähigkeit, sich von Punkt A nach Punkt zu bewegen
+    \item Möglichkeit, für Nutzer, ein Ziel mit natürlicher Sprache zu kommunizieren
+    \item Möglichkeit, dass Nutzer ohne Vorwissen und mit motorischen Einschränkungen das System nutzen können
+    \item  Kommunikation soll sich für den Nutzer natürlich anfühlen
+    \item datenschutzrechtliche Bedenken von Nutzern sollen ausgeräumt werden
+    \item Verhalten des Roboters gemäß gängiger Sozialnormen
+\end{my_list_item}
+
+
+\section{Auswahl eines geeigneten Sprachassistenten}
+\label{sec:konzept:systeme}
+
+Basierend auf der Anforderungsanalyse im vorherigen Kapitel hat sich herausgestellt, dass die Verwendung eines Sprachassistenten am geeignetsten für die Interaktion mit einem Roboter ist. Dieser kann sowohl durch motorisch eingeschränkte wie auch sehbehinderte Menschen ohne größere Probleme genutzt werden. Auch benötigen die Nutzer kein zusätzliches Wissen, um mit dem Roboter auf Basis natürlicher, gesprochener Sprache zu kommunizieren. Auch sind die Hardware Anforderungen an den Roboter dadurch minimiert, was bedeutet, dass das Konzept mehr Anwendungsfälle abdeckt. \\ 
+In Kapitel \ref{sec:analyse:auswahl} wurden drei verschiedene Sprachassistenzsystem vorgestellt. Deren Eignung für die Erfüllung der zuvor angegeben Kriterien soll nun überprüft werden. Dabei sollen aber nur solche Anforderungen betrachtet werden, die auch in direktem Zusammenhang mit dem Sprachassistenten stehen. Beispielsweise kann der Sprachassistent keinen Einfluss darauf nehmen, ob der Roboter sich gemäß Sozialnormen verhält.\\
+Die Möglichkeit der Kommunikation auf Basis von natürlicher, gesprochener Sprache wird offensichtlich durch alle drei Assistenzsystem gegeben. Das einzige Vorwissen, welches ein Nutzer benötigt, ist das Weckwort. Dies ist aber bei allen Systemen der Fall und kann auch individuell angepasst werden (siehe Kapitel \ref{sec:analyse}. Eine positive Eigenschaft, die durch alle drei Systeme geteilt wird ist außerdem, dass sie auch mit eigener Hardware für die Soundein- und ausgabe genutzt werden können. Somit muss bei der Entwicklung keine Rücksicht auf spezielle Lautsprecher oder Mikrofone genommen werden. \\
+Die Differenzierung der Systeme ist allerdings mithilfe der Datenschutz- und Infrastrukturaspekte möglich. So benötigt Alexa immer eine Verbindung zur Amazon Cloud, damit Sprachbefehle in Text umgewandelt werden kann. Dies hat zum einen zur Folge, dass auch immer eine Internetverbindung nötigt ist. Zum anderen bedeutet die Verarbeitung in einer Cloud, auf die der Nutzer keinen Einfluss hat, dass dateenschutzrechtliche Bedenken nicht ausgeräumt werden können. \\
+Diese beiden Einschränkungen treffen sowohl auf Snips und Mycroft nicht zu. Vielmehr ist einer ihrer Hauptpunkte, dass sie auf den Datenschutz Wert legen. Somit hat der Nutzer das Wissen, dass seine eigene Privatsphäre gewahrt wird. Für den Einsatz von Mycroft ist es möglich, die Sprache-zu-Text Umwandlung auf eigener Hardware durchzuführen. Dafür muss das ein Server so konfiguriert werden, dass dieser als DeepSpeech Server fungieren kann. Dabei ist es wesentlich, dass dieser über ausreichend Rechenkapazitäten verfügt, um die Anfragen in möglichst kurzer Zeit verarbeitet werden. Denn gerade durch lange Verzögerungen bei der Antwort auf Anfragen kann für den Nutzer das Gefühl der Natürlichkeit der Interaktion verloren gehen. Alternativ ist es möglich, auf Mycroft Server zurückzugreifen, welche ausreichende Rechenkapazitäten besitzen und sich auch durch AGBs auszeichnen, die datenschutzfreundlich sind. QUELLE Snips hingegen kann komplett offline ablaufen, ohne das dafür eine besonders leistungsfähige Software benötigt wird. \\
+Allerdings hat Snips das Problem, dass es nicht komplett OpenSource ist und somit keine Aussagen zur genauen Funktionsweise einiger Programmteile getroffen werden können (siehe Kapitel \ref{sec:analyse:spezArch:snips}). Somit befindet sich der Nutzer immer in einer gewissen Abhängigkeit von dem Hersteller, auch wenn es möglich ist, einige Teile der Verarbeitung mittels OpenSource Programmen durchzuführen. Durch eine Betrachtung aller Aspekte der beiden Systeme ist Mycroft somit besser für den Einsatz mit eine Assistenzroboter unter Betrachtung des Datenschutzes geeignet. Denn gerade dadurch, dass die Software OpenSource ist, entsteht eine große Unabhängigkeit vom Hersteller, da an jedem einzelnen Teil der Software Modifizierungen vorgenommen werden können, so dass dieses System genaustens an die eigenen Einsatzszenarien angepasst werden. Zwar werden durch die Sprache-zu-Text Umwandlung stärkere Anforderungen an die Infrastruktur gestellt, aber diese werden durch die Flexibilität aufgewogen. \\
+Aus diesem Grund basiert das folgende Konzept auf Mycroft. Möglicherweise ist das Konzept auch mit einer anderen Assistenzsoftware umsetzbar, allerdings bestehen die verschiedenen Systeme aus unterschiedlichen Modulen (siehe \ref{sec:analyse:spezArch}), weshalb für den Einsatz eines anderen Assistenzsystems möglicherweise Modifizierungen vorgenommen werden müssen.
+
+
+\section{gewählte Bestandteile des Sprachassistenzsystems}
+
+Wie im vorherigen Abschnitt erarbeitet, werden im Folgenden die Bestandteile von Mycroft basierend auf Kapitel \ref{sec:analyse:spezArch:mycroft} daraufhin untersucht, wie gut es mit ihnen möglich ist, die Anforderungen aus Abschnitt \ref{sec:konzept:anforderungen} erfüllen. Dafür werden im Folgenden die verfügbaren Systembestandteile der einzelnen Verarbeitungsschritte auf ihre Erfüllung der Anforderungen untersucht.
+
+\paragraph{Weckworterkennung}
+Es ist möglich, für die Erkennung der Weckwörter sowohl PocketSphinx, als auch Snowboy oder Precise einzusetzen. Da alle drei Systeme offline funktionieren, erfüllen sie die Anforderungen an Datenschutz und Funktionalität ohne Internetverbindung gleichermaßen. Somit muss die Auswahl eines Systems auf Basis der Qualität der Umsetzung erfolgen. Dabei rückt Precise von Mycroft in den Vordergrund. Zum einen verspricht die Entwicklung durch das Mycroft Team eine verbesserte Integration in das Gesamtsystem. Zum anderen verspricht die Sprachunabhängigkeit, das ein System damit universeller einsetzbar ist. PocketSphinx hat wie in Kapitel \ref{sec:analyse:spezArch:mycroft} erwähnt, durchaus Schwierigkeiten bei der Unterscheidung zwischen Lauten, sobald ein nicht Muttersprachler das System nutzt. Bei Snowboy gibt es das Huaptproblem, dass das System nicht OpenSource ist, wodurch man sich in die Abhängigkeit eines Herstellers begibt. \\
+Somit wird das Folgende Konzept auf Basis von Precise erstellt, wobei als Weckewort \glqq Christopher\grqq{} zum Einsatz kommt. Dies ist eins von vier Signalphrasen, die durch Mycroft angeboten werden. Die anderen drei Phrasen \glqq Hey Mycroft\grqq{}, \glqq Hey Ezra\grqq{} sowie \glqq Hey Jarvis\grqq{} schränken das Gefühl der Natürlichkeit ein, sobald es zu einer wiederholten Interaktion innerhalb kurzer zeit kommt. Da die Modelle für diese Erkennung ständig anhand echter Daten verbessert werden, eigenen sie sich außerdem besser, als selbst erstellte Modelle für individuelle Wörter.  
+
+\paragraph{Sprache-zu-Text Umwandlung}
+
+Für die Sprache-zu-Text Umwandlung kommt offen verfügbare System Kaldi, sowie das von Mozilla entwickelte System DeepSpeech infrage. Dabei legen beide Wert auf Datenschutz. Dabei kann Kaldi ohne Internetverbindung eingesetzt werden. Für DeepSpeech hingegen wird eine Servereinheit bneötigt, die aber nach den eigenen Bedürfnissen konfiguriert werden kann (z.B. lokal). Dieses System wird durch Mycroft empfohlen und durch eine Kooperation mit Mozilla auch laufend verbessert. Außerdem bietet Mycroft eigene Server zur kostenfreien Nutzung an, wobei dabei keine Speicherung der Anfragen erfolgt. Somit können diese Server als sehr datenschutzfreundlich betrachtet werden, gestützt wird dies durch die AGBs. Durch die Nutzung dieser Server muss der Nutzer auch keine eigene Konfiguration vornehmen und außerdem ist auch kein Training des KI Systems nötig. Ein weiterer Vorteil von DeepSpeech ist die große Menge an verfügbaren Sprachen, was einen universelleren Einsatz des Systems erlaubt. \\
+Insgesamt lässt sich zusammenfassen, dass DeepSpeech das erfolgversprechendere System ist. Denn gerade durch die kontinuierliche Verbesserung des Systems und die große Menge an vorhandenen Sprachen lässt dieses System auf eine erhöhte Nutzeraktzeptanz hoffen. HIER NOCH WAS ZU DEM SENDEN VIA PROXY, MUSS SICHER AUCH SCHON IRGENDWO EHER HIN
+
+\paragraph{Intent Paser}
+
+Für die Erkennung der Nutzerintention kann sowohl Adapt als auch Padatious eingesetzt werden. Beide sind dabei offiziell durch Mycroft entwickelt. Jedoch ist die Wahrscheinlichkeit, dass ein Nutzer möglichst natürlich mit dem System kommunizieren kann, mit Padatious größer. Dies liegt daran, dass dieser auf Basis eines neuronalen Netzes funktioniert und somit keine feste Struktur der Aussagen nötig ist. Deswegen wird auch Padatious im Folgenden mit Mycroft eingesetzt.
+
+\paragraph{Text-zu-Sprache Umwandlung}
+
+AN PASSENDE STELLE IN ARBEIT AUCH NOCH SCHREIBEN, DASS MIMIC IN ZUSAMMENARBEIT MIT VOCALID ENTSTANDEN IST -> ZU VOCALID GIBT ES SICHER AUCH EINE VERÖFFENTLICHUNG, DIE ZITIERFÄHIG IST //
+Durch Mycroft werden zwei verschiedene Systeme für die Text-zu-Sprache Umwandlung unterstützt. Dies sind beides unternehmenseigene Entwicklungen, Mimic und Mimic 2. 
+Zwar limitiert Mimic den Einsatz des Systems, da lediglich Antworten in Englisch gegeben werden können. Allerdings können diese auch ohne Internetverbindung geliefert werden, womit das System dem Nutzer auch akustisch mitteilen kann, dass es Probleme mit der Internetverbindung gibt. Zwar klingt die Sprache weniger natürlich als mit Mimic 2, dies ist jedoch besser, als wenn das System ohne Internet kein Feedback geben kann. ÜBERARBEITEN \\
+
+Eine Übersicht über die einzelnen Bestandteile von Mycroft die am besten geeignet sind, um die Anforderungen an das Konzept erfüllen, sind in Tabelle \ref{tab:konzept:bestandteile} aufgeführt.
+
+\begin{table}[H]
+    \centering
+    \begin{tabular}{c|c}
+         Sprachassistenzsystem & Mycroft.AI  \\
+         \hline
+         Weckworterkennung & Precise \\
+         \hline
+         Weckworte & Christopher \\
+         \hline
+         Sprache-zu-Text Umwandlung & DeepSpeech \\
+         \hline
+         Intent Parser & Padatious \\
+         \hline
+         Text-zu-Sprache Umwandlung & Mimic TTS \\
+    \end{tabular}
+    \caption{gewählte Systembestandteile für Sprachassistenz}
+    \label{tab:konzept:bestandteile}
+\end{table}
+
+
+
+\section{Konzept für Einsatz von Sprachassistenten mit Assistenzrobotern}
+\label{sec:konzept:erstellung}
+
+Das Konzept soll das zuvor erstellte Einsatzszenario mithilfe der Sprachassistenzsoftware möglichst gut umsetzen. Im Idealfall ist es möglich, dieses Konzept auch für andere Szenarien einzusetzen. Damit eine Interaktion möglichst gut möglich ist, wird in  Abbildung \ref{fig:konzept:ablaufdia} der prinzipielle Ablauf der Interaktion mit einem Sequenzdiagramm veranschaulicht. ANDERS FORMULIEREN \\
+Dabei spricht der Nutzer zwar mit dem Roboter, auf diesem findet jedoch keine Verarbeitung der Sprache statt. Es wird lediglich die Sprache an den Sprachassistenten weitergeleitet, der diese Sprache dann verarbeitet, analysiert und dem Roboter entsprechende Kommandos erteilt sowie für eine Sprachausgabe auf dem Roboter sorgt. Dies stellt zwar die Anforderung, dass der Roboter sowohl ein Mikrofon, als auch einen Lautsprecher besitzt, aber es erlaubt einen universelleren Einsatz DOPPLUNG MIT ANFORDERUNGSANALYSE. Würden sich Lautsprecher und Mikrofon direkt an dem Sprachassistenten befinden, würde sich die Interaktion für den Nutzer weniger natürlich anfühlen, da sie nicht direkt mit dem Roboter stattfindet. Außerdem müssten mehrere Mikrofone und Lautsprecher im Einsatzgebiet verteilt werden, so dass der Nutzer immer verstanden wird. Oder aber der Nutzer müsste sich immer in die Nähe des Mikrofons bewegen, so dass der Sprachassistent den Nutzer auch verstehen kann. Beide dieser Anforderungen sind weniger praxistauglich, als den Roboter mit Mikrofon und Lautsprecher auszustatten. \\ 
+Damit ein Roboter mit Mycroft zusammenarbeiten kann, muss er sich mittels Websocket mit dem System verbinden. Dadurch kann auf den sogennanten Messagebus zugegriffen werden, auf dem JSON Nachrichten zwischen den verschiedenen Teilen des Assisestenzsystems ausgetauscht werden\footnote{https://mycroft.ai/documentation/message-bus/}. Bei einer erfolgreichen Verbindung mit dem Messagebus wird ein \glqq Connected\grqq{} Event ausgelöst. Somit kann auf Seiten des Sprachassistenten festgestellt werden, ob der Roboter verbunden ist. IST DAS HIER NÖTIG?? \\
+Sobald es eine Verbindung zwischen dem Sprachassistenten und dem Roboter gibt, kann die Interaktion auf zwei verschiedenen Wegen gestartet werden. IN SEQUENZDIAGRAMM ÜBERNEHMEN \\
+Zum einen kann der Nutzer mittels Weckwort und anschließender Phrase dem Roboter Befehle erteilen. Zum anderen ist es aber auch möglich, dass der Roboter die Interaktion startet. Dafür benötigt er die Fähigkeit, Personen zu erkennen. Diese Erkennung ist am einfachsten mittels einer Kamera möglich. Es kann davon ausgegangen werden, dass der Roboter eine solche besitzt, da für die Objekterkennung im allgemeinen eine solche benötigt wird. Diese Objekte können Hindernisse sein, denen der Roboter ausweichen muss, aber auch Gegenstände, die für die erfolgreiche Erledigung der Aufgaben benötigt werden. Hat der Roboter eine Person erkannt, kann er dieser seine Dienste aktiv anbieten und der Nutzer kann ohne Benutzung eines Weckwortes entsprechende Befehle erteilen oder aber die Unterstützung ablehnen. Dies stellt zugleich eine Verbesserung gegenüber stationären Sprachassistenten dar, da der Start einer Interaktion mit diesen immer vom Nutzer gestartet werden muss. \\
+Damit der Nutzer die Möglichkeit hat, fehlerhaft erkannte Eingaben abzubrechen, noch bevor sie ausgeführt werden, wiederholt der Roboter diese Eingaben. Dies ist an das in Kapitel \ref{sec:einsatzszenarien:menschRoboInteraktion} geschilderte Konzept von Green et al. \cite{green2000user} angelehnt. Jedoch unterscheidet sich das hier erstellte Konzept von diesem, in dem der Roboter weder eine Geste darstellt, da der Roboter nicht zwangsläufig über entsprechende Extremitäten verfügt, noch dass eine explizite Bestätigung durch den Nutzer nötig ist. \\
+Wenn ein Nutzer mit der erkannten Handlung einverstanden ist, bedarf es keiner Reaktion auf die Aussage des Roboters, siehe Abbildung \ref{fig:konzept:bestätigung:impl}. Der Roboter fasst dabei das Nichtvorhandensein einer Ablehnung als implizite Bestätigung des Befehls auf. Der Nutzer hat die Möglichkeit, auch explizit zu bestätigen, muss dies aber nicht. \\
+Im Falle einer Ablehnung jedoch hat der Nutzer die Möglichkeit, direkt nach der Wiederholung des Befehls durch ein einfaches Stop die Durchführung abzubrechen. Daraufhin bittet der Roboter um eine erneute Eingabe des Befehels. Dabei handelt es sich um eine durchgängige Interaktion, wodurch es nicht der erneuten Benutzung des Weckwortes Bedarf. Beispielhaft ist ein solcher Ablauf in Abbildung \ref{fig:konzept:bestätigung:expl} dargestellt, dabei versteht der Roboter statt \glqq Kaffee\grqq{} das Wort \glqq Tee\grqq{}.
+\begin{figure}[H]
+    \begin{subfigure}{\linewidth}
+        \begin{verbatim}
+            Nutzer:  Roboter, hole Kaffee aus der Küche!
+            Roboter: Hole Kaffee aus der Küche.
+            * Roboter wartet 1s*
+            * Roboter führt Handlung durch *
+        \end{verbatim}
+        \subcaption{Roboter hat Anweisung korrekt verstanden und führt sie aus}
+        \label{fig:konzept:bestätigung:impl}
+    \end{subfigure}
+    \begin{subfigure}{\linewidth}
+        \begin{verbatim}
+            Nutzer:  Roboter, hole Kaffee aus der Küche!
+            Roboter: Hole Tee aus der Küche.
+            Nutzer:  Stop!
+            Roboter: Leider habe ich etwas falsch verstanden. 
+                     Bitte wiederholen Sie den Befehl.
+        \end{verbatim}
+        \subcaption{Roboter versteht Anweisung falsch und Nutzer bricht sie vor Ausführungsbeginn ab}
+        \label{fig:konzept:bestätigung:expl}
+    \end{subfigure}
+    \caption{implizite Bestätigung und explizite Ablehnung des Befehls}
+    \label{fig:konzept:bestätigung}
+
+\end{figure}
+
+Wenn der erkannte Befehl nicht abgelehnt wurde, wird durch Mycroft über die Ausführung des korrekten Befehls entschieden. Dies geschieht, in dem der zuvor definierte Skill aufgerufen wird. In diesem sind die JSON Nachrichten festgelegt, die über den Messagebus an den Roboter gesendet werden. Dieser stellt somit die Schnittstelle zwischen Sprachassistenten und Roboter dar. \\
+Die Analyse dieser Nachricht auf die benötigten Aktionen wiederum obliegt dem Roboter und ist von seinen Spezifikationen abhängig. Diese spielen jedoch keine Rolle für die Anwendbarkeit dieses Konzepts, so lange der Roboter in der Lage ist, Geräusche aufzunehmen und auszugeben, seine Umgebung zu erkennen und sich selbständig fortzubewegen. \\
+Wichtig ist aber auch, dass der Nutzer zu jedem Zeitpunkt die Möglichkeit hat, eine Aktion abzubrechen. Es kann beispielsweise sein, dass der Roboter zwar die Nutzerintention korrekt erkannt hat, aber es dann bei der Ausführung zu Fehlern kommt. Um das Beispiel aus Abbildung \ref{fig:konzept:bestätigung} erneut aufzugreifen, kann es passieren, dass fehlerhafter Weise die Teepackung als Kaffeepackung erkannt wird. Sobald der Nutzer dies erkennt, kann er durch einen Abbruchbefehl die Ausführung der Handlung beenden. Auch kann es sein, dass sich der Nutzer anders entscheidet und somit der aktuell ausgeführte Befehl veraltet ist. Dies könnte beispielsweise sein, in dem der Nutzer zuerst einen Früchtetee angefordert hat, sich aber für einen Kräutertee umentschieden hat, während sich der Roboter in die Küche bewegt. \\
+Nicht zu vernachlässigen ist auch die Ausdrucksweise des Roboters. Diese sollte immer höflich sein, auch wenn dies die Länge von Dialogen erhöht. Jedoch entsteht dadurch ein besseres Nutzergefühl, als wenn der Roboter nur mit kurzen Antworten reagiert. Denn gerade durch solche Verkürzungen kann für den Nutzer schnell der Eindruck entstehen, nicht natürlich zu interagieren, sondern mit einer Maschine. Ziel ist jedoch, dass sich die Interaktion für den Nutzer so natürlich wie möglich anfühlt. \\
+Der Nutzer jedoch kann auch in kurzen Befehlen interagieren, da die Aussagen von dem Sprachassistenten lediglich auf Schlüsselwörter untersucht werden, die eindeutig mit einem Skill assoziiert sind. Wörter wie \glqq Danke\grqq{}, \glqq Bitte\grqq{} lassen keine eindeutigen Zuordnungen zu und werden deshalb bei der Untersuchung der Phrasen herausgefiltert.  \\
+Da nicht bei allen Aktionen klar erkenntlich ist, ob diese erfolgreich ausgeführt wurden, ist er nützlich, wenn der Roboter ein Feedback nach Erledigung der Aktion gibt. Sollte der Befehl sein, dass der Roboter Pflanzen gießen soll, ist das Ergebnis der Handlung für den Nutzer erst nach mehreren Tagen erkenntlich. Wurde die Handlung nicht erfolgreich erledigt, dann sind die Pflanzen nach einigen Tagen vertrocknet und können nicht mehr gerettet werden. Würde der Roboter aber bereits beim Scheitern der Befehlsausführung dem Nutzer eine Meldung geben, dass die Handlung nicht ausgeführt werden konnte, kann der Nutzer rechtzeitig entsprechenden eigenen Maßnahmen einleiten, damit der Roboter den Befehl korrekt ausführen kann. Andererseits ist es auch gut für den Nutzer, wenn er weiß, dass der Roboter erfolgreich war, in dem er eine Erfolgsmitteilung bekommt. \\
+Wie komplex diese Meldungen ausfallen, ist abhängig von den Befehlen und Handlungsmöglichkeiten des Roboters. Dies kann einfach die Meldung sein, dass eine Handlung fehlgeschlagen ist oder auch umfassen, warum die Handlung nicht ausgeführt werden konnte. \\ 
+
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1.0\textwidth]{grafiken/konzept/sequenzdiagramm.png}
+    \caption{Sequenzdiagramm der Interaktion }
+    \label{fig:konzept:ablaufdia}
+\end{figure}
+
+
+
+
+\section{Zusammenfassung}
+\label{sec:konzept:zusammenfassung}
+
