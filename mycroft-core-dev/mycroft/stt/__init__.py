@@ -406,7 +406,6 @@ class STTFactory:
 
     @staticmethod
     def create():
-        # TODO: hier so anpassen, dass es nicht zum auslesen der Daten aus der Standardconfig kommt, sondern aus eigener Datei
         config = Configuration.get().get("stt", {})
         module = config.get("module", "mycroft_deepspeech")
         clazz = STTFactory.CLASSES.get(module)
