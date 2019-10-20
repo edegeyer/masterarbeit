@@ -172,7 +172,7 @@ Intent Parser<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:LabelModel
     <node id="n7">
       <data key="d6">
         <y:ShapeNode>
-          <y:Geometry height="182.23348519362196" width="493.39957997024214" x="131.38174121426783" y="108.4874715261958"/>
+          <y:Geometry height="182.23348519362196" width="493.39957997024214" x="131.3817412142679" y="114.76651480637804"/>
           <y:Fill hasColor="false" transparent="false"/>
           <y:BorderStyle color="#000000" raised="false" type="dashed" width="1.0"/>
           <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="12" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" hasText="false" height="4.0" horizontalTextPosition="center" iconTextGap="4" modelName="custom" textColor="#000000" verticalTextPosition="bottom" visible="true" width="4.0" x="244.69978998512107" y="89.11674259681098">
@@ -191,10 +191,10 @@ Intent Parser<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:LabelModel
     <node id="n8">
       <data key="d6">
         <y:ShapeNode>
-          <y:Geometry height="137.48015853160769" width="346.9765518356139" x="647.0284738041001" y="108.4874715261958"/>
+          <y:Geometry height="138.73348519362196" width="369.22370445520403" x="624.78132118451" y="114.76651480637804"/>
           <y:Fill hasColor="false" transparent="false"/>
           <y:BorderStyle color="#000000" raised="false" type="dashed" width="1.0"/>
-          <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="12" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" hasText="false" height="4.0" horizontalTextPosition="center" iconTextGap="4" modelName="custom" textColor="#000000" verticalTextPosition="bottom" visible="true" width="4.0" x="171.48827591780696" y="66.74007926580384">
+          <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="12" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" hasText="false" height="4.0" horizontalTextPosition="center" iconTextGap="4" modelName="custom" textColor="#000000" verticalTextPosition="bottom" visible="true" width="4.0" x="182.61185222760196" y="67.36674259681098">
             <y:LabelModel>
               <y:SmartNodeLabelModel distance="4.0"/>
             </y:LabelModel>
@@ -202,7 +202,7 @@ Intent Parser<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:LabelModel
               <y:SmartNodeLabelModelParameter labelRatioX="0.0" labelRatioY="0.0" nodeRatioX="0.0" nodeRatioY="0.0" offsetX="0.0" offsetY="0.0" upX="0.0" upY="-1.0"/>
             </y:ModelParameter>
           </y:NodeLabel>
-          <y:NodeLabel alignment="left" autoSizePolicy="content" fontFamily="Dialog" fontSize="20" fontStyle="bold" hasBackgroundColor="false" hasLineColor="false" height="28.501953125" horizontalTextPosition="center" iconTextGap="4" modelName="sides" modelPosition="n" textColor="#000000" verticalTextPosition="bottom" visible="true" width="15.11328125" x="165.93163529280696" xml:space="preserve" y="-32.501953125">II</y:NodeLabel>
+          <y:NodeLabel alignment="left" autoSizePolicy="content" fontFamily="Dialog" fontSize="20" fontStyle="bold" hasBackgroundColor="false" hasLineColor="false" height="28.501953125" horizontalTextPosition="center" iconTextGap="4" modelName="sides" modelPosition="n" textColor="#000000" verticalTextPosition="bottom" visible="true" width="15.11328125" x="177.05521160260196" xml:space="preserve" y="-32.501953125">II</y:NodeLabel>
           <y:Shape type="rectangle"/>
         </y:ShapeNode>
       </data>
@@ -231,6 +231,39 @@ Intent Parser<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:LabelModel
         </y:ShapeNode>
       </data>
     </node>
+    <node id="n11">
+      <data key="d5"/>
+      <data key="d6">
+        <y:ImageNode>
+          <y:Geometry height="34.0" width="36.0" x="338.1028901734104" y="291.8883826879271"/>
+          <y:Fill color="#CCCCFF" transparent="false"/>
+          <y:BorderStyle color="#000000" type="line" width="1.0"/>
+          <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="12" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" hasText="false" height="4.0" horizontalTextPosition="center" iconTextGap="4" modelName="sandwich" modelPosition="s" textColor="#000000" verticalTextPosition="bottom" visible="true" width="4.0" x="16.0" y="38.0"/>
+          <y:Image alphaImage="true" refid="4"/>
+        </y:ImageNode>
+      </data>
+    </node>
+    <node id="n12">
+      <data key="d5"/>
+      <data key="d6">
+        <y:ShapeNode>
+          <y:Geometry height="83.86288525140367" width="56.554100036621094" x="327.82584015509985" y="242.02549743652344"/>
+          <y:Fill hasColor="false" transparent="false"/>
+          <y:BorderStyle color="#000000" raised="false" type="line" width="1.0"/>
+          <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="12" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" hasText="false" height="4.0" horizontalTextPosition="center" iconTextGap="4" modelName="custom" textColor="#000000" verticalTextPosition="bottom" visible="true" width="4.0" x="26.277050018310547" y="39.931442625701834">
+            <y:LabelModel>
+              <y:SmartNodeLabelModel distance="4.0"/>
+            </y:LabelModel>
+            <y:ModelParameter>
+              <y:SmartNodeLabelModelParameter labelRatioX="0.0" labelRatioY="0.0" nodeRatioX="0.0" nodeRatioY="0.0" offsetX="0.0" offsetY="0.0" upX="0.0" upY="-1.0"/>
+            </y:ModelParameter>
+          </y:NodeLabel>
+          <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="12" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="33.40234375" horizontalTextPosition="center" iconTextGap="4" modelName="sides" modelPosition="s" textColor="#000000" verticalTextPosition="bottom" visible="true" width="51.35546875" x="2.599315643310547" xml:space="preserve" y="87.86288525140367">Sprach-
+assistent</y:NodeLabel>
+          <y:Shape type="rectangle"/>
+        </y:ShapeNode>
+      </data>
+    </node>
     <edge id="e0" source="n0" target="n5">
       <data key="d10">
         <y:BezierEdge>
@@ -240,7 +273,7 @@ Intent Parser<y:LabelModel><y:SmartNodeLabelModel distance="4.0"/></y:LabelModel
           <y:LineStyle color="#000000" type="line" width="1.0"/>
           <y:Arrows source="none" target="standard"/>
           <y:EdgeLabel alignment="center" configuration="AutoFlippingLabel" distance="2.0" fontFamily="Dialog" fontSize="14" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="38.302734375" horizontalTextPosition="center" iconTextGap="4" modelName="custom" preferredPlacement="anywhere" ratio="0.5" textColor="#000000" verticalTextPosition="bottom" visible="true" width="100.482421875" x="73.89698791503906" xml:space="preserve" y="-143.928955078125">1. Aktivierungs-
-wort<y:LabelModel><y:SmartEdgeLabelModel autoRotationEnabled="false" defaultAngle="0.0" defaultDistance="10.0"/></y:LabelModel><y:ModelParameter><y:SmartEdgeLabelModelParameter angle="0.0" distance="30.0" distanceToCenter="true" position="center" ratio="1.0" segment="0"/></y:ModelParameter><y:PreferredPlacementDescriptor angle="0.0" angleOffsetOnRightSide="0" angleReference="absolute" angleRotationOnRightSide="co" distance="-1.0" frozen="true" placement="anywhere" side="anywhere" sideReference="relative_to_edge_flow"/></y:EdgeLabel>
+wort<y:LabelModel><y:SmartEdgeLabelModel autoRotationEnabled="false" defaultAngle="0.0" defaultDistance="10.0"/></y:LabelModel><y:ModelParameter><y:SmartEdgeLabelModelParameter angle="0.0" distance="30.0" distanceToCenter="true" position="center" ratio="0.0" segment="-1"/></y:ModelParameter><y:PreferredPlacementDescriptor angle="0.0" angleOffsetOnRightSide="0" angleReference="absolute" angleRotationOnRightSide="co" distance="-1.0" frozen="true" placement="anywhere" side="anywhere" sideReference="relative_to_edge_flow"/></y:EdgeLabel>
         </y:BezierEdge>
       </data>
     </edge>
@@ -259,12 +292,12 @@ wort<y:LabelModel><y:SmartEdgeLabelModel autoRotationEnabled="false" defaultAngl
       <data key="d9" xml:space="preserve"><![CDATA[Audioantwort]]></data>
       <data key="d10">
         <y:BezierEdge>
-          <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0">
+          <y:Path sx="-25.6028901734104" sy="45.5" tx="0.0" ty="0.0">
             <y:Point x="220.5" y="401.0"/>
           </y:Path>
           <y:LineStyle color="#000000" type="line" width="1.0"/>
           <y:Arrows source="none" target="standard"/>
-          <y:EdgeLabel alignment="center" configuration="AutoFlippingLabel" distance="2.0" fontFamily="Dialog" fontSize="14" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="21.1513671875" horizontalTextPosition="center" iconTextGap="4" modelName="custom" preferredPlacement="anywhere" ratio="0.5" textColor="#000000" verticalTextPosition="bottom" visible="true" width="85.716796875" x="-160.45132446289062" xml:space="preserve" y="97.15328979492188">Audioantwort<y:LabelModel><y:SmartEdgeLabelModel autoRotationEnabled="false" defaultAngle="0.0" defaultDistance="10.0"/></y:LabelModel><y:ModelParameter><y:SmartEdgeLabelModelParameter angle="0.0" distance="30.0" distanceToCenter="true" position="center" ratio="0.0" segment="-1"/></y:ModelParameter><y:PreferredPlacementDescriptor angle="0.0" angleOffsetOnRightSide="0" angleReference="absolute" angleRotationOnRightSide="co" distance="-1.0" frozen="true" placement="anywhere" side="anywhere" sideReference="relative_to_edge_flow"/></y:EdgeLabel>
+          <y:EdgeLabel alignment="center" configuration="AutoFlippingLabel" distance="2.0" fontFamily="Dialog" fontSize="14" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="21.1513671875" horizontalTextPosition="center" iconTextGap="4" modelName="custom" preferredPlacement="anywhere" ratio="0.5" textColor="#000000" verticalTextPosition="bottom" visible="true" width="85.716796875" x="-152.8583984375" xml:space="preserve" y="67.92431640625">Audioantwort<y:LabelModel><y:SmartEdgeLabelModel autoRotationEnabled="false" defaultAngle="0.0" defaultDistance="10.0"/></y:LabelModel><y:ModelParameter><y:SmartEdgeLabelModelParameter angle="0.0" distance="30.0" distanceToCenter="true" position="center" ratio="0.0" segment="-1"/></y:ModelParameter><y:PreferredPlacementDescriptor angle="0.0" angleOffsetOnRightSide="0" angleReference="absolute" angleRotationOnRightSide="co" distance="-1.0" frozen="true" placement="anywhere" side="anywhere" sideReference="relative_to_edge_flow"/></y:EdgeLabel>
         </y:BezierEdge>
       </data>
     </edge>
@@ -319,13 +352,13 @@ Skill<y:LabelModel><y:SmartEdgeLabelModel autoRotationEnabled="false" defaultAng
         </y:BezierEdge>
       </data>
     </edge>
-    <edge id="e8" source="n4" target="n5">
+    <edge id="e8" source="n4" target="n12">
       <data key="d10">
         <y:BezierEdge>
-          <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
+          <y:Path sx="0.0" sy="0.0" tx="28.307529194265896" ty="33.71964719894231"/>
           <y:LineStyle color="#000000" type="line" width="1.0"/>
           <y:Arrows source="none" target="standard"/>
-          <y:EdgeLabel alignment="center" configuration="AutoFlippingLabel" distance="2.0" fontFamily="Dialog" fontSize="14" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="21.1513671875" horizontalTextPosition="center" iconTextGap="4" modelName="custom" preferredPlacement="anywhere" ratio="0.5" textColor="#000000" verticalTextPosition="bottom" visible="true" width="85.716796875" x="-157.78919406851662" xml:space="preserve" y="-50.63028105203898">Audioantwort<y:LabelModel><y:SmartEdgeLabelModel autoRotationEnabled="false" defaultAngle="0.0" defaultDistance="10.0"/></y:LabelModel><y:ModelParameter><y:SmartEdgeLabelModelParameter angle="0.0" distance="30.0" distanceToCenter="true" position="left" ratio="0.5" segment="0"/></y:ModelParameter><y:PreferredPlacementDescriptor angle="0.0" angleOffsetOnRightSide="0" angleReference="absolute" angleRotationOnRightSide="co" distance="-1.0" frozen="true" placement="anywhere" side="anywhere" sideReference="relative_to_edge_flow"/></y:EdgeLabel>
+          <y:EdgeLabel alignment="center" configuration="AutoFlippingLabel" distance="2.0" fontFamily="Dialog" fontSize="14" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="21.1513671875" horizontalTextPosition="center" iconTextGap="4" modelName="custom" preferredPlacement="anywhere" ratio="0.5" textColor="#000000" verticalTextPosition="bottom" visible="true" width="85.716796875" x="-74.48524705204488" xml:space="preserve" y="-60.66039149590313">Audioantwort<y:LabelModel><y:SmartEdgeLabelModel autoRotationEnabled="false" defaultAngle="0.0" defaultDistance="10.0"/></y:LabelModel><y:ModelParameter><y:SmartEdgeLabelModelParameter angle="0.0" distance="29.523710315992066" distanceToCenter="true" position="right" ratio="0.5286995192804418" segment="0"/></y:ModelParameter><y:PreferredPlacementDescriptor angle="0.0" angleOffsetOnRightSide="0" angleReference="absolute" angleRotationOnRightSide="co" distance="-1.0" frozen="true" placement="anywhere" side="anywhere" sideReference="relative_to_edge_flow"/></y:EdgeLabel>
         </y:BezierEdge>
       </data>
     </edge>
@@ -462,6 +495,50 @@ fPUewAjQAIDAaABAYDQAIDAaABAYDQAIjAYABEYDAAKjAQCB0QCAwGgAQGA0ACAwGgAQGA0ACIwG&#13
 AARGAwACowEAgdEAgMBoAEBgNAAgMBoAEBgNAAiMBgAERgMAAqMBAIHRAIDAaABAYDQAIDAaABAY&#13;
 DQAIjAYABEYDAAKjAQCB0QCAwPZQU7BdZncBAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA&#13;
 AGbzX9JYVkSglb9uAAAAAElFTkSuQmCC</y:Resource>
+      <y:Resource id="4" type="java.awt.image.BufferedImage" xml:space="preserve">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&#13;
+fz16N+hnSNnvAAAAAElFTkSuQmCC</y:Resource>
     </y:Resources>
   </data>
 </graphml>
