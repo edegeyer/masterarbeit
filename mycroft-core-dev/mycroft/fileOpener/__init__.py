@@ -1,14 +1,13 @@
+# class that's used to open the local wave file, that's generated as spoken answer
 
 import socket
-import pyaudio
 
 class fileOpener():
     def __init__(self):
-        # just for testing
-        self.fileLocation = '/home/martin/Desktop/masterarbeit/sampleAudio/booting.wav'
+        pass
 
     def openFile(self, uri):
-
+        # TODO: set the IP to the one that's currently used by Loomo
         #LoomoIP = '192.168.0.108'
         LoomoIP = "192.168.43.52"
         LoomoPort = 65433
