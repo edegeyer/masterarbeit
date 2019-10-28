@@ -11,7 +11,7 @@ import sys
 
 # TODO: set IP to the own IP in the network
 myHOST = "192.168.43.138"
-myPORT = 65432  # Port to listen on (non-privileged ports are > 1023)
+myPORT = 65432
 
 class socketServer(Thread):
 

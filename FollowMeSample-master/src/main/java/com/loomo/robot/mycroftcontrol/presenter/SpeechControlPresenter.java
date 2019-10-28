@@ -86,30 +86,27 @@ public class SpeechControlPresenter {
     private static final int CHANNEL_CONFIG = AudioFormat.CHANNEL_IN_DEFAULT;
     private static final int AUDIO_FORMAT = AudioFormat.ENCODING_PCM_16BIT;
     private static final int BUFFER_SIZE_FACTOR = 10;
-    /**
-     * Size of the buffer where the audio data is stored by Android
-     */
+
+    // variables needed to play & record audio
     private static final int BUFFER_SIZE = AudioRecord.getMinBufferSize(SAMPLING_RATE_IN_HZ,
             CHANNEL_CONFIG, AUDIO_FORMAT) * BUFFER_SIZE_FACTOR;
     private final AtomicBoolean recordingInProgress = new AtomicBoolean(false);
-    MediaPlayer mplayer = new MediaPlayer();
     private AudioRecord recorder = null;
-
     private Thread recordingThread = null;
+
+    // variables to get the connection set up
     WebSocketClient mWebSocketClient;
     private String lastCommand;
+    // TODO: change to the IP of the device, that is running mycroft
     private String SERVER = "192.168.43.138";
 
-    //private String SERVER = "192.168.0.109";
-    //private String SERVER = "192.168.178.31";
+    // port that the audio stream gets send to
     private int PORT = 65432;
-    // String messageBusAddress = "ws://192.168.0.109:8181/core";
+
     String messageBusAddress = "ws://192.168.43.138:8181/core";
     private int audioDuration;
     private AudioManager audioManager;
 
-
-    //String messageBusAddress = "ws://192.168.178.31:8181/core";
 
     public enum RobotStateType {
         INITIATE_DETECT, TERMINATE_DETECT;
@@ -127,14 +124,12 @@ public class SpeechControlPresenter {
         mVision.bindService(CustomApplication.getContext(), mVisionBindStateListener);
         mHead.bindService(CustomApplication.getContext(), mHeadBindStateListener);
         mBase.bindService(CustomApplication.getContext(), mBaseBindStateListener);
+
+        // start the audio recording and start streaming it to the socket of the base station & connect to the messagebus
         audioManager = (AudioManager) CustomApplication.getContext().getSystemService(Context.AUDIO_SERVICE);
         connectWebSocket();
         mWebSocketClient.connect();
         startRecording();
-
-        /**
-         * the second parameter is the distance between loomo and the followed target. must > 1.0f
-         */
     }
 
 
@@ -148,7 +143,9 @@ public class SpeechControlPresenter {
         mHead.unbindService();
     }
 
-    /******************************************* audio actions ************************************/
+    /******************************************* audio actions************************************/
+
+    // connect to the websocket which is the messagebus
     private void connectWebSocket() {
         URI uri;
         try {
@@ -164,29 +161,30 @@ public class SpeechControlPresenter {
             }
 
             @Override
+            /*
+             when a message is received, first cast it to JSON, so it can be used further without difficulties
+             afterwards, check what type it is (play sound, stop current action, control loomo), all other messages get ignored
+             */
             public void onMessage(String message) {
-                //System.out.println(message);
-
                 try {
                     final JSONObject jsonObject = new JSONObject(message);
-
+                    // play sound, when wakeword was detected -> user knows then, that loomo is listening
                     if (jsonObject.get("type").equals("recognizer_loop:record_begin")) {
-                        // play sound, when wakeword was detected -> user knows then, that loomo is listening
                         MediaPlayer mPlayer = MediaPlayer.create(CustomApplication.getContext(), R.raw.start_listening);
                         mPlayer.start();
-                    } else if (jsonObject.get("type").equals("mycroft.skill.handler.start")) {
                         // make loomo stop during an action
+                    } else if (jsonObject.get("type").equals("mycroft.skill.handler.start")) {
                         JSONObject jsonData = jsonObject.getJSONObject("data");
                         if (jsonData.get("name").equals("StopSkill.handle_stop")) {
-                            System.out.println("STOP");
                             stop();
                         }
+                        //control Loomo by callung the right command
+                        // lastCommand saves that instruction to reverse it on the comeback command
                     } else if (jsonObject.get("type").equals("loomoInstruction")) {
                         try {
                             JSONObject jsonData = jsonObject.getJSONObject("data");
                             String action = jsonData.get("action").toString();
                             mBase.setControlMode(Base.CONTROL_MODE_RAW);
-
                             switch (action) {
                                 case "turn":
                                     String direction = jsonData.get("direction").toString();
@@ -242,6 +240,7 @@ public class SpeechControlPresenter {
         };
     }
 
+    // function to start the recording in a separate thread
     private void startRecording() {
         recorder = new AudioRecord(MediaRecorder.AudioSource.DEFAULT, SAMPLING_RATE_IN_HZ,
                 CHANNEL_CONFIG, AUDIO_FORMAT, 1024);
@@ -252,6 +251,7 @@ public class SpeechControlPresenter {
         startAudioProcessingServer();
     }
 
+    // class to create a server on Loomo to enable playing the audio that's been created by mycroft
     public void startAudioProcessingServer() {
         final ExecutorService clientProcessingPool = Executors.newFixedThreadPool(10);
 
@@ -261,13 +261,13 @@ public class SpeechControlPresenter {
                 try {
                     ServerSocket serverSocket = new ServerSocket(65433);
                     System.out.println("Created socket. Listening....");
-
+                    // have the server run forever, so mycroft simply reconnects whenever there was an audio output
                     while (true) {
                         Socket clientSocket = serverSocket.accept();
                         clientProcessingPool.submit(new ClientTask((clientSocket)));
                     }
                 } catch (IOException e) {
-                    System.out.println("Unable to process client reuqest");
+                    System.out.println("Unable to process client request");
                     e.printStackTrace();
                 }
 
@@ -277,21 +277,19 @@ public class SpeechControlPresenter {
         serverThread.start();
     }
 
+
+    // class that takes care of playing the audio
     private class ClientTask implements Runnable {
-
-
         private final Socket clientSocket;
         MediaPlayer mediaPlayer;
-
         private ClientTask(Socket clientSocket) {
             this.clientSocket = clientSocket;
-
         }
 
         @Override
         public void run() {
             System.out.println("Got a client");
-
+            // read the audio from the cache and play it
             File file = new File(CustomApplication.getContext().getCacheDir(), "cachedAudio.wav");
             try (OutputStream output = new FileOutputStream(file)) {
                 DataInputStream dataInputStream = new DataInputStream(clientSocket.getInputStream());
@@ -305,7 +303,7 @@ public class SpeechControlPresenter {
                 mediaPlayer.setDataSource(path);
                 mediaPlayer.prepare();
                 audioDuration = mediaPlayer.getDuration();
-                // mute microphone for the duration of the audio
+                // mute microphone for the duration of the audio to avoid looping back
                 audioManager.setMicrophoneMute(true);
                 mediaPlayer.start();
                 try {
@@ -328,6 +326,7 @@ public class SpeechControlPresenter {
         }
     }
 
+    // runnable that implements the audio recording
     private class RecordingRunnable implements Runnable {
 
         @Override
@@ -370,6 +369,11 @@ public class SpeechControlPresenter {
     }
 
     /******************************************* functions to control loomo ***********************/
+    /*
+    all classes excecuted the instructions in a separate thread -> avoids blocking anything whilst executing the tasks
+    the sleep period is needed, otherwise Loomo would turn & drive at the same time
+    always remember, that these functions simulate behaviour and don't have collision avoidance integrated
+     */
     public void goTo(String destination) {
         new Thread() {
             @Override
@@ -590,6 +594,10 @@ public class SpeechControlPresenter {
 
     }
 
+
+    /**************************  detecting and tracking listeners   *****************************/
+
+
     public void actionInitiateDetect() {
         if (mCurrentState == RobotStateType.INITIATE_DETECT) {
             return;
@@ -611,11 +619,10 @@ public class SpeechControlPresenter {
     }
 
 
-    /**************************  detecting and tracking listeners   *****************************/
-
     private PersonDetectListener mPersonDetectListener = new PersonDetectListener() {
         @Override
         public void onPersonDetected(DTSPerson[] persons) {
+            // Loomo only reacts to the first person discovered -> if the is a secon person, it just gets ignored
             if (persons == null || persons.length == 0) {
                 detectedPerson.asked = false;
 
@@ -630,7 +637,7 @@ public class SpeechControlPresenter {
 
 
             if (!detectedPerson.asked) {
-                // ask person, if first seen
+                // ask person, if first seen -> send a suitable json via the messagebus to mycroft
                 detectedPerson.asked = true;
                 detectedPerson.timestamp = System.currentTimeMillis();
                 mWebSocketClient.send("{\"type\": \"recognizer_loop:utterance\"," +
@@ -639,10 +646,7 @@ public class SpeechControlPresenter {
                 // when person wasn't seen for defined time, ask again if help can be provided
                 long timedifference = System.currentTimeMillis() - detectedPerson.timestamp;
                 // check if person was asked over 30s before
-                System.out.println("ASKED BEFORE " + timedifference / 1000);
                 if (timedifference > 30000) {
-                    // TODO: ask again
-                    System.out.println("ASKING AGAIN");
                     detectedPerson.timestamp = System.currentTimeMillis();
                     mWebSocketClient.send("{\"type\": \"recognizer_loop:utterance\"," +
                             "\"data\":{\"utterances\":[\"loomo1234567\"], \"lang\": \"en-us\"}, \"context\":{}}");

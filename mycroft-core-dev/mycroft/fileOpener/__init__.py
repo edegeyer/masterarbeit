@@ -7,8 +7,7 @@ class fileOpener():
         pass
 
     def openFile(self, uri):
-        # TODO: set the IP to the one that's currently used by Loomo
-        #LoomoIP = '192.168.0.108'
+        # TODO: set the IP to the one that's currently used by Loomo (find it by accessing Loomo's settings)
         LoomoIP = "192.168.43.52"
         LoomoPort = 65433
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
