@@ -6,10 +6,10 @@
 
     <!--Tip: The root container should be RelativeLayout-->
 
-    <com.segway.robot.followsample.view.AutoFitDrawableView
+    <com.loomo.robot.mycroftcontrol.view.AutoFitDrawableView
         android:id="@+id/autoDrawable"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"></com.segway.robot.followsample.view.AutoFitDrawableView>
+        android:layout_height="wrap_content"></com.loomo.robot.mycroftcontrol.view.AutoFitDrawableView>
 
 
     <LinearLayout

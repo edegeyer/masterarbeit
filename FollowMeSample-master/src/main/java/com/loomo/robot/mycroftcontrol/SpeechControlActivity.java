@@ -1,4 +1,4 @@
-package com.segway.robot.followsample;
+package com.loomo.robot.mycroftcontrol;
 
 import android.app.Activity;
 import android.graphics.SurfaceTexture;
@@ -8,21 +8,22 @@ import android.view.TextureView;
 import android.view.View;
 import android.widget.LinearLayout;
 
+import com.loomo.robot.mycroftcontrol.interfaces.PresenterChangeInterface;
+import com.loomo.robot.mycroftcontrol.interfaces.ViewChangeInterface;
+import com.loomo.robot.mycroftcontrol.presenter.SpeechControlPresenter;
 import com.segway.robot.algo.dts.DTSPerson;
-import com.segway.robot.followsample.interfaces.PresenterChangeInterface;
-import com.segway.robot.followsample.interfaces.ViewChangeInterface;
-import com.segway.robot.followsample.presenter.FollowMePresenter;
-import com.segway.robot.followsample.util.LoadingUtil;
-import com.segway.robot.followsample.util.ToastUtil;
-import com.segway.robot.followsample.view.AutoFitDrawableView;
+import com.segway.robot.followsample.R;
+import com.loomo.robot.mycroftcontrol.util.LoadingUtil;
+import com.loomo.robot.mycroftcontrol.util.ToastUtil;
+import com.loomo.robot.mycroftcontrol.view.AutoFitDrawableView;
 
 /**
  * @author jacob
  * @Des While using following function, the robot may run into people or other obstacles. Always be on the look-out.
  */
-public class FollowMeActivity extends Activity implements View.OnClickListener {
+public class SpeechControlActivity extends Activity implements View.OnClickListener {
 
-    public static final String TAG = "FollowMeActivity";
+    public static final String TAG = "SpeechControlActivity";
 
     private static final int PREVIEW_WIDTH = 640;
     private static final int PREVIEW_HEIGHT = 480;
@@ -30,7 +31,7 @@ public class FollowMeActivity extends Activity implements View.OnClickListener {
     private AutoFitDrawableView mAutoFitDrawableView;
     private LinearLayout mButtons;
 
-    private FollowMePresenter mFollowMePresenter;
+    private SpeechControlPresenter mSpeechControlPresenter;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -52,7 +53,7 @@ public class FollowMeActivity extends Activity implements View.OnClickListener {
     @Override
     protected void onStop() {
         super.onStop();
-        mFollowMePresenter.stopPresenter();
+        mSpeechControlPresenter.stopPresenter();
         finish();
     }
 
@@ -64,8 +65,6 @@ public class FollowMeActivity extends Activity implements View.OnClickListener {
     private void initListener() {
         findViewById(R.id.initiateDetect).setOnClickListener(this);
         findViewById(R.id.terminateDetect).setOnClickListener(this);
-        //findViewById(R.id.initiateTrack).setOnClickListener(this);
-        //findViewById(R.id.terminateTrack).setOnClickListener(this);
         mAutoFitDrawableView.setOnClickListener(this);
     }
 
@@ -73,8 +72,8 @@ public class FollowMeActivity extends Activity implements View.OnClickListener {
     private TextureView.SurfaceTextureListener mSurfaceTextureListener = new TextureView.SurfaceTextureListener() {
         @Override
         public void onSurfaceTextureAvailable(SurfaceTexture surfaceTexture, int i, int i1) {
-            mFollowMePresenter = new FollowMePresenter(mPresenterChangeInterface, mViewChangeInterface);
-            mFollowMePresenter.startPresenter();
+            mSpeechControlPresenter = new SpeechControlPresenter(mPresenterChangeInterface, mViewChangeInterface);
+            mSpeechControlPresenter.startPresenter();
         }
 
         @Override
@@ -106,7 +105,7 @@ public class FollowMeActivity extends Activity implements View.OnClickListener {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    ToastUtil.showToast(FollowMeActivity.this, message);
+                    ToastUtil.showToast(SpeechControlActivity.this, message);
                 }
             });
         }
@@ -133,15 +132,15 @@ public class FollowMeActivity extends Activity implements View.OnClickListener {
     @Override
     public void onClick(View v) {
 
-        if (!mFollowMePresenter.isServicesAvailable()) {
+        if (!mSpeechControlPresenter.isServicesAvailable()) {
             return;
         }
         switch (v.getId()) {
             case R.id.initiateDetect:
-                mFollowMePresenter.actionInitiateDetect();
+                mSpeechControlPresenter.actionInitiateDetect();
                 break;
             case R.id.terminateDetect:
-                mFollowMePresenter.actionTerminateDetect();
+                mSpeechControlPresenter.actionTerminateDetect();
                 break;
         }
     }

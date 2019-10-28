@@ -1,6 +1,6 @@
-package com.segway.robot.followsample.interfaces;
+package com.loomo.robot.mycroftcontrol.interfaces;
 
-import com.segway.robot.followsample.view.AutoFitDrawableView;
+import com.loomo.robot.mycroftcontrol.view.AutoFitDrawableView;
 
 /**
  * @author jacob

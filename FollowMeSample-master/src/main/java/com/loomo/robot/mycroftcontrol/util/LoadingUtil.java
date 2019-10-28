@@ -1,10 +1,10 @@
-package com.segway.robot.followsample.util;
+package com.loomo.robot.mycroftcontrol.util;
 
 import android.app.Activity;
 import android.view.Display;
 import android.view.WindowManager;
 
-import com.segway.robot.followsample.view.LoadingDialog;
+import com.loomo.robot.mycroftcontrol.view.LoadingDialog;
 
 /**
  * @author jacob

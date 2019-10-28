@@ -1,4 +1,4 @@
-package com.segway.robot.followsample.view;
+package com.loomo.robot.mycroftcontrol.view;
 
 import android.app.Activity;
 import android.app.Dialog;

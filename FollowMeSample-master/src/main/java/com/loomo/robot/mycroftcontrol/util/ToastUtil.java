@@ -1,4 +1,4 @@
-package com.segway.robot.followsample.util;
+package com.loomo.robot.mycroftcontrol.util;
 
 import android.content.Context;
 import android.graphics.Color;
