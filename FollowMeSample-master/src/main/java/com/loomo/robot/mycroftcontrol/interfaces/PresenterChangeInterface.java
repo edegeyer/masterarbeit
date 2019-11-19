@@ -1,4 +1,4 @@
-package com.segway.robot.followsample.interfaces;
+package com.loomo.robot.mycroftcontrol.interfaces;
 
 import com.segway.robot.algo.dts.DTSPerson;
 

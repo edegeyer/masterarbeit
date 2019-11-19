@@ -386,19 +386,11 @@ class GoVivaceSTT(TokenSTT):
     def get_response(self, response):
         return response.json()["result"]["hypotheses"][0]["transcript"]
 
-
+# most stt has been removed, see Mycroft Repo for more Details
 class STTFactory:
     CLASSES = {
         "mycroft": MycroftSTT,
-        #"google": GoogleSTT,
-        #"google_cloud": GoogleCloudSTT,
-        #"google_cloud_streaming": GoogleCloudStreamingSTT,
-        #"wit": WITSTT,
-        #"ibm": IBMSTT,
         "kaldi": KaldiSTT,
-        #"bing": BingSTT,
-        #"govivace": GoVivaceSTT,
-        #"houndify": HoundifySTT,
         "deepspeech_server": DeepSpeechServerSTT,
         "deepspeech_stream_server": DeepSpeechStreamServerSTT,
         "mycroft_deepspeech": MycroftDeepSpeechSTT

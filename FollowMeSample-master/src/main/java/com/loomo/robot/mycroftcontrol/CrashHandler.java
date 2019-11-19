@@ -1,4 +1,4 @@
-package com.segway.robot.followsample;
+package com.loomo.robot.mycroftcontrol;
 
 import android.content.Context;
 import android.content.pm.PackageInfo;

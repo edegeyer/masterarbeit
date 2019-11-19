@@ -1,4 +1,4 @@
-package com.segway.robot.followsample.presenter;
+package com.loomo.robot.mycroftcontrol.presenter;
 
 import android.content.Context;
 import android.media.AudioFormat;
@@ -9,24 +9,24 @@ import android.media.MediaRecorder;
 import android.util.Log;
 import android.view.Surface;
 
-import com.segway.robot.algo.dts.BaseControlCommand;
 import com.segway.robot.algo.dts.DTSPerson;
 import com.segway.robot.algo.dts.PersonDetectListener;
-import com.segway.robot.algo.dts.PersonTrackingListener;
-import com.segway.robot.algo.dts.PersonTrackingProfile;
-import com.segway.robot.algo.dts.PersonTrackingWithPlannerListener;
-import com.segway.robot.followsample.CustomApplication;
+import com.loomo.robot.mycroftcontrol.CustomApplication;
 import com.segway.robot.followsample.R;
-import com.segway.robot.followsample.interfaces.PresenterChangeInterface;
-import com.segway.robot.followsample.interfaces.ViewChangeInterface;
-import com.segway.robot.followsample.util.HeadControlHandlerImpl;
-import com.segway.robot.followsample.view.AutoFitDrawableView;
+import com.loomo.robot.mycroftcontrol.interfaces.PresenterChangeInterface;
+import com.loomo.robot.mycroftcontrol.interfaces.ViewChangeInterface;
+import com.loomo.robot.mycroftcontrol.util.HeadControlHandlerImpl;
+import com.loomo.robot.mycroftcontrol.view.AutoFitDrawableView;
 import com.segway.robot.sdk.base.bind.ServiceBinder;
 import com.segway.robot.sdk.locomotion.head.Head;
 import com.segway.robot.sdk.locomotion.sbv.Base;
 import com.segway.robot.sdk.vision.DTS;
 import com.segway.robot.sdk.vision.Vision;
 import com.segway.robot.support.control.HeadPIDController;
+
+import org.java_websocket.client.WebSocketClient;
+import org.java_websocket.handshake.ServerHandshake;
+import org.json.JSONObject;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -39,32 +39,23 @@ import java.net.Socket;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
-import org.java_websocket.client.WebSocketClient;
-import org.java_websocket.handshake.ServerHandshake;
-import org.json.JSONObject;
 
 
 /**
  * @author jacob
+ * @author Martin Eisoldt
  * @date 5/29/18
  */
 
-class DetectedPerson{
+class DetectedPerson {
     public long timestamp = System.currentTimeMillis();
     public Boolean asked = false;
 }
 
-public class FollowMePresenter {
-
-    private static final String TAG = "FollowMePresenter";
+public class SpeechControlPresenter {
 
     private static final int TIME_OUT = 10 * 1000;
 
@@ -84,7 +75,6 @@ public class FollowMePresenter {
 
     private DTS mDts;
 
-    //private List personList = Collections.synchronizedList(new ArrayList());
     private DetectedPerson detectedPerson = new DetectedPerson();
     private long startTime;
 
@@ -96,33 +86,33 @@ public class FollowMePresenter {
     private static final int CHANNEL_CONFIG = AudioFormat.CHANNEL_IN_DEFAULT;
     private static final int AUDIO_FORMAT = AudioFormat.ENCODING_PCM_16BIT;
     private static final int BUFFER_SIZE_FACTOR = 10;
-    /**
-     * Size of the buffer where the audio data is stored by Android
-     */
+
+    // variables needed to play & record audio
     private static final int BUFFER_SIZE = AudioRecord.getMinBufferSize(SAMPLING_RATE_IN_HZ,
             CHANNEL_CONFIG, AUDIO_FORMAT) * BUFFER_SIZE_FACTOR;
     private final AtomicBoolean recordingInProgress = new AtomicBoolean(false);
-    MediaPlayer mplayer = new MediaPlayer();
     private AudioRecord recorder = null;
-
     private Thread recordingThread = null;
+
+    // variables to get the connection set up
     WebSocketClient mWebSocketClient;
     private String lastCommand;
-    private String SERVER = "192.168.0.109";
-    //private String SERVER = "192.168.178.31";
+    // TODO: change to the IP of the device, that is running mycroft
+    private String SERVER = "192.168.43.138";
+
+    // port that the audio stream gets send to
     private int PORT = 65432;
-    String messageBusAddress = "ws://192.168.0.109:8181/core";
+
+    String messageBusAddress = "ws://192.168.43.138:8181/core";
     private int audioDuration;
     private AudioManager audioManager;
 
-
-    //String messageBusAddress = "ws://192.168.178.31:8181/core";
 
     public enum RobotStateType {
         INITIATE_DETECT, TERMINATE_DETECT;
     }
 
-    public FollowMePresenter(PresenterChangeInterface mPresenterChangeInterface, ViewChangeInterface mViewChangeInterface) {
+    public SpeechControlPresenter(PresenterChangeInterface mPresenterChangeInterface, ViewChangeInterface mViewChangeInterface) {
         this.mPresenterChangeInterface = mPresenterChangeInterface;
         this.mViewChangeInterface = mViewChangeInterface;
     }
@@ -134,16 +124,12 @@ public class FollowMePresenter {
         mVision.bindService(CustomApplication.getContext(), mVisionBindStateListener);
         mHead.bindService(CustomApplication.getContext(), mHeadBindStateListener);
         mBase.bindService(CustomApplication.getContext(), mBaseBindStateListener);
+
+        // start the audio recording and start streaming it to the socket of the base station & connect to the messagebus
         audioManager = (AudioManager) CustomApplication.getContext().getSystemService(Context.AUDIO_SERVICE);
-        //detectedPerson.asked = false;
-        //detectedPerson.time = Calendar.getInstance().getTime();
         connectWebSocket();
         mWebSocketClient.connect();
         startRecording();
-
-        /**
-         * the second parameter is the distance between loomo and the followed target. must > 1.0f
-         */
     }
 
 
@@ -155,10 +141,11 @@ public class FollowMePresenter {
         mVision.unbindService();
         mHeadPIDController.stop();
         mHead.unbindService();
-        //mBase.unbindService();
     }
 
-    /******************************************* audio actions ************************************/
+    /******************************************* audio actions************************************/
+
+    // connect to the websocket which is the messagebus
     private void connectWebSocket() {
         URI uri;
         try {
@@ -174,33 +161,34 @@ public class FollowMePresenter {
             }
 
             @Override
+            /*
+             when a message is received, first cast it to JSON, so it can be used further without difficulties
+             afterwards, check what type it is (play sound, stop current action, control loomo), all other messages get ignored
+             */
             public void onMessage(String message) {
-                //System.out.println(message);
-
                 try {
                     final JSONObject jsonObject = new JSONObject(message);
-
+                    // play sound, when wakeword was detected -> user knows then, that loomo is listening
                     if (jsonObject.get("type").equals("recognizer_loop:record_begin")) {
-                        // play sound, when wakeword was detected -> user knows then, that loomo is listening
                         MediaPlayer mPlayer = MediaPlayer.create(CustomApplication.getContext(), R.raw.start_listening);
                         mPlayer.start();
-                    } else if (jsonObject.get("type").equals("mycroft.skill.handler.start")) {
                         // make loomo stop during an action
+                    } else if (jsonObject.get("type").equals("mycroft.skill.handler.start")) {
                         JSONObject jsonData = jsonObject.getJSONObject("data");
                         if (jsonData.get("name").equals("StopSkill.handle_stop")) {
-                            System.out.println("STOP");
                             stop();
                         }
+                        //control Loomo by callung the right command
+                        // lastCommand saves that instruction to reverse it on the comeback command
                     } else if (jsonObject.get("type").equals("loomoInstruction")) {
                         try {
                             JSONObject jsonData = jsonObject.getJSONObject("data");
                             String action = jsonData.get("action").toString();
                             mBase.setControlMode(Base.CONTROL_MODE_RAW);
-
                             switch (action) {
                                 case "turn":
                                     String direction = jsonData.get("direction").toString();
-                                    lastCommand = action + " " +direction;
+                                    lastCommand = action + " " + direction;
                                     detectTurnDirection(direction);
                                     break;
                                 case "goPlace":
@@ -252,9 +240,10 @@ public class FollowMePresenter {
         };
     }
 
+    // function to start the recording in a separate thread
     private void startRecording() {
         recorder = new AudioRecord(MediaRecorder.AudioSource.DEFAULT, SAMPLING_RATE_IN_HZ,
-                CHANNEL_CONFIG, AUDIO_FORMAT, BUFFER_SIZE);
+                CHANNEL_CONFIG, AUDIO_FORMAT, 1024);
         recorder.startRecording();
         recordingInProgress.set(true);
         recordingThread = new Thread(new RecordingRunnable(), "Recording Thread");
@@ -262,6 +251,7 @@ public class FollowMePresenter {
         startAudioProcessingServer();
     }
 
+    // class to create a server on Loomo to enable playing the audio that's been created by mycroft
     public void startAudioProcessingServer() {
         final ExecutorService clientProcessingPool = Executors.newFixedThreadPool(10);
 
@@ -271,13 +261,13 @@ public class FollowMePresenter {
                 try {
                     ServerSocket serverSocket = new ServerSocket(65433);
                     System.out.println("Created socket. Listening....");
-
+                    // have the server run forever, so mycroft simply reconnects whenever there was an audio output
                     while (true) {
                         Socket clientSocket = serverSocket.accept();
                         clientProcessingPool.submit(new ClientTask((clientSocket)));
                     }
                 } catch (IOException e) {
-                    System.out.println("Unable to process client reuqest");
+                    System.out.println("Unable to process client request");
                     e.printStackTrace();
                 }
 
@@ -287,21 +277,19 @@ public class FollowMePresenter {
         serverThread.start();
     }
 
+
+    // class that takes care of playing the audio
     private class ClientTask implements Runnable {
-
-
         private final Socket clientSocket;
         MediaPlayer mediaPlayer;
-
         private ClientTask(Socket clientSocket) {
             this.clientSocket = clientSocket;
-
         }
 
         @Override
         public void run() {
             System.out.println("Got a client");
-
+            // read the audio from the cache and play it
             File file = new File(CustomApplication.getContext().getCacheDir(), "cachedAudio.wav");
             try (OutputStream output = new FileOutputStream(file)) {
                 DataInputStream dataInputStream = new DataInputStream(clientSocket.getInputStream());
@@ -315,7 +303,7 @@ public class FollowMePresenter {
                 mediaPlayer.setDataSource(path);
                 mediaPlayer.prepare();
                 audioDuration = mediaPlayer.getDuration();
-                // mute microphone for the duration of the audio
+                // mute microphone for the duration of the audio to avoid looping back
                 audioManager.setMicrophoneMute(true);
                 mediaPlayer.start();
                 try {
@@ -338,6 +326,7 @@ public class FollowMePresenter {
         }
     }
 
+    // runnable that implements the audio recording
     private class RecordingRunnable implements Runnable {
 
         @Override
@@ -380,6 +369,11 @@ public class FollowMePresenter {
     }
 
     /******************************************* functions to control loomo ***********************/
+    /*
+    all classes excecuted the instructions in a separate thread -> avoids blocking anything whilst executing the tasks
+    the sleep period is needed, otherwise Loomo would turn & drive at the same time
+    always remember, that these functions simulate behaviour and don't have collision avoidance integrated
+     */
     public void goTo(String destination) {
         new Thread() {
             @Override
@@ -447,6 +441,11 @@ public class FollowMePresenter {
                         e.printStackTrace();
                     }
                 }
+                try {
+                    Thread.sleep(4000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
                 if (keepGoing) {
                     detectTurnDirection("around");
                     try {
@@ -506,9 +505,8 @@ public class FollowMePresenter {
     }
 
 
-    private void comeback(String lastCommand){
-        System.out.println("last command is: " + lastCommand);
-        switch (lastCommand){
+    private void comeback(String lastCommand) {
+        switch (lastCommand) {
             case "straight":
                 detectTurnDirection("around");
                 try {
@@ -568,7 +566,7 @@ public class FollowMePresenter {
         this.lastCommand = "";
     }
 
-    private void goStraight(){
+    private void goStraight() {
         new Thread() {
             @Override
             public void run() {
@@ -596,6 +594,10 @@ public class FollowMePresenter {
 
     }
 
+
+    /**************************  detecting and tracking listeners   *****************************/
+
+
     public void actionInitiateDetect() {
         if (mCurrentState == RobotStateType.INITIATE_DETECT) {
             return;
@@ -617,12 +619,10 @@ public class FollowMePresenter {
     }
 
 
-
-    /**************************  detecting and tracking listeners   *****************************/
-
     private PersonDetectListener mPersonDetectListener = new PersonDetectListener() {
         @Override
         public void onPersonDetected(DTSPerson[] persons) {
+            // Loomo only reacts to the first person discovered -> if the is a secon person, it just gets ignored
             if (persons == null || persons.length == 0) {
                 detectedPerson.asked = false;
 
@@ -636,21 +636,17 @@ public class FollowMePresenter {
             mPresenterChangeInterface.drawPersons(persons);
 
 
-            if (!detectedPerson.asked){
-                // ask person, if first seen
+            if (!detectedPerson.asked) {
+                // ask person, if first seen -> send a suitable json via the messagebus to mycroft
                 detectedPerson.asked = true;
                 detectedPerson.timestamp = System.currentTimeMillis();
                 mWebSocketClient.send("{\"type\": \"recognizer_loop:utterance\"," +
                         "\"data\":{\"utterances\":[\"loomo1234567\"], \"lang\": \"en-us\"}, \"context\":{}}");
-            }
-            else{
+            } else {
                 // when person wasn't seen for defined time, ask again if help can be provided
                 long timedifference = System.currentTimeMillis() - detectedPerson.timestamp;
                 // check if person was asked over 30s before
-                System.out.println("ASKED BEFORE " +timedifference/1000);
-                if (timedifference > 30000){
-                    // TODO: ask again
-                    System.out.println("ASKING AGAIN");
+                if (timedifference > 30000) {
                     detectedPerson.timestamp = System.currentTimeMillis();
                     mWebSocketClient.send("{\"type\": \"recognizer_loop:utterance\"," +
                             "\"data\":{\"utterances\":[\"loomo1234567\"], \"lang\": \"en-us\"}, \"context\":{}}");
@@ -675,7 +671,6 @@ public class FollowMePresenter {
             mPresenterChangeInterface.showToast("PersonDetectListener: " + message);
         }
     };
-
 
 
     /***************************************** bind services **************************************/

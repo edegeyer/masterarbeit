@@ -1,4 +1,4 @@
-package com.segway.robot.followsample.util;
+package com.loomo.robot.mycroftcontrol.util;
 
 import com.segway.robot.sdk.locomotion.head.Angle;
 import com.segway.robot.sdk.locomotion.head.Head;

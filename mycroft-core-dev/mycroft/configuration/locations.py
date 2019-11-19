@@ -17,6 +17,7 @@ from os.path import join, dirname, expanduser, exists
 DEFAULT_CONFIG = join(dirname(__file__), 'mycroft.conf')
 SYSTEM_CONFIG = os.environ.get('MYCROFT_SYSTEM_CONFIG',
                                '/etc/mycroft/mycroft.conf')
+# TODO: set to own filepath
 USER_CONFIG = os.environ.get('ownmycroft.conf',
                              '/home/martin/Desktop/masterarbeit/conf/ownmycroft.conf') # join(expanduser('~'), '.mycroft/mycroft.conf')
 print("user config:", USER_CONFIG)
