@@ -1,31 +1,16 @@
-/*
- * Copyright 2016 the original author or authors.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 
 package com.example.audiorecord;
 
+import android.content.Context;
 import android.media.AudioFormat;
+import android.media.AudioManager;
 import android.media.AudioRecord;
+import android.media.MediaPlayer;
 import android.media.MediaRecorder;
 import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.view.View;
-import android.widget.Button;
 
 import com.segway.robot.algo.dts.Person;
 import com.segway.robot.sdk.base.bind.ServiceBinder;
@@ -39,21 +24,27 @@ import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
+import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.ByteBuffer;
 import java.util.Locale;
-import java.util.Timer;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Sample that demonstrates how to record a device's microphone using {@link AudioRecord}.
  */
+
+
 public class AudioRecordActivity extends AppCompatActivity {
 
     Base mBase;
@@ -65,12 +56,14 @@ public class AudioRecordActivity extends AppCompatActivity {
     private boolean isVisionBind;
     private boolean isHeadBind;
     private boolean isBaseBind;
-
+    private boolean keepGoing = true;
     private static final int SAMPLING_RATE_IN_HZ = 16000;
 
     private static final int CHANNEL_CONFIG = AudioFormat.CHANNEL_IN_DEFAULT;
 
     private static final int AUDIO_FORMAT = AudioFormat.ENCODING_PCM_16BIT;
+
+    AudioManager audioManager;
 
     /**
      * Factor by that the minimum buffer size is multiplied. The bigger the factor is the less
@@ -90,28 +83,28 @@ public class AudioRecordActivity extends AppCompatActivity {
      * Signals whether a recording is in progress (true) or not (false).
      */
     private final AtomicBoolean recordingInProgress = new AtomicBoolean(false);
-
+    MediaPlayer mplayer = new MediaPlayer();
     private AudioRecord recorder = null;
 
     private Thread recordingThread = null;
-    private Thread listeningThread = null;
+    private Thread playerThread = null;
 
-    private Button startButton;
     TextToSpeech mTTS = null;
-    private final int ACT_CHECK_TTS_DATA = 1000;
     WebSocketClient mWebSocketClient;
-    private Button stopButton;
-
-    private Button playButton;
+    private String lastCommand;
+    private MediaPlayer player;
 
     private String SERVER = "192.168.0.109";
-    private int PORT  = 65432;
+    //private String SERVER = "192.168.178.31";
+    private int PORT = 65432;
     String messageBusAddress = "ws://192.168.0.109:8181/core";
 
+    //String messageBusAddress = "ws://192.168.178.31:8181/core";
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.audio);
+        audioManager = (AudioManager) getApplicationContext().getSystemService(Context.AUDIO_SERVICE);
         mTTS = new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
             @Override
             public void onInit(int i) {
@@ -121,98 +114,190 @@ public class AudioRecordActivity extends AppCompatActivity {
         setUpLoomo();
         connectWebSocket();
         mWebSocketClient.connect();
-        stopButton = (Button) findViewById(R.id.btnStop);
-        stopButton.setEnabled(true);
-        playButton = (Button) findViewById(R.id.playButton);
-        playButton.setEnabled(true);
-
-        playButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                startPlaying();
-            }
-        });
-
-        stopButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                stopRecording();
-                startButton.setEnabled(true);
-                stopButton.setEnabled(false);
-            }
-        });
         startRecording();
+        // Should make sure, that loomo always tries to detect persons
+        //initateDetect();
 
     }
 
-    private void connectWebSocket(){
+
+    private void connectWebSocket() {
         URI uri;
         try {
             uri = new URI(messageBusAddress);
-        }
-        catch (URISyntaxException e){
+        } catch (URISyntaxException e) {
             e.printStackTrace();
             return;
         }
-        mWebSocketClient = new WebSocketClient(uri){
+        mWebSocketClient = new WebSocketClient(uri) {
             @Override
-            public void onOpen(ServerHandshake serverHandshake){
+            public void onOpen(ServerHandshake serverHandshake) {
                 System.out.println("WebSocket opened");
             }
 
             @Override
-            public void onMessage(String message){
+            public void onMessage(String message) {
+                //System.out.println(message);
+
                 try {
                     final JSONObject jsonObject = new JSONObject(message);
 
-                    if(jsonObject.get("type").equals("speak")){
-                        JSONObject jsonObject1 = jsonObject.getJSONObject("data");
-                        String utterance = jsonObject1.get("utterance").toString();
-                        System.out.println("UTTERANCE: "+ utterance);
-                        //   mTTS.speak(utterance, TextToSpeech.QUEUE_FLUSH, null);
-                    }
-                    if (jsonObject.get("type").equals("loomoInstruction")){
-                        try {
-                            JSONObject jsonObject1 = jsonObject.getJSONObject("data");
-                            System.out.println(jsonObject1.toString());
-                            String action = jsonObject1.get("action").toString();
-                            String direction = jsonObject1.get("direction").toString();
-                            detectTurnDirection(direction);
-                            if (action.equals("turn")){
-                                detectTurnDirection(direction);
-                            }
-                            else if (action.equals("go to")){
-                                System.out.println("Going to, dummy function");
-                                // TODO. implement Dummy
-                            }
-                            else {
-                                System.out.println("No idea what to do");
-                                // TODO: implement action
-                            }
+                    if (jsonObject.get("type").equals("recognizer_loop:record_begin")) {
+                        MediaPlayer mPlayer = MediaPlayer.create(getApplicationContext(), R.raw.start_listening);
+                        mPlayer.start();
+                    } else if (jsonObject.get("type").equals("mycroft.skill.handler.start")) {
+                        JSONObject jsonData = jsonObject.getJSONObject("data");
+                        if (jsonData.get("name").equals("StopSkill.handle_stop")) {
+                            System.out.println("STOP");
+                            stop();
                         }
-                        catch (Throwable t){
+                    } else if (jsonObject.get("type").equals("loomoInstruction")) {
+                        try {
+                            JSONObject jsonData = jsonObject.getJSONObject("data");
+                            String action = jsonData.get("action").toString();
+                            mBase.setControlMode(Base.CONTROL_MODE_RAW);
+
+                            switch (action) {
+                                case "turn":
+                                    String direction = jsonData.get("direction").toString();
+                                    lastCommand = action + " " +direction;
+                                    detectTurnDirection(direction);
+                                    break;
+                                case "goPlace":
+                                    String destination = jsonData.get("destination").toString();
+                                    lastCommand = action;
+                                    goTo(destination);
+                                    break;
+                                case "getItem":
+                                    String item = jsonData.get("item").toString();
+                                    lastCommand = action;
+                                    getItem(item);
+                                    break;
+                                case "outofway":
+                                    lastCommand = action;
+                                    outofway();
+                                    break;
+                                case "comeback":
+                                    comeback(lastCommand);
+                                    lastCommand = "";
+                                    break;
+                                case "straight":
+                                    lastCommand = action;
+                                    goStraight();
+                                    break;
+                                default:
+                                    System.out.println("No idea what to do");
+                                    break;
+                            }
+                        } catch (Throwable t) {
                             System.out.println("Issue: " + t);
                         }
                     }
-                }
-                catch (Throwable t){
+                } catch (Throwable t) {
                     System.out.println("Malformed JSON");
                 }
 
             }
+
             @Override
-            public void onClose(int i, String s, boolean b){
+            public void onClose(int i, String s, boolean b) {
                 Log.i("WebSocket", "Closed" + s);
             }
 
             @Override
-            public void onError(Exception e){
-                Log.i("WebSocket", "Error "+ e.getMessage());
+            public void onError(Exception e) {
+                Log.i("WebSocket", "Error " + e.getMessage());
             }
         };
     }
 
-    private void startPlaying(){
+    private void comeback(String lastCommand){
+        System.out.println("last command is: " + lastCommand);
+        switch (lastCommand){
+            case "straight":
+                detectTurnDirection("around");
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                goStraight();
+                break;
+            case "outofway":
+                detectTurnDirection("around");
+                try {
+                    Thread.sleep(2000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                mBase.setLinearVelocity(1);
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                mBase.setLinearVelocity(0);
+                detectTurnDirection("left");
+                break;
+            case "getItem":
+                // can be empty, because robot should be back with the user
+                break;
+            case "goPlace":
+                detectTurnDirection("around");
+                try {
+                    Thread.sleep(2000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                mBase.setLinearVelocity(1);
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                mBase.setLinearVelocity(0);
+                break;
+            case "turn left":
+                detectTurnDirection("right");
+                break;
+            case "turn right":
+                detectTurnDirection("left");
+                break;
+            case "turn around":
+                detectTurnDirection("around");
+                break;
+            default:
+                break;
+        }
+        // set it to empty string
+        this.lastCommand = "";
+    }
+
+    private void goStraight(){
+        new Thread() {
+            @Override
+            public void run() {
+                mBase.setLinearVelocity(2);
+                try {
+                    Thread.sleep(600);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                mBase.setLinearVelocity(2);
+                try {
+                    Thread.sleep(600);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+               mBase.setLinearVelocity(0);
+            }
+        }.start();
+    }
+
+    private void stop() {
+        keepGoing = false;
+        mBase.setLinearVelocity(0);
+        mBase.setAngularVelocity(0);
 
     }
 
@@ -223,20 +308,9 @@ public class AudioRecordActivity extends AppCompatActivity {
         recordingInProgress.set(true);
         recordingThread = new Thread(new RecordingRunnable(), "Recording Thread");
         recordingThread.start();
+        startAudioProcessingServer();
     }
 
-    private void stopRecording() {
-        if (null == recorder) {
-            return;
-        }
-
-        recordingInProgress.set(false);
-
-        recorder.stop();
-        recorder.release();
-        recorder = null;
-        recordingThread = null;
-    }
 
     public void setUpLoomo() {
         // setup the base
@@ -271,8 +345,84 @@ public class AudioRecordActivity extends AppCompatActivity {
     }
 
 
+    public void goTo(String destination) {
+        new Thread() {
+            @Override
+            public void run() {
+                mBase.setLinearVelocity(1);
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                mBase.setLinearVelocity(0);
+            }
+        }.start();
+
+    }
+
+    public void outofway() {
+        new Thread() {
+            @Override
+            public void run() {
+                if (keepGoing) {
+                    detectTurnDirection("left");
+                    try {
+                        Thread.sleep(2000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+                if (keepGoing) {
+                    mBase.setLinearVelocity(1);
+                    try {
+                        Thread.sleep(2000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+                mBase.setLinearVelocity(0);
+                keepGoing = true;
+            }
+        }.start();
+    }
+
+    public void getItem(String item) {
+        new Thread() {
+            @Override
+            public void run() {
+                if (keepGoing) {
+                    mBase.setLinearVelocity(1);
+                    try {
+                        Thread.sleep(2000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+                if (keepGoing) {
+                    detectTurnDirection("around");
+                    try {
+                        Thread.sleep(2000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+                if (keepGoing) {
+                    mBase.setLinearVelocity(1);
+                    try {
+                        Thread.sleep(2000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+                mBase.setLinearVelocity(0);
+                mBase.setAngularVelocity(0);
+                keepGoing = true;
+            }
+        }.start();
+    }
+
     public void detectTurnDirection(String direction) {
-        mBase.setControlMode(Base.CONTROL_MODE_RAW);
         switch (direction) {
             case "left":
                 turn((float) 2.2);
@@ -281,21 +431,23 @@ public class AudioRecordActivity extends AppCompatActivity {
                 turn((float) -2.2);
                 break;
             case "around":
-                turn((float) 4.4);
+                turn((float) 4.9);
                 break;
             default:
                 break;
         }
     }
 
+
     public void turn(final float velocity) {
         new Thread() {
             @Override
             public void run() {
-                System.out.println(mHead.getHeadJointYaw());
-                mHead.setMode(Head.MODE_ORIENTATION_LOCK);
+
+                mBase.setLinearVelocity(0);
+                //mHead.setMode(Head.MODE_ORIENTATION_LOCK);
                 mBase.setAngularVelocity(velocity);
-                mHead.setYawAngularVelocity(velocity);
+                //mHead.setYawAngularVelocity(velocity);
                 try {
                     // sets for how long the robot is turning with that speed
                     Thread.sleep(1000);
@@ -304,27 +456,117 @@ public class AudioRecordActivity extends AppCompatActivity {
                 }
                 // make the robot stop
                 mBase.setAngularVelocity(0);
-                mHead.setYawAngularVelocity(0);
-                mHead.setMode(Head.MODE_SMOOTH_TACKING);
+                //mHead.setYawAngularVelocity(0);
+                //  mHead.setMode(Head.MODE_SMOOTH_TACKING);
             }
         }.start();
     }
 
+    // TODO: funktioniert noch nicht
     public void initateDetect() {
-        //mDts.startDetectingPerson(mPersonDetectListener);
-        //DTSPerson person[] = mDts.detectPersons(3 * 1000 * 1000);
-        //System.out.println("PErsons: " + person.length);
-        //    mVisionBindStateListener.onBind();
-        if (isVisionBind) {
-            Person[] persons = mDts.detectPersons(3 * 1000 * 1000);
-            System.out.println("PErsoons: " + persons.length);
-            if (persons.length > 0){
-                turn(2);
-                turn(-4);
-                turn(2);
+        new Thread() {
+            @Override
+            public void run() {
+                //mDts.startDetectingPerson(mPersonDetectListener);
+                //DTSPerson person[] = mDts.detectPersons(3 * 1000 * 1000);
+                //System.out.println("PErsons: " + person.length);
+                //    mVisionBindStateListener.onBind();
+                DTS dts = mVision.getDTS();
+                dts.setVideoSource(DTS.VideoSource.CAMERA);
+                dts.start();
+                Person[] persons = dts.detectPersons(3 * 1000 * 1000);
+                if (persons.length > 0) {
+                    mplayer = MediaPlayer.create(getApplicationContext(), R.raw.start_listening);
+                    mplayer.start();
+                }
+
+                /*
+                if (isVisionBind) {
+                    Person[] persons = mDts.detectPersons(3 * 1000 * 1000);
+                    System.out.println("PErsoons: " + persons.length);
+                    // TODO: Datenstruktur wie für eine utterance, nur so, dass das system denkt, es wurde eine utterance gesprochen
+                    //mWebSocketClient.send("{\"loomo\": \"personDetect\"}");
+                    if (persons.length > 0){
+                        mplayer = MediaPlayer.create(getApplicationContext(), R.raw.beep);
+                        mplayer.start();
+                    }
+                } else {
+                    System.out.println("not bound");
+                }*/
             }
-        } else {
-            System.out.println("not bound");
+        }.start();
+
+    }
+
+
+    public void startAudioProcessingServer() {
+        final ExecutorService clientProcessingPool = Executors.newFixedThreadPool(10);
+
+        Runnable serverTask = new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    ServerSocket serverSocket = new ServerSocket(65433);
+                    System.out.println("Created socket. Listening....");
+
+                    while (true) {
+                        Socket clientSocket = serverSocket.accept();
+                        clientProcessingPool.submit(new ClientTask((clientSocket)));
+                    }
+                } catch (IOException e) {
+                    System.out.println("Unable to process client reuqest");
+                    e.printStackTrace();
+                }
+
+            }
+        };
+        Thread serverThread = new Thread(serverTask);
+        serverThread.start();
+    }
+
+    private class ClientTask implements Runnable {
+
+
+        private final Socket clientSocket;
+        MediaPlayer mediaPlayer;
+
+        private ClientTask(Socket clientSocket) {
+            this.clientSocket = clientSocket;
+
+        }
+
+        @Override
+        public void run() {
+            System.out.println("Got a client");
+
+            File file = new File(getCacheDir(), "cachedAudio.wav");
+            try (OutputStream output = new FileOutputStream(file)) {
+                DataInputStream dataInputStream = new DataInputStream(clientSocket.getInputStream());
+                byte[] buffer = new byte[4 * 1024];
+                int read;
+                while ((read = dataInputStream.read(buffer)) != -1) {
+                    output.write(buffer, 0, read);
+                }
+                String path = getCacheDir().getPath().concat("/cachedAudio.wav");
+                // TODO: suspend/pause recording thread while playing
+                mediaPlayer = new MediaPlayer();
+                mediaPlayer.setDataSource(path);
+                mediaPlayer.prepare();
+                // pause micro recording while playing -> allows confirmation
+                audioManager.setMicrophoneMute(true);
+                mediaPlayer.start();
+                // activate micro when audio finished played
+                audioManager.setMicrophoneMute(false);
+                output.flush();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            try {
+                System.out.println("closing connecting");
+                clientSocket.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -337,9 +579,9 @@ public class AudioRecordActivity extends AppCompatActivity {
                 DataOutputStream dataOutputStream = new DataOutputStream(s.getOutputStream());
                 dataOutputStream.write("Connected to mic".getBytes());
                 final ByteBuffer buffer = ByteBuffer.allocateDirect(BUFFER_SIZE);
-                while (recordingInProgress.get()){
+                while (recordingInProgress.get()) {
                     int result = recorder.read(buffer, BUFFER_SIZE);
-                    if (result < 0){
+                    if (result < 0) {
                         throw new RuntimeException("Reading of audio buffer failed" +
                                 getBufferReadFailureReason(result));
                     }
@@ -347,8 +589,7 @@ public class AudioRecordActivity extends AppCompatActivity {
                     buffer.clear();
                 }
                 s.close();
-            }
-            catch (IOException e){
+            } catch (IOException e) {
                 e.printStackTrace();
             }
 

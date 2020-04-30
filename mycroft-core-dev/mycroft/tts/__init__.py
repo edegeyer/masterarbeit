@@ -17,7 +17,9 @@ import os
 import random
 import re
 import wave
+import time as t
 import sys
+import contextlib
 from abc import ABCMeta, abstractmethod
 from threading import Thread
 from time import time, sleep
@@ -35,14 +37,9 @@ from mycroft.util import (
 )
 from mycroft.util.log import LOG
 from queue import Queue, Empty
-import socket
-import pyaudio
-import threading
-import subprocess
 import mycroft.fileOpener as fileOpener
-
-#myHOST = '192.168.0.109'  # Standard loopback interface address (localhost)
-myHost = '192.168.178.31'
+myHOST = '192.168.43.138'#0.109'  # Standard loopback interface address (localhost)
+#myHost = '192.168.178.31'
 myPORT = 65432  # Port to listen on (non-privileged ports are > 1023)
 audioPort = 65433 # Port to send audio to client
 
@@ -70,7 +67,7 @@ class PlaybackThread(Thread):
         self.queue = queue
         self._terminated = False
         self._processing_queue = False
-        self.fileOpener = fileOpener.fileOpener()
+        self.fo = fileOpener.fileOpener()
 
 
     def init(self, tts, bus):
@@ -102,18 +99,17 @@ class PlaybackThread(Thread):
                     self._processing_queue = True
                     self.tts.begin_audio()
                 stopwatch = Stopwatch()
-                # TODO: hier die daten verschicken
-                self.fileOpener.openFile(data, self.bus)
-                self.bus.emit(Message(
-                    "PLAYBACK1",
-                    {'action': "heiha"}))
+                self.fo.openFile(data)
                 with stopwatch:
                     if snd_type == 'wav':
-                        self.bus.emit(Message(
-                            "PLAYBACK1",
-                            {'action': data}))
-                        # TODO: öffnen der dateien funktioniert noch nicht
-                        self.p = play_wav(data, self.bus)
+                        with contextlib.closing(wave.open(data, "r")) as f:
+                            frames = f.getnframes()
+                            rate  = f.getframerate()
+                            duration = frames/float(rate)
+                            print("DURATION ", duration)
+                            t.sleep(duration)
+                        #self.p = play_wav(data)
+                        pass
                     elif snd_type == 'mp3':
                         self.p = play_mp3(data)
 
@@ -243,7 +239,7 @@ class TTS(metaclass=ABCMeta):
             bus:    Mycroft messagebus connection
         """
         self.bus = bus
-        self.playback.init(self, bus=bus)
+        self.playback.init(self, bus=self.bus)
         self.enclosure = EnclosureAPI(self.bus)
         self.playback.enclosure = self.enclosure
 

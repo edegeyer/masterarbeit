@@ -1,0 +1,36 @@
+Studie:
+
+Unterweisung:
+    - Ziel ist eine Interaktion mit Loomo auf Basis von gesprochener, natürlicher Sprache
+    - dabei auch Fokus auf Datenschutz -> Einsatz von OpenSoure Sprachassistent mit der Möglichkeit, die alle Daten auf eigener Infrastruktur zu verarbeiten
+    - möglicher Anwendungsfall: Einsatz als Assistent für körperlich eingeschränkte Personen -> Helfer um Dinge zu holen etc
+    - gezeigt werden soll die Funktionsfähigkeit eines solchen Konzepts mit Loomo -> vorliegende Software ist ein Prototyp -> Funktionen zum Teil nur     Dummyfunktionen -> simulieren entsprechendes Verhalten
+    - Untersuchung soll zeigen, ob Interkation sich natürlich anfühlt & ohne weitere Vorkenntnisse funktioniert
+    - dabei ist es ausdrücklich gewünscht, dass laut gedacht wird -> sowohl negativ als auch positiv
+    - im Anschluss an die Aufgaben: zuerst ein kurzer Fragebogen und dann noch ein kurzes persönliches Gespräch
+    - Interkation ist auf Englisch beschränkt, da die Software (Mycroft) noch in der Entwicklung befindlich ist
+    - Gerät reagiert auf den Namen "Christopher"
+    
+    
+Aufgaben:
+    - Roboter nach links/rechts drehen lassen
+    - Roboter zur Küche fahren lassen
+    - dafür sorgen, dass der Roboter wieder zurück kommt -> bedeutet, dass einmal turn around & go to benötigt werden -> nutzer soll das selber herausfinden
+        -> benötigt noch einen Skill, der come to me hat -> sollte durch eine Erweiterung von go to kein Problem sein
+    - Roboter Tee besorgen lassen -> hier soll das falsche verstehen durch den Roboter provoziert werden (meist kommt get tea zu getty, eventuell lässt sich das Vokabular noch zu "get black tea" oder änhlichem anpassen
+    - Roboter Wasser/Milch besorgen lassen
+    - Szenario: Roboter besorgt Item A, zwischendrin ändert sich aber der Wille des Nutzers -> Roboter stoppen lassen
+    - davon ausgehen, dass der Roboter im Weg steht und ihn aus dem Weg fahren lassen "out of my way" o.ä.
+    - falls Funktionsfähig: die Personenerkennung testen
+    
+    - hier noch den Vergleich von Mimic i & Mimic II durchführen?
+    
+Auswertung:
+    - zuerst den Fragebogen ausfüllen lassen
+    - danach Gerspräch suchen -> auch basierend auf den Lautstark geäußerten Gedanken
+    
+    Fokus dabei:
+        - wird selber ein Sprachassistent genutzt -> warum ja/nein?
+        - würde es helfen, wenn Datenschutz garantiert werden kann?
+        - was ist die eigene Meinung zu der Interaktion -> warum war das Gefühl so?
+        - Welche der beiden Stimmen fühlte sich besser an? Und warum?

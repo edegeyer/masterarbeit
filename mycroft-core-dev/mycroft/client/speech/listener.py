@@ -40,14 +40,6 @@ STREAM_START = 1
 STREAM_DATA = 2
 STREAM_STOP = 3
 
-import pyaudio
-import socket
-import threading
-
-myHOST = '192.168.0.109'  # Standard loopback interface address (localhost)
-myPORT = 65432  # Port to listen on (non-privileged ports are > 1023)
-audioPort = 65433 # Port to send audio to client
-
 
 class AudioStreamHandler(object):
     def __init__(self, queue):
@@ -80,57 +72,9 @@ class AudioProducer(Thread):
         self.emitter = emitter
         self.stream_handler = stream_handler
         self.isStreaming = False
-        self.server = mycroft.socketServer.socketServer()
-        self.server.start()
-        #thread = threading.Thread(target=self.createListener)
-        #audioThread = threading.Thread(target=self.audioWriter())
-        #thread.daemon = True
-        #audioThread.daemon = True
-        #thread.start()
-        #audioThread.start()
+        self.micServer = mycroft.socketServer.socketServer()
+        self.micServer.start()
 
-
-
-    def audioWriter(self):
-        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        s.bind((myHOST, audioPort))
-        print("created audio output socket at: ", socket.gethostname(), " ", audioPort)
-        s.listen(1)
-        print("now listetning on auidosocket")
-        while True:
-            conn, addr = s.accept()
-            print("Connected to: ", addr)
-            while True:
-                data = conn.recv(1024)
-                print("sending data")
-                conn.send(b'in the audio stream')
-
-
-    def createListener(self):
-        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        s.bind((myHOST, myPORT))
-        p = pyaudio.PyAudio()
-        audiostream = p.open(format=pyaudio.paInt16, channels=1, rate=16000, output=True)
-        #audiostream = self.audio.open(format=pyaudio.paInt16, channels=1, rate=16000, input=True)
-
-        print("created socket at: ", socket.gethostname(), " ", myPORT)
-        s.listen(1)
-        print("now listening...")
-        while True:
-            conn, addr = s.accept()
-            #self.print_lock.acquire()
-            print("Connected to: ", addr)
-            self.isStreaming = True
-            while True:
-                data = conn.recv(7168)
-                audiostream.write(data)
-                if not data:
-                    print("Bye")
-                    self.isStreaming = False
-                    break
-                elif data == 'killsrv':
-                    conn.close()
-                    sys.exit()
 
     def run(self):
         with self.mic as source:

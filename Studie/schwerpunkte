@@ -1,0 +1,117 @@
+Untersuchungspunkte:
+
+- Wichtigkeit Symbol, dass Gerät zuhört
+        -> Audio?
+        -> Grafisch?
+        
+- Stimme:
+    - werden Mimic und Mimc II verschieden wahrgenommen
+    - wenn ja: hat es einen Einfluss auf die Nutzerempfindung?
+    
+    
+irgendeine Fragen im Bezug auf Assistenzroboter stelln -> im qualitativen Teil
+    
+Fragebogen auf Englisch -> da Interaktion mit dem Roboter auf Englisch kann von entsprechenden Wissen ausgeganen werden -> mündliche Befragung dann auf Deutsch    
+    
+Durchführung:
+1. Kurze Unterweisung der Nutzer:
+    was ist das Ziel -> prototypische Umsetzung -> einige Funktionen sind nur Dummy mäßig implementiert
+    wofür könnte das System später genutzt werden
+    wie kann mit dem Gerät kommuniziert werden -> Weckwort (wie lautet dieses?) & auf welcher Sprache ist zu kommunizieren -> Englisch
+    Beschreibung des Ablaufs: 1. einige kleine Aufgaben
+                              2. Fragebogen zu den Aufgaben (quantitative Antworten)
+                              3. kurzes Gespräch über die Erfahrung (qualitativ)
+    Lautes Denken ist generell erwünscht -> erlaubt dann auch Fragen zu stellen, die sich auf die persönlichen Eindrücke beziehen
+    
+2. Aufgaben:
+    - Roboter nach links/rechts drehen lassen
+    - Roboter zur Küche fahren lassen
+    - dafür sorgen, dass der Roboter wieder zurück kommt -> bedeutet, dass einmal turn around & go to benötigt werden -> nutzer soll das selber herausfinden
+        -> benötigt noch einen Skill, der come to me hat -> sollte durch eine Erweiterung von go to kein Problem sein
+    - Roboter Tee besorgen lassen -> hier soll das falsche verstehen durch den Roboter provoziert werden (meist kommt get tea zu getty, eventuell lässt sich das Vokabular noch zu "get black tea" oder änhlichem anpassen
+    - Roboter Wasser/Milch besorgen lassen
+    - Szenario: Roboter besorgt Item A, zwischendrin ändert sich aber der Wille des Nutzers -> Roboter stoppen lassen
+    - davon ausgehen, dass der Roboter im Weg steht und ihn aus dem Weg fahren lassen "out of my way" o.ä.
+    - falls Funktionsfähig: die Personenerkennung testen
+    
+    - hier noch den Vergleich von Mimic i & Mimic II durchführen?
+    
+    -> Nutzer weiß zu Beginn nur, was das Weckwort ist und bekommt die Aufgaben allgemein gestellt -> Herausforderung ist somit zugleich, die entsprechenden Befehle selber herauszufinden
+    
+3. quantitative Auswertung:
+    - Nutzung von SUS (oder anderes) -> allgemeine Vergleichbarkeit herstellen
+    - außerdem noch um einige eigene Fragen erweitern -> wichtig hierbei, dass diese Fragen einfach auf einer Skala eintragbar sind
+    - auch für die Vergleichbarkeit Fragen stellen wie: Alter, Geschlecht, Schulabschluss, damit anschließend eine Einordnung vorgenommen werden kann
+    
+4. qualitative Auswertung:
+    - Nachfragen bezogen auf die Aufgaben  -> Nutzererfahrung
+                            
+    
+
+SUS sind 10 Fragen mit denen dann Score ausgerechnet werden kann
+Kurzfassung:
+1. würde regelmäßig nutzen
+2. unnötig komplex
+3. einfach zu nutzen
+4. technische Unterstüzung nötig
+5. Funktionen gut integriert
+6. zu viele inkonsistenzen im System
+7. für meiste Personen schnelles erlernen des Umgangs mit System
+8. unhandliche Nutzung
+9. sicher gefühlt bei Nutzung
+10. musste viel Lernen
+
+Erweiterung im Bezug uaf Sprachassistenten:
+
+11. Ich fand die gesprochenen Antworten des Systems klar und natürlich
+12. Das System hat immer schnell auf meine Anfragen reagiert.
+13. Das System hatte keine Probleme, meine Anfragen richtig zu verstehen
+14. Die Interaktion fühlte sich für mich natürlich an
+15. Das Weckwort war einfch zu gebrauchen
+16. Die Verzögerung bis zu den Antworten war störend
+17. Ich nutze bereits einen Sprachassistenten in einem anderen Zusammenhang
+18. Generell lege ich viel Wert auf Datenschutz
+19.
+20. 
+
+
+Persönlich:
+Alter: <18; 18-23; 24-30; 31-40; 41-50; 51-60; 61-70
+höchster Abschluss: keiner; mittlere Reife, Ausbildung, Abi, Bachelor, Master
+Tätigkeit: Schüler, Student, arbeitslos, selbständig, angestellt
+Technikaffinität (selbsteinschätzung)
+
+qualitativ:
+Fragen zur Einstellung gegenüber Sprachassistenten -> selber Nutzung, warum ja/nein
+Datenschutzbedenken? -> möglich, das System zu nutzen, wenn dies e ausgeräumt sind?
+Meinung zur Interaktion -> wieso war das Gefühl, so wie es ist
+Welche Stimme fühlte sich besser für die Interaktion an -> Mimic I oder II -> hatte das Geschlecht einen Einfluss
+Ich hatte das Gefühl, mit einem unausgefeiften System zu interagieren
+
+
+hypothese für die Untersuchung: 
+"Die Nutzung des Systems ist für den Nutzer intuitiv und fühlt sich natürlich an"
+
+Subhypothese:
+    "Ein stärkerer Fokus auf den Datenschutz überzeugt auch Nutzer, die bislang keinen Sprachassistenten verwenden"
+    "Die Stimme & Latenz der Antworten durch das System tragen maßgeblich zum Gefühl der Natürlichkeit bei"
+    
+    
+    
+Probanden: -> sollte sich auf 12 beschränken, da ansonsten zu hoher Zeitaufwand
+1. Tom
+2. Kriss
+3. Konny
+4. Shauna
+5. Ellie?
+6. George?
+7. Vati
+8. Mutti
+9. Paula
+10. Thomas?
+11. Sinthu?
+12. Konsti?
+13. Olli?
+14. Jonas?
+15. Johannes?
+16. Max? 

@@ -61,6 +61,7 @@ class WebsocketEventHandler(tornado.websocket.WebSocketHandler):
     def on_close(self):
         client_connections.remove(self)
 
+
     def emit(self, channel_message):
         if (hasattr(channel_message, 'serialize') and
                 callable(getattr(channel_message, 'serialize'))):

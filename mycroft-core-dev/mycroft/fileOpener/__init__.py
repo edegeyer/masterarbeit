@@ -1,28 +1,20 @@
-from mycroft.messagebus.message import Message
+# class that's used to open the local wave file, that's generated as spoken answer
+
+import socket
 
 class fileOpener():
     def __init__(self):
-        self.fileLocation = '/home/martin/Desktop/masterarbeit/sampleAudio/turnLeft.wav'
+        pass
 
-    def openFile(self, uri, bus):
-        chunk = 2048
-        f = open(self.fileLocation, "rb")
-        while True:
-            piece = f.read(chunk)
-            print(piece)
-            stringPiece = str(piece)
-            bus.emit(Message(
-                "Audio",
-                {'action': stringPiece}))
-            if piece == b'':
-                bus.emit(Message(
-                    "Audio",
-                    {'action': "end"}))
-                break
+    def openFile(self, uri):
+        # TODO: set the IP to the one that's currently used by Loomo (find it by accessing Loomo's settings)
+        LoomoIP = "192.168.43.52"
+        LoomoPort = 65433
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
 
-        #print(f.read())
-
-        #bus.emit(Message )
-        #print("uri is: ", uri)
-        # TODO: einfaches emit auf bus
+            s.connect((LoomoIP, LoomoPort))
+            with open (uri, 'rb') as f:
+                message = f.read()
+                s.sendall(message)
+            s.close()
 

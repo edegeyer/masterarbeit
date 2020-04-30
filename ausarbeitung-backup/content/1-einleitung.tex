@@ -1,0 +1,41 @@
+% !TEX root = ../thesis-example.tex
+%
+\chapter{Einleitung}
+\label{sec:einleitung}
+
+Die aktuelle Entwicklung der Technik weist klar die Tendenz auf, dass in immer mehr Bereichen des Alltags Roboter zum Einsatz kommen. Diese können zunehmend mehr Aufgaben des täglichen Lebens übernehmen und entwickeln sich somit zu echten Assistenzrobotern. Jedoch variieren die Aufgaben, die sich stellen, mit jedem Tag. So ist es nicht ausreichend, dass diese Roboter zu vorgegebenen Zeiten die immer gleichen Tätigkeiten durchführen. Vielmehr müssen sie mit dem Nutzer interagieren und flexibel auf die Anforderungen reagieren. Eine solche Interaktion lässt sich beispielsweise über gesprochen Sprache umsetzen. Jedoch ist es dafür notwendig, dass die gesprochenen Befehle durch die Maschine korrekt erkannt werden. \\
+Aktuell sind große Unternehmen bereits damit beschäftigt, Sprachassistenten zu erstellen. Zu diesen gehört beispielsweise Amazon Alexa oder Google Assistant, welche bereits in zahlreichen Produkten der Hersteller zum Einsatz kommen. An dieser Stelle stellen sicher aber immer auch datenschutzrechtliche Bedenken, da mittels dieser Helfer prinzipiell jedes Geräusch in der Umgebung mitgeschnitten werden kann. Für europäische Nutzer ist auf den ersten Blick auch nicht zu erkennen, welche Gesetze für die Datenverarbeitung zur Geltung kommen, da die großen IT Konzerne ihren Sitz häufig in den USA haben und dortige Gesetze durchaus von den europäischen abweichen So berichtet Pfeifle \cite{pfeifle2018alexa} darüber, dass Strafverfolgungsbehörden in den USA Zugriff auf Aufzeichnungen erhalten haben, die von Alexa erstellt wurden. Dies ist ohne die Zustimmung durch den Nutzer geschehen. \\
+Für die Verarbeitung einer Nutzereingabe durch kommerzielle Anbieter wird diese an eine Cloud geschickt. Dabei handelt es sich zumeist um unternehmenseigene Infrastruktur, von welcher das Ergebnis danach wieder zurück an den Nutzer geschickt wird. Da die physikalische Lage dieser Rechenzentren für den Nutzer nicht bekannt ist, kann auch nicht eindeutig festgestellt werden, auf welcher Gesetzesgrundlage die Datenverarbeitung durchgeführt wird. Des Weiteren stellt Pfeifle \cite{pfeifle2018alexa} heraus, dass durch Alexa erzeugte Aufzeichnungen mindestens teilweise gespeichert werden und für weiteres Training verwendet werden. Auch wird in verschiedenen Medien immer wieder über neue Probleme berichtet. So wurde im April 2019 aufgedeckt, dass sich Amazon Mitarbeiter die Aufzeichnungen der Geräte anhören, um diese dann für die Verbesserung der Geräte zu verwenden. Darüber wurden die Nutzer zu keinem Zeitpunkt informiert und teilweise können dadurch Dritte an sensible Informationen gelangen \footnote{https://www.spiegel.de/netzwelt/gadgets/
+amazon-mitarbeiter-hoeren-sich-tausende-privatgespraeche-mit-alexa-an-a-1262315 [Abgerufen am 20.04.2019]}. Andere Recherchen haben auch ergeben, dass andere Hersteller, zumindest bislang, ähnlich verfahren sind. Berichten aus dem Sommer 2019 zu Folge ist Apple auf ähnliche Art und Weise vorgegangen \footnote{https://www.golem.de/news/datenschutz-apple-hoert-durch-siri-drogengeschaefte-und-sex-mit-1907-142817.html [Abgerufen am 28.07.2019] }. \\
+Die Vermutung, dass solche Vorgänge für Verunsicherung bei Nutzern sorgen kann, wird durch Lau et al. \cite{lau2018alexa} bestätigt. So stellen sie fest, dass besonders Personen, die keinen Sprachassistenten besitzen, große Bedenken bezüglich der Privatsphäre haben. Zeitgleich sind die Nutzer solcher Systeme stark darauf angewiesen, den Herstellern zu vertrauen. \\
+Da sich insbesondere  sprachgesteuerte Assistenzroboter stark für die Unterstützung älterer Menschen eignen, ist diesem Punkt große Bedeutung zu zumessen. Denn gerade ältere Menschen nutzen das Internet im allgemeinen nur selten, wie die Initiative D21 in ihrem jährlichen Lagebild zur digitalen Gesellschaft 2018/19 erläutert \cite{d21}. Entsprechend selten verwendet diese Nutzergruppe auch Sprachassistenzsysteme. Aus diesen Gründen ist es notwendig, Bedenken bezüglich des Datenschutzes aus dem Weg zu räumen, um eine hohe Akzeptanz des Systems Sprachassistent-Assistenzroboter  zu erzielen. \\ 
+Aus diesem Grund eigenen sich besonders digitale Assistenten, die ihren Fokus auf den Datenschutz legen. Dies realisieren beispielsweise das OpenSource Projekt \textit{Mycroft.ai} oder das teilweise quelloffene System \textit{Snips.ai}. Im Rahmen dieser Arbeit sollen dabei mögliche Einsatzszenarien eines Sprachassistenten in Zusammenarbeit mit einem Assistenzroboters betrachtet werden. Dafür wird zunächst die Architektur und Funktionsweise von Sprachassistenzsytemen untersucht werden. Auf dieser Betrachtungen wird dann ein Konzept erstellt, welches auch prototypisch umgesetzt wird. Dieser Prototyp wird abschließen auf seine Praxistauglichkeit untersucht.
+
+
+\section{Ziele}
+\label{sec:einleitung:ziele}
+
+Hauptziel dieser Arbeit ist es, ein Konzept zu entwickeln, mit dem die Interaktion von Mensch und Roboter mittels natürlicher, gesprochener Sprache möglich ist. Diese Interaktion soll auch für Menschen mit beschränktem technischen Verständnis oder motorischen Einschränkungen möglich sein, so dass dieses Konzept universell verwendbar ist. \\
+Dafür ist es nötig, eine Sprachassistenzsoftware zu identifizieren, die für diese Interaktion gut geeignet ist und zeitgleich den Schutz der Privatssphäre berücksichtigt.  Außerdem bedarf es einer prototypischen Umsetzung des Konzepts, um zu zeigen, dass dieses funktionsfähig ist.
+
+\section{Aufbau der Arbeit}
+\label{sec:einleitung:aufbau}
+
+\textbf{Kapitel \ref{sec:analyse}} \\[0.2em]
+Dieses Kapitel beschäftigt sich mit der allgemeinen Architektur von Sprachassistenzsystemen. Außerdem werden drei verschiedene Systeme (Mycroft AI, Snips AI, Amazon Alexa) genauer darauf untersucht, wie sie die Architektur umsetzen und welche Besonderheiten sie aufweisen. Des weiteren wird die aktuelle Datenschutzsituation anhand der \ac{DSGVO}  betrachtet. Zusätzlich werden Bedrohungen des Datenschutzes durch Angriffe auf Sprachassistenten analysiert und wie die Hersteller der Systeme diesen vorbeugen.
+
+\textbf{Kapitel \ref{sec:einsatzszenarien}} \\[0.2em]
+Im Fokus dieses Kapitels stehen Assistenzroboter. Dabei wird betrachtet, welche Einsatzmöglichkeiten es für solche Roboter gibt. Außerdem wird die allgemeine Architektur dieser Roboter beleuchtet. Ein weiterer Betrachtungspunkt ist die Funktionsweise der Mensch-Roboter Interaktion.
+
+
+\textbf{Kapitel \ref{sec:konzept}} \\[0.2em]
+Für die Erstellung eines Einsatzkonzepts für Assistenzroboter ist es zunächst nötig, geeignete Einsatzszenarien zu analysieren. Auf Basis dieser können dann daraus resultierenden Anforderungen formuliert werden. Diese stellen die Grundlage für die Auswahl eines passenden Sprachassistenzsystems dar. Um die Anforderungen bestmöglich zu erfüllen, werden im Anschluss die passenden Bestandteile des Sprachassistenten für die einzelnen Verarbeitungsschritte gewählt. Anhand dieser Ergebnisse wird danach ein Konzept für den Einsatz des Sprachassistenten gemeinsam mit Assistenzrobotern erstellt.
+
+\textbf{Kapitel \ref{sec:umsetzung}} \\[0.2em]
+Um das Konzept auf seine Funktionsfähigkeit in der Realität überprüfen zu können, ist es nötig, dass dieses in Form eines Prototypen umgesetzt wird. Dabei wird in diesem Kapitel betrachtet, was im Zusammenhang mit dem verwendeten Roboter zu beachten ist. Außerdem wird beschrieben, wie die Funktionalität des Konzepts mit Mycroft erzielt werden kann und wie das Zusammenspiel zwischen den beiden Systemen funktioniert. Dafür wird auch die Systemarchitektur genauer betrachtet.
+
+\textbf{Kapitel \ref{sec:eva}} \\[0.2em]
+Um eine Bewertung des Konzepts mittels des Prototypens vorzunehmen, muss dieser von Versuchspersonen getestet werden. Diese Tests werden in diesem Kapitel im Rahmen einer Pilotstudie vorgenommen. Dafür wird das Konzept sowie der Ablauf der Studie betrachtet und im Anschluss daran die Antworten der Teilnehmer analysiert. Auf der Basis dieser Analyse wird abschließend eine Bewertung des Konzepts vorgenommen.
+
+\textbf{Kapitel \ref{sec:fazit}} \\[0.2em]
+Zum Abschluss der Arbeit werden alle zuvor erlangten Erkenntnisse zusammengefasst. Außerdem wird ein Ausblick auf weitere Entwicklungsmöglichkeiten gegeben.
