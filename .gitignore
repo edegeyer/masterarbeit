@@ -31,6 +31,12 @@ proguard/
 # Android Studio captures folder
 captures/
 
+mycroft-core-dev/venv/
+
+skills/firstLoomoSkill/\.idea/
+
+\.idea/
+
 \.idea/
 
 mycroft-core-dev/\.venv/
